@@ -22,7 +22,7 @@
   "scripts": {
     "start": "node ./dist/app.js",
     "dev": "nodemon -L -e ts --exec \"npm run build && npm start\"",
-    "build": "tsc",
+    "build": "npm install && tsc",
     "typeorm": "typeorm-ts-node-commonjs"
   }
 }
