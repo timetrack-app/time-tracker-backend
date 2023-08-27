@@ -36,7 +36,7 @@ AppDataSource.initialize()
     // start express server
     app.listen(process.env.PORT, () => {
       console.log(
-        `Express server has started on port 3000. Open http://localhost:${process.env.PORT}/users to see results`
+        `Express server has started on port ${process.env.PORT}. Open http://localhost:${process.env.PORT}/users to see results`
       );
     });
   })

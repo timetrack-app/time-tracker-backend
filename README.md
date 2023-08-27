@@ -1,7 +1,3 @@
-# Awesome Project Build with TypeORM
+# Backend for Time-track app
 
-Steps to run this project:
-
-1. Run `npm i` command
-2. Setup database settings inside `data-source.ts` file
-3. Run `npm start` command
+https://time-tracker-4oaa.onrender.com
