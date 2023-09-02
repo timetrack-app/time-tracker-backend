@@ -1,79 +1,43 @@
-import { BeforeInsert, BeforeUpdate, Column, Entity, Index, PrimaryGeneratedColumn, ManyToOne, OneToOne, JoinColumn } from 'typeorm';
-import { IsEmail, validateOrReject } from 'class-validator';
-import { classToPlain, Exclude } from 'class-transformer';
-import { hashPassword, isPasswordMatch } from '../../../shared/utils/password.utils';
-import { CurrentStatus, UserRole, UserType } from '../../../shared/utils/enum';
-import { Restaurent } from '../../restaurent/entity/restaurent.entity';
-import { UserInfo } from './user-info.entity';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  OneToMany,
+  OneToOne,
+  JoinColumn,
+} from 'typeorm';
+import { WorkSession } from '../../workSession/entity/workSession.entity';
+import { UserEmailVerification } from './userEmailVerification.entity';
+import { Template } from '../../template/entity/template.entity';
 
-@Entity()
+@Entity('users')
 export class User {
-    @PrimaryGeneratedColumn()
-    @Exclude({ toPlainOnly: true })
-    id: number;
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @Column({ nullable: false, type: 'varchar' })
-    uuid: string;
+  @Column({ unique: true, nullable: false, type: 'varchar' })
+  email: string;
 
-    @Column({ nullable: false, type: 'varchar' })
-    @Index({ unique: true })
-    @IsEmail()
-    email: string;
+  @Column({ nullable: false, type: 'varchar' })
+  password: string;
 
-    @Column({ nullable: false, type: 'varchar' })
-    @Exclude({ toPlainOnly: true })
-    password: string;
+  @CreateDateColumn({ name: 'created_at' })
+  createdAt: Date;
 
-    @ManyToOne(
-        type => Restaurent,
-        restaurent => restaurent.user,
-        { eager: false }
-    )
-    restaurent: Restaurent;
-    
-    @OneToOne(
-        type => UserInfo,
-        { eager: true }
-    )
-    @JoinColumn()
-    user_info: UserInfo
+  @UpdateDateColumn({ name: 'updated_at' })
+  updatedAt: Date;
 
-    @Column({ 
-        type: 'enum',
-        enum: UserType,
-        default: UserType.VISITOR
-    })
-    user_type: string;
+  // Define the relations
 
-    @Column({
-        type: 'enum',
-        enum: UserRole,
-        default: UserRole.NONE
-    })
-    role: string;
+  @OneToMany(() => WorkSession, (workSession) => workSession.user)
+  workSessions: WorkSession[];
 
-    @Column({ 
-        type: 'enum', 
-        enum: CurrentStatus, 
-        default: CurrentStatus.ACTIVE 
-    })
-    current_status: string;
+  @OneToMany(() => Template, (template) => template.user)
+  templates: Template[];
 
-    toJSON() {
-        return classToPlain(this);
-    }
-
-    async doPasswordhashing(password: string): Promise<string> {
-        return await hashPassword(password);
-    }
-
-    async validatePassword(password: string, hashPassword: string): Promise<boolean> {
-        return await isPasswordMatch(hashPassword, password);
-    }
-
-    @BeforeInsert()
-    @BeforeUpdate()
-    async validate() {
-        await validateOrReject(this);
-    }
+  @OneToOne(() => UserEmailVerification)
+  @JoinColumn()
+  emailVerification: UserEmailVerification;
 }
