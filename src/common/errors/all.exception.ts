@@ -1,4 +1,4 @@
-import { httpStatusCode } from '../utils/types';
+import { httpStatusCode } from '../utils/httpStatus.utils';
 import { HttpException } from './http.exception';
 
 export class BadRequestException extends HttpException {
@@ -42,7 +42,7 @@ export class InternalServerErrorException extends HttpException {
 
 export class MethodNotAllowedException extends HttpException {
   constructor(description = 'Method Not Allowed') {
-    super('METHOD NOT ALLOWRD', httpStatusCode.methodNotAllowed, description);
+    super('METHOD NOT ALLOWED', httpStatusCode.methodNotAllowed, description);
   }
 }
 

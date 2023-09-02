@@ -1,12 +1,12 @@
-import { HttpStatusCode } from '../utils/types';
+import { HttpStatusCode, HttpStatusErrorName } from '../utils/httpStatus.utils';
 
 export class HttpException extends Error {
-  public readonly name: string;
+  public readonly name: HttpStatusErrorName;
   public readonly httpCode: HttpStatusCode;
   public readonly validationErrors?: any;
 
   constructor(
-    name: string,
+    name: HttpStatusErrorName,
     httpCode: HttpStatusCode,
     description: string,
     validationErrors?: any,

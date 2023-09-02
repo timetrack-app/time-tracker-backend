@@ -2,7 +2,10 @@ import express, { Request, Response, NextFunction } from 'express';
 
 import { InversifyExpressServer } from 'inversify-express-utils';
 import container from './core/container.core';
-import { HttpStatusCode, httpStatusCode } from './common/utils/types';
+import {
+  HttpStatusCode,
+  httpStatusCode,
+} from './common/utils/httpStatus.utils';
 import {
   BadRequestException,
   NotFoundException,
