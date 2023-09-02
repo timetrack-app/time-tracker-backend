@@ -6,7 +6,7 @@ import { DatabaseService } from './service/database.service';
 import { IDatabaseService } from './interface/IDatabase.service';
 
 /* Shared Service Import */
-import { Logger } from '../shared/services/logger.service';
+import { Logger } from '../common/services/logger.service';
 
 /* All Controller Import */
 import '../modules/index.controller';
