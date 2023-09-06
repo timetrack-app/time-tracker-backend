@@ -12,7 +12,8 @@ export const appDataSource = new DataSource({
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
   synchronize: true,
-  entities: [__dirname + '/modules/**/entity/*.entity{.ts,.js}'],
-  migrations: [__dirname + '/migrations/**/*{.ts,.js}'],
+  entities: ['src/modules/**/entity/*.entity{.ts,.js}'],
+  migrations: ['src/migrations/**/*{.ts,.js}'],
   migrationsTableName: 'timeTracker_app_migrations',
+  logging: ['query', 'error', 'schema'],
 });

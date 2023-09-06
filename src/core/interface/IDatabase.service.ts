@@ -1,5 +1,7 @@
-import { ObjectType, Repository } from "typeorm";
+import { ObjectType, Repository } from 'typeorm';
 
 export interface IDatabaseService {
-    getRepository(entity: ObjectType<any>): Promise<Repository<any>>;
+  getRepository<Entity>(
+    entity: ObjectType<Entity>,
+  ): Promise<Repository<Entity>>;
 }

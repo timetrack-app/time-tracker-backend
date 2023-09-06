@@ -1,7 +1,4 @@
-import { SignInCredentialsDto } from "./signin-credentials.dto";
-import { SignUpCredentialsDto } from "./signup-credentials.dto";
+import { AuthLoginDto } from './auth-login.dto';
+import { AuthRegisterDto } from './auth-register.dto';
 
-export {
-    SignInCredentialsDto,
-    SignUpCredentialsDto
-};
+export { AuthRegisterDto, AuthLoginDto };

@@ -1,15 +1,17 @@
-import { IsEmail, IsString, MinLength, MaxLength, IsOptional } from "class-validator";
-import { UserRole } from "../../../shared/utils/enum";
+import {
+  IsEmail,
+  IsString,
+  MinLength,
+  MaxLength,
+  IsOptional,
+} from 'class-validator';
 
 export class SignUpCredentialsDto {
-    @IsEmail()
-    email: string
+  @IsEmail()
+  email: string;
 
-    @IsString()
-    @MinLength(3)
-    @MaxLength(10)
-    password: string
-
-    @IsOptional()
-    role?: UserRole
+  @IsString()
+  @MinLength(3)
+  @MaxLength(10)
+  password: string;
 }

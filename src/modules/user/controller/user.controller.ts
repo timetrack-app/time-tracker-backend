@@ -6,17 +6,20 @@ import { IUserService } from '../interfaces/IUser.service';
 
 @controller('/users')
 export class UserController {
-    constructor(
-        @inject(TYPES.IUserService) private readonly userService: IUserService
-    ) {}
+  constructor(
+    @inject(TYPES.IUserService) private readonly userService: IUserService,
+  ) {}
 
-    @httpGet('/:uuid')
-    public async getUser(
-        @requestParam('uuid') uuid: string, req: Request, res: Response
-    ) {
-        const results = await this.userService.getUser(uuid);
-        return res.status(200).json({
-            'results': results
-        });
-    }
+  @httpGet('/:userId')
+  public async getUser(
+    @requestParam('userId') id: number,
+    req: Request,
+    res: Response,
+  ) {
+    const user = await this.userService.findOne(id);
+    const { email } = user;
+    return res.status(200).json({
+      email,
+    });
+  }
 }

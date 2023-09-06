@@ -1,5 +1,5 @@
 import express, { Request, Response, NextFunction } from 'express';
-
+import passport from 'passport';
 import { InversifyExpressServer } from 'inversify-express-utils';
 import container from './core/container.core';
 import {
@@ -16,11 +16,17 @@ import {
   MethodNotAllowedException,
   RequestTimeoutException,
 } from './common/errors/all.exception';
+import { PassportService } from './modules/passport/service/passport.service';
+import { TYPES } from './core/type.core';
+
+const passportConfig = container.get<PassportService>(TYPES.PassportService);
+passportConfig.init();
 
 export const server = new InversifyExpressServer(container);
 server.setConfig((app) => {
   app.use(express.urlencoded({ extended: true }));
   app.use(express.json());
+  app.use(passport.initialize());
 });
 
 const errorResponse = (

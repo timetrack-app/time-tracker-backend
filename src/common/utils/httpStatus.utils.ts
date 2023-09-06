@@ -10,6 +10,7 @@ export const httpStatusCode = {
   methodNotAllowed: 405,
   requestTimeOut: 408,
   conflict: 409,
+  validationError: 422,
   internalServerError: 500,
 } as const;
 
@@ -28,6 +29,7 @@ export const httpStatusName = {
   methodNotAllowed: 'METHOD NOT ALLOWED',
   requestTimeOut: 'REQUEST TIMEOUT',
   conflict: 'CONFLICT',
+  validationError: 'VALIDATION ERROR',
   internalServerError: 'INTERNAL SERVER ERROR',
 } as const;
 
