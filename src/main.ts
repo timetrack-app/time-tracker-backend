@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 import { server } from './server';
 
-const port: number = Number(process.env.PORT) || 3000;
+const port: number = Number(process.env.APP_PORT) || 3000;
 
 server
   .build()

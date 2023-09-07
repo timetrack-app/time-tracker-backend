@@ -1,26 +1,49 @@
-version: '3.8'
+version: '3'
 services:
-  api:
-    container_name: api
+  db:
+    container_name: timetrack-app-db
+    image: postgres
     restart: always
-    build: .
+    env_file:
+      - ./env/.env.dev
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+    networks:
+      - timetrack_app_api
+  pgamin:
+    container_name: timetracker-app-pgadmin4
+    image: dpage/pgadmin4
+    restart: always
+    env_file:
+      - ./env/.env.dev
     ports:
-      - ${PORT}:${PORT}
+      - '${WEBSERVER_PORT}:${PGADMIN_LISTEN_PORT}'
+    volumes:
+      - ./pgadmin-data:/var/lib/pgadmin # Named volumn in container
     depends_on:
       - db
+    networks:
+      - timetracker_app_api
+  dev:
+    container_name: timetrack-app-dev
+    image: timetrack-app-api
+    env_file:
+      - ./env/.env.dev
+    build:
+      context: .
+      dockerfile: ./dockerfiles/Dockerfile-dev
     volumes:
-      - .:/usr/src/app
-
-  db:
-    container_name: postgres
-    image: postgres
+      - .:/app # create volumn in current directory of container
+      - /app/node_modules # anonymus/unnamed volumn in container
     ports:
-      - '5433:${DB_PORT}'
-    volumes:
-      - data:/data/db
-    environment:
-      - POSTGRES_PASSWORD=${DB_PASSWORD}
-      - POSTGRES_DB=${DB_NAME}
-
+      - '${APP_PORT}:${APP_PORT}'
+    depends_on:
+      - db
+    restart: unless-stopped
+    networks:
+      - timetrack_app_api
+networks:
+  timetrack_app_api:
 volumes:
-  data: {}
+  pgdata:
+  pgadmin-data:

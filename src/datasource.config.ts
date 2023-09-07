@@ -4,16 +4,16 @@ import { config } from 'dotenv';
 
 config();
 
-export const appDataSource = new DataSource({
+const appDataSource = new DataSource({
   type: 'postgres',
-  host: process.env.DB_HOST,
-  port: parseInt(process.env.DB_PORT || '5432'),
-  username: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-  synchronize: true,
-  entities: ['src/modules/**/entity/*.entity{.ts,.js}'],
-  migrations: ['src/migrations/**/*{.ts,.js}'],
-  migrationsTableName: 'timeTracker_app_migrations',
-  logging: ['query', 'error', 'schema'],
+  host: process.env.POSTGRES_HOST,
+  port: Number(process.env.POSTGRES_PORT),
+  username: process.env.POSTGRES_USER,
+  password: process.env.POSTGRES_PASSWORD,
+  database: process.env.DATABASE_NAME,
+  entities: [__dirname + '/modules/**/entity/*.entity{.ts,.js}'],
+  migrations: [__dirname + '/migrations/**/*{.ts,.js}'],
+  migrationsTableName: 'timetrack_app_migrations',
 });
+
+export default appDataSource;
