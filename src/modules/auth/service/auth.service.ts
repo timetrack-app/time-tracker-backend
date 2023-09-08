@@ -9,24 +9,22 @@ import { AuthLoginDto, AuthRegisterDto } from '../dto/index.dto';
 import { IUserRepository } from '../../user/interfaces/IUser.repository';
 import {
   ConflictException,
+  InternalServerErrorException,
   ValidationErrorException,
 } from '../../../common/errors/all.exception';
-import { IUserService } from '../../user/interfaces/IUser.service';
 import { UserWithToken } from '../types/types';
 import { authConfig } from '../config/config';
+import { IUserService } from 'src/modules/user/interfaces/IUser.service';
 
 @injectable()
 export class AuthService implements IAuthService {
-  constructor(
-    @inject(TYPES.IUserRepository) private userRepository: IUserRepository,
-    @inject(TYPES.IUserService) private userService: IUserService,
-  ) {}
+  constructor(@inject(TYPES.IUserService) private userService: IUserService) {}
 
   async registerUser(registerDto: AuthRegisterDto): Promise<UserWithToken> {
     const { password, email } = registerDto;
 
     // check if the user with this email exists in the db
-    const userInDb = await this.userRepository.findOneByEmail(email);
+    const userInDb = await this.userService.findOneByEmail(email);
     if (userInDb) {
       throw new ConflictException('User with this email already exists.');
     }
@@ -36,7 +34,7 @@ export class AuthService implements IAuthService {
     const hashedPassword = await bcrypt.hash(password, salt);
 
     const newUser = { email, password: hashedPassword };
-    const user = await this.userRepository.create(newUser);
+    const user = await this.userService.createUser(newUser);
 
     const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET_KEY, {
       expiresIn: authConfig.jwtTokenExpiresIn,
@@ -51,7 +49,7 @@ export class AuthService implements IAuthService {
 
   async login(authLoginDto: AuthLoginDto): Promise<string> {
     const { email, password } = authLoginDto;
-    const user = await this.userRepository.findOneByEmail(email);
+    const user = await this.userService.findOneByEmail(email);
     if (!user) {
       throw new ValidationErrorException('Email is invalid.');
     }
@@ -65,7 +63,6 @@ export class AuthService implements IAuthService {
     const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET_KEY, {
       expiresIn: authConfig.jwtTokenExpiresIn,
     });
-
     return token;
   }
 }

@@ -14,32 +14,32 @@ export class PassportService {
   ) {}
 
   public init() {
-    passport.use(
-      'local-login',
-      new LocalStrategy(
-        {
-          usernameField: 'email', // The field used for username in the request body
-          passwordField: 'password', // The field used for password in the request body
-        },
-        async (email, password, done) => {
-          try {
-            // Find the user by email
-            const user = await this.userRepository.findOneByEmail(email);
-            // If the user doesn't exist or the password is incorrect, return an error
-            if (!user || !(await bcrypt.compare(password, user.password))) {
-              return done(null, false, {
-                message: 'Incorrect email or password',
-              });
-            }
+    // passport.use(
+    //   'local-login',
+    //   new LocalStrategy(
+    //     {
+    //       usernameField: 'email',
+    //       passwordField: 'password',
+    //     },
+    //     async (email, password, done) => {
+    //       try {
+    //         // Find the user by email
+    //         const user = await this.userRepository.findOneByEmail(email);
+    //         // If the user doesn't exist or the password is incorrect, return an error
+    //         if (!user || !(await bcrypt.compare(password, user.password))) {
+    //           return done(null, false, {
+    //             message: 'Incorrect email or password',
+    //           });
+    //         }
 
-            // If the user exists and the password is correct, return the user
-            return done(null, user);
-          } catch (error) {
-            return done(error);
-          }
-        },
-      ),
-    );
+    //         // If the user exists and the password is correct, return the user
+    //         return done(null, user);
+    //       } catch (error) {
+    //         return done(error);
+    //       }
+    //     },
+    //   ),
+    // );
 
     passport.use(
       'jwt',

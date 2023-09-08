@@ -57,9 +57,6 @@ export class AuthController {
     res: Response,
   ) {
     const token = await this.authService.login(body);
-    if (!token) {
-      throw new ValidationErrorException('User not found.');
-    }
 
     // Store the token in a cookie
     res.cookie(authConfig.jwtCookieName, token, {
