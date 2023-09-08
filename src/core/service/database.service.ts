@@ -1,3 +1,4 @@
+import { config } from 'dotenv';
 import { inject, injectable } from 'inversify';
 import { DataSource, ObjectType, Repository } from 'typeorm';
 import { TYPES } from '../type.core';
@@ -27,10 +28,10 @@ export class DatabaseService implements IDatabaseService {
     return DatabaseService.myDataSource;
   }
 
-  public async getRepository(
-    entity: ObjectType<any>,
-  ): Promise<Repository<any>> {
+  public async getRepository<Entity>(
+    entity: ObjectType<Entity>,
+  ): Promise<Repository<Entity>> {
     const connection = await this.getConnection();
-    return await connection?.getRepository(entity);
+    return await connection.getRepository(entity);
   }
 }

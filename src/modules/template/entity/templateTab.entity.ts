@@ -9,7 +9,7 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { Template } from './template.entity';
-import { TemplateList } from './templateList';
+import { TemplateList } from './templateList.entity';
 
 @Entity('template_tabs')
 export class TemplateTab {

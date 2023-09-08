@@ -1,10 +1,9 @@
-import 'reflect-metadata';
 import { DataSource } from 'typeorm';
 import { config } from 'dotenv';
 
 config();
 
-const appDataSource = new DataSource({
+export const appDataSource = new DataSource({
   type: 'postgres',
   host: process.env.POSTGRES_HOST,
   port: Number(process.env.POSTGRES_PORT),
@@ -15,5 +14,3 @@ const appDataSource = new DataSource({
   migrations: [__dirname + '/migrations/**/*{.ts,.js}'],
   migrationsTableName: 'timetrack_app_migrations',
 });
-
-export default appDataSource;
