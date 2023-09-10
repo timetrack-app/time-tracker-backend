@@ -3,7 +3,7 @@ import { TYPES } from '../../../core/type.core';
 import { IUserRepository } from '../interfaces/IUser.repository';
 import { User } from '../entity/user.entity';
 import { IUserService } from '../interfaces/IUser.service';
-import { CreateUserDto } from '../dto/create-user-dto';
+import { CreateUserDto } from '../dto/create-user.dto';
 import {
   InternalServerErrorException,
   NotFoundException,
@@ -40,6 +40,57 @@ export class UserService implements IUserService {
       const user = await this.userRepository.findOneByEmail(email);
       if (!user) throw new NotFoundException('user not found');
       return user;
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async updateUser(user: User, attrs: Partial<User>) {
+    Object.assign(user, attrs);
+    const updatedUser = this.userRepository.update(user);
+    return updatedUser;
+  }
+  catch(error) {
+    throw new InternalServerErrorException(error.message);
+  }
+
+  async updateById(id: number, attrs: Partial<User>) {
+    try {
+      const user = await this.findOneById(id);
+      if (!user) {
+        throw new NotFoundException('user not found');
+      }
+      Object.assign(user, attrs);
+      const updatedUser = this.userRepository.update(user);
+      return updatedUser;
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async updateByEmail(email: string, attrs: Partial<User>) {
+    try {
+      const user = await this.findOneByEmail(email);
+      if (!user) {
+        throw new NotFoundException('user not found');
+      }
+      Object.assign(user, attrs);
+      const updatedUser = this.userRepository.update(user);
+      return updatedUser;
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async verifyUserWithEmail(email: string): Promise<User> {
+    return await this.updateByEmail(email, { isVerified: true });
+  }
+
+  async updateEmail(id: number, newEmail: string) {
+    try {
+      const user = await this.findOneById(id);
+      const updatedUser = await this.updateUser(user, { email: newEmail });
+      // mailsending
     } catch (error) {
       throw new InternalServerErrorException(error.message);
     }

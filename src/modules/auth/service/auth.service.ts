@@ -1,26 +1,33 @@
 import jwt from 'jsonwebtoken';
 import { inject, injectable } from 'inversify';
-import { ParsedQs } from 'qs';
 import bcrypt from 'bcryptjs';
 
 import { TYPES } from '../../../core/type.core';
 import { IAuthService } from '../interfaces/IAuth.service';
-import { AuthLoginDto, AuthRegisterDto } from '../dto/index.dto';
-import { IUserRepository } from '../../user/interfaces/IUser.repository';
+import { AuthLoginDto } from '../dto/auth-login.dto';
+import { AuthRegisterDto } from '../dto/auth-register.dto';
 import {
   ConflictException,
-  InternalServerErrorException,
+  ForbiddenException,
   ValidationErrorException,
 } from '../../../common/errors/all.exception';
-import { UserWithToken } from '../types/types';
 import { authConfig } from '../config/config';
-import { IUserService } from 'src/modules/user/interfaces/IUser.service';
+import { IUserService } from '../../../modules/user/interfaces/IUser.service';
+import { IUserEmailVerificationService } from '../../../modules/userEmailVerification/interface/IUserEmailVerification.service';
+import { ISendEmailService } from '../../../modules/sendMail/interface/ISendEmail.service';
+import { User } from 'src/modules/user/entity/user.entity';
 
 @injectable()
 export class AuthService implements IAuthService {
-  constructor(@inject(TYPES.IUserService) private userService: IUserService) {}
+  constructor(
+    @inject(TYPES.IUserService) private userService: IUserService,
+    @inject(TYPES.IUserService)
+    private userEmailVerificationService: IUserEmailVerificationService,
+    @inject(TYPES.ISendEMailService)
+    private readonly sendEmailService: ISendEmailService,
+  ) {}
 
-  async registerUser(registerDto: AuthRegisterDto): Promise<UserWithToken> {
+  async registerUser(registerDto: AuthRegisterDto): Promise<void> {
     const { password, email } = registerDto;
 
     // check if the user with this email exists in the db
@@ -36,15 +43,19 @@ export class AuthService implements IAuthService {
     const newUser = { email, password: hashedPassword };
     const user = await this.userService.createUser(newUser);
 
+    // create a token, save the verification
+    const verificationToken =
+      await this.userEmailVerificationService.createVerificationToken(email);
+
+    // send verification email
+    await this.sendEmailService.sendVerificationEmail(email, verificationToken);
+  }
+
+  generateJWT(user: User) {
     const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET_KEY, {
       expiresIn: authConfig.jwtTokenExpiresIn,
     });
-
-    return { ...user, token };
-  }
-
-  emailVerification(token: string | ParsedQs | string[] | ParsedQs[]): void {
-    throw new Error('Method not implemented.');
+    return token;
   }
 
   async login(authLoginDto: AuthLoginDto): Promise<string> {
@@ -59,10 +70,15 @@ export class AuthService implements IAuthService {
       throw new ValidationErrorException('Password is incorrect.');
     }
 
-    // Generate a JWT token
-    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET_KEY, {
+    // if user hasn't completed email verification
+    if (!user.isVerified) {
+      throw new ForbiddenException('Email not verified');
+    }
+
+    // Generate new JWT
+    const newToken = jwt.sign({ userId: user.id }, process.env.JWT_SECRET_KEY, {
       expiresIn: authConfig.jwtTokenExpiresIn,
     });
-    return token;
+    return newToken;
   }
 }

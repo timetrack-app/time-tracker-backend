@@ -1,4 +1,4 @@
-import { CreateUserDto } from './../dto/create-user-dto';
+import { CreateUserDto } from '../dto/create-user.dto';
 import { inject, injectable } from 'inversify';
 import { TYPES } from '../../../core/type.core';
 import { User } from '../entity/user.entity';
@@ -19,29 +19,21 @@ export class UserRepository implements IUserRepository {
   }
 
   async findOneById(id: number): Promise<User | null> {
-    // try {
     const repo = await this.database.getRepository(User);
     const result = await repo.findOneBy({ id });
     return result;
-    // } catch (error: any) {
-    //   if (error instanceof NotFoundException)
-    //     throw new NotFoundException('User not found');
-    //   throw new InternalServerErrorException(`${error.message}`);
-    // }
   }
 
   async findOneByEmail(email: string): Promise<User | null> {
-    // try {
     const repo = await this.database.getRepository(User);
 
-    try {
-      const result = await repo.findOne({ where: { email } });
-      return result;
-    } catch (error: any) {
-      // if (error instanceof NotFoundException)
-      //   throw new NotFoundException('User not found');
-      // throw new InternalServerErrorException(`${error.message}`);
-      console.log(error);
-    }
+    const result = await repo.findOne({ where: { email } });
+    return result;
+  }
+
+  // receive already updated user data, and save it
+  async update(user: User): Promise<User> {
+    const repo = await this.database.getRepository(User);
+    return repo.save(user);
   }
 }

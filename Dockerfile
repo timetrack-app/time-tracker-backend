@@ -1,13 +1,10 @@
 # FROM node:14.18.2
 FROM node:16.13.1-alpine3.14
 
-ARG NODE_ENV=dev
-ENV NODE_ENV=${NODE_ENV}
-
 WORKDIR /app
 
 COPY package.json ./
-COPY .env ./
+COPY env/.env.dev ./.env
 
 RUN rm -rf node_modules
 RUN npm cache clean -force

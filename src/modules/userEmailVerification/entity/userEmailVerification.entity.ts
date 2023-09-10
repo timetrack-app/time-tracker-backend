@@ -1,13 +1,11 @@
+import { ParsedQs } from 'qs';
 import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
   UpdateDateColumn,
-  OneToOne,
-  JoinColumn,
 } from 'typeorm';
-import { User } from './user.entity';
 
 @Entity('user_email_verifications')
 export class UserEmailVerification {
@@ -18,17 +16,11 @@ export class UserEmailVerification {
   email: string;
 
   @Column({ nullable: false, type: 'varchar' })
-  verificationToken: string;
+  verificationToken: string | ParsedQs | string[] | ParsedQs[];
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
-
+  s;
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
-
-  // Define the relation
-
-  @OneToOne(() => User, (user) => user.emailVerification)
-  @JoinColumn()
-  user: User;
 }

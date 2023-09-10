@@ -18,9 +18,15 @@ import {
 } from './common/errors/all.exception';
 import { PassportService } from './modules/passport/service/passport.service';
 import { TYPES } from './core/type.core';
+import { ISendEmailService } from './modules/sendMail/interface/ISendEmail.service';
 
 const passportConfig = container.get<PassportService>(TYPES.PassportService);
 passportConfig.init();
+
+const sendEmailService = container.get<ISendEmailService>(
+  TYPES.ISendEMailService,
+);
+sendEmailService.init();
 
 export const server = new InversifyExpressServer(container);
 server.setConfig((app) => {

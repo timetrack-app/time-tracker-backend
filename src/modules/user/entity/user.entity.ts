@@ -5,11 +5,8 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
-  OneToOne,
-  JoinColumn,
 } from 'typeorm';
 import { WorkSession } from '../../workSession/entity/workSession.entity';
-import { UserEmailVerification } from './userEmailVerification.entity';
 import { Template } from '../../template/entity/template.entity';
 
 @Entity('users')
@@ -22,6 +19,9 @@ export class User {
 
   @Column({ nullable: false, type: 'varchar' })
   password: string;
+
+  @Column({ default: false })
+  isVerified: boolean;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
@@ -36,8 +36,4 @@ export class User {
 
   @OneToMany(() => Template, (template) => template.user)
   templates: Template[];
-
-  @OneToOne(() => UserEmailVerification)
-  @JoinColumn()
-  emailVerification: UserEmailVerification;
 }

@@ -9,6 +9,7 @@ import {
 } from 'inversify-express-utils';
 import { TYPES } from '../../../core/type.core';
 import { IUserService } from '../interfaces/IUser.service';
+import { UpdateEmailDto } from '../dto/update-email.dto';
 
 @controller('/users')
 export class UserController {
@@ -32,12 +33,13 @@ export class UserController {
   @httpPost('/:userId/email-update')
   public async updateUserEmail(
     @requestParam('userId') id: number,
-    @requestBody() emailData: { email: string },
+    @requestBody() updateEmailDto: UpdateEmailDto,
     req: Request,
     res: Response,
   ) {
-    // Implement logic to update the user's email and send an email to the user
-    // Return appropriate responses for success or error cases
+    const { newEmail } = updateEmailDto;
+    await this.userService.updateEmail(id, newEmail);
+    return res.status(200);
   }
 
   @httpGet('/email-update/verification')

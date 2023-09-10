@@ -1,3 +1,4 @@
+import { ISendEmailService } from './../modules/sendMail/interface/ISendEmail.service';
 import { Container } from 'inversify';
 import { TYPES } from './type.core';
 
@@ -23,6 +24,11 @@ import { UserService } from '../modules/user/service/user.service';
 
 /* Passport Import */
 import { PassportService } from './../modules/passport/service/passport.service';
+import { IUserEmailVerificationRepository } from 'src/modules/userEmailVerification/interface/IUserEmailVerification.repository';
+import { UserEmailVerificationRepository } from 'src/modules/userEmailVerification/repository/userEmailVerification.repository';
+import { IUserEmailVerificationService } from 'src/modules/userEmailVerification/interface/IUserEmailVerification.service';
+import { UserEmailVerificationService } from 'src/modules/userEmailVerification/service/userEmailVerification.service';
+import { SendEmailService } from 'src/modules/sendMail/service/sendEMail.service';
 
 const container = new Container();
 
@@ -38,6 +44,20 @@ container.bind<IAuthService>(TYPES.IAuthService).to(AuthService);
 container.bind<IUserRepository>(TYPES.IUserRepository).to(UserRepository);
 container.bind<IUserService>(TYPES.IUserService).to(UserService);
 
+/* EmailVerification Module bind */
+container
+  .bind<IUserEmailVerificationRepository>(
+    TYPES.IUserEmailVerificationRepository,
+  )
+  .to(UserEmailVerificationRepository);
+container
+  .bind<IUserEmailVerificationService>(TYPES.IUserEmailVerificationService)
+  .to(UserEmailVerificationService);
+
+/*  SendEmailService bind */
+container.bind<ISendEmailService>(TYPES.ISendEMailService).to(SendEmailService);
+
+/* Passport bind */
 container.bind<PassportService>(TYPES.PassportService).to(PassportService);
 
 export default container;

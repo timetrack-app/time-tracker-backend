@@ -6,5 +6,10 @@ export const TYPES = {
   IAuthService: Symbol.for('IAuthService'),
   IUserRepository: Symbol.for('IUserRepository'),
   IUserService: Symbol.for('IUserService'),
+  IUserEmailVerificationRepository: Symbol.for(
+    'IUserEmailVerificationRepository',
+  ),
+  IUserEmailVerificationService: Symbol.for('IUserEmailVerificationService'),
+  ISendEMailService: Symbol('ISendEMailService'),
   PassportService: Symbol('PassportService'),
 };

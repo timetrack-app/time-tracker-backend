@@ -4,31 +4,23 @@ services:
     container_name: timetrack-app-db
     image: postgres
     restart: always
-    env_file: .env
+    env_file: ./env/.env.dev
     volumes:
       - ./pgdata:/var/lib/postgresql/data
     networks:
       - timetracker_app_api
-  pgamin:
-    container_name: timetracker-app-pgadmin4
-    image: dpage/pgadmin4
+  mailhog:
+    image: mailhog/mailhog:latest
     restart: always
-    env_file: .env
-    ports:
-      - '${WEBSERVER_PORT}:${PGADMIN_LISTEN_PORT}'
-    volumes:
-      - ./pgadmin-data:/var/lib/pgadmin # Named volumn in container
-    depends_on:
-      - db
-    networks:
-      - timetracker_app_api
+    ports: -1025:1025
+      -8025:8025
   dev:
     container_name: timetrack-app-dev
     image: timetrack-app-api
-    env_file: .env
+    env_file: ./env/.env.dev
     build:
       context: .
-      dockerfile: ./dockerfiles/dev.Dockerfile
+      dockerfile: ./Dockerfile
     volumes:
       - .:/app
       - /app/node_modules
@@ -39,6 +31,7 @@ services:
     restart: unless-stopped
     networks:
       - timetracker_app_api
+
 networks:
   timetracker_app_api:
 volumes:
