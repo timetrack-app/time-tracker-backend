@@ -12,8 +12,9 @@ services:
   mailhog:
     image: mailhog/mailhog:latest
     restart: always
-    ports: -1025:1025
-      -8025:8025
+    ports:
+      - 1025:1025
+      - 8025:8025
   dev:
     container_name: timetrack-app-dev
     image: timetrack-app-api

@@ -5,6 +5,7 @@ import {
   httpGet,
   httpPost,
   requestBody,
+  requestParam,
 } from 'inversify-express-utils';
 import { TYPES } from '../../../core/type.core';
 import { IAuthService } from '../interfaces/IAuth.service';
@@ -13,14 +14,12 @@ import { AuthLoginDto } from '../dto/auth-login.dto';
 import { AuthRegisterDto } from '../dto/auth-register.dto';
 import { InternalServerErrorException } from '../../../common/errors/all.exception';
 import { authConfig } from '../config/config';
-import { IUserEmailVerificationService } from 'src/modules/userEmailVerification/interface/IUserEmailVerification.service';
+import { IUserEmailVerificationService } from '../../../modules/userEmailVerification/interface/IUserEmailVerification.service';
 
 @controller('/auth')
 export class AuthController {
   constructor(
     @inject(TYPES.IAuthService) private readonly authService: IAuthService,
-    @inject(TYPES.IUserEmailVerificationService)
-    private readonly emailVerificationService: IUserEmailVerificationService,
   ) {}
 
   @httpPost('/register', DtoValidationMiddleware(AuthRegisterDto))
@@ -35,10 +34,12 @@ export class AuthController {
   }
 
   @httpGet('/email-verification')
-  public async emailVerification(req: Request, res: Response) {
-    const { token } = req.query;
-    const user = await this.emailVerificationService.verifyUser(token);
-    const jwtToken = await this.authService.generateJWT(user);
+  public async emailVerification(
+    @requestParam('token') token: string,
+    req: Request,
+    res: Response,
+  ) {
+    const jwtToken = await this.authService.emailVerification(token);
     return res.status(200).json({ token: jwtToken });
   }
 

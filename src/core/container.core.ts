@@ -24,11 +24,11 @@ import { UserService } from '../modules/user/service/user.service';
 
 /* Passport Import */
 import { PassportService } from './../modules/passport/service/passport.service';
-import { IUserEmailVerificationRepository } from 'src/modules/userEmailVerification/interface/IUserEmailVerification.repository';
-import { UserEmailVerificationRepository } from 'src/modules/userEmailVerification/repository/userEmailVerification.repository';
-import { IUserEmailVerificationService } from 'src/modules/userEmailVerification/interface/IUserEmailVerification.service';
-import { UserEmailVerificationService } from 'src/modules/userEmailVerification/service/userEmailVerification.service';
-import { SendEmailService } from 'src/modules/sendMail/service/sendEMail.service';
+import { IUserEmailVerificationRepository } from '../modules/userEmailVerification/interface/IUserEmailVerification.repository';
+import { UserEmailVerificationRepository } from '../modules/userEmailVerification/repository/userEmailVerification.repository';
+import { IUserEmailVerificationService } from '../modules/userEmailVerification/interface/IUserEmailVerification.service';
+import { UserEmailVerificationService } from '../modules/userEmailVerification/service/userEmailVerification.service';
+import { SendEmailService } from '../modules/sendMail/service/sendEMail.service';
 
 const container = new Container();
 

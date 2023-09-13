@@ -7,13 +7,19 @@ import { CreateUserDto } from '../dto/create-user.dto';
 import {
   InternalServerErrorException,
   NotFoundException,
-} from 'src/common/errors/all.exception';
+} from '../../../common/errors/all.exception';
+import { IUserEmailVerificationService } from '../../../modules/userEmailVerification/interface/IUserEmailVerification.service';
+import { ISendEmailService } from '../../../modules/sendMail/interface/ISendEmail.service';
 
 @injectable()
 export class UserService implements IUserService {
   constructor(
     @inject(TYPES.IUserRepository)
     private readonly userRepository: IUserRepository,
+    @inject(TYPES.IUserEmailVerificationService)
+    private userEmailVerificationService: IUserEmailVerificationService,
+    @inject(TYPES.ISendEMailService)
+    private readonly sendEmailService: ISendEmailService,
   ) {}
 
   async createUser(createUserDto: CreateUserDto): Promise<User> {
@@ -54,43 +60,48 @@ export class UserService implements IUserService {
     throw new InternalServerErrorException(error.message);
   }
 
-  async updateById(id: number, attrs: Partial<User>) {
+  async verifyUserWithToken(token: string): Promise<User> {
     try {
-      const user = await this.findOneById(id);
-      if (!user) {
-        throw new NotFoundException('user not found');
-      }
-      Object.assign(user, attrs);
-      const updatedUser = this.userRepository.update(user);
-      return updatedUser;
-    } catch (error) {
-      throw new InternalServerErrorException(error.message);
-    }
-  }
-
-  async updateByEmail(email: string, attrs: Partial<User>) {
-    try {
+      const email = await this.userEmailVerificationService.verify(token);
       const user = await this.findOneByEmail(email);
-      if (!user) {
-        throw new NotFoundException('user not found');
-      }
-      Object.assign(user, attrs);
-      const updatedUser = this.userRepository.update(user);
-      return updatedUser;
+      return await this.updateUser(user, { isVerified: true });
     } catch (error) {
       throw new InternalServerErrorException(error.message);
     }
   }
 
-  async verifyUserWithEmail(email: string): Promise<User> {
-    return await this.updateByEmail(email, { isVerified: true });
-  }
-
-  async updateEmail(id: number, newEmail: string) {
+  async updateEmail(id: number, email: string) {
     try {
       const user = await this.findOneById(id);
-      const updatedUser = await this.updateUser(user, { email: newEmail });
-      // mailsending
+      await this.updateUser(user, {
+        email,
+        isVerified: false,
+      });
+      // generate a email verification token
+      const token =
+        await this.userEmailVerificationService.createVerificationToken(email);
+      // using the token, send verification email to the user
+      await this.sendEmailService.sendVerificationEmail(email, token);
+      //update user's email and set user verification status
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async updatePassword(id: number, password: string) {
+    try {
+      const user = await this.findOneById(id);
+      //update user's email and set user verification status
+      await this.updateUser(user, {
+        password,
+      });
+      const { email } = user;
+      // generate a email verification token
+      const token =
+        await this.userEmailVerificationService.createVerificationToken(email);
+      // using the token, send verification email to the user
+      await this.sendEmailService.sendVerificationEmail(email, token);
+      //update user's email and set user verification status
     } catch (error) {
       throw new InternalServerErrorException(error.message);
     }

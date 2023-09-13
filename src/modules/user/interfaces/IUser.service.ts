@@ -6,8 +6,7 @@ export interface IUserService {
   findOneById(id: number): Promise<User | null>;
   findOneByEmail(email: string): Promise<User | null>;
   updateUser(user: User, attrs: Partial<User>): Promise<User>;
-  updateById(id: number, attrs: Partial<User>);
-  updateByEmail(email: string, attrs: Partial<User>);
-  verifyUserWithEmail(email: string): Promise<User>;
-  updateEmail(id: number, newEmail: string): Promise<void>;
+  verifyUserWithToken(token: string): Promise<User>;
+  updateEmail(id: number, email: string): Promise<void>;
+  updatePassword(id: number, password: string): Promise<void>;
 }

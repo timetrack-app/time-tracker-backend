@@ -15,13 +15,13 @@ import { authConfig } from '../config/config';
 import { IUserService } from '../../../modules/user/interfaces/IUser.service';
 import { IUserEmailVerificationService } from '../../../modules/userEmailVerification/interface/IUserEmailVerification.service';
 import { ISendEmailService } from '../../../modules/sendMail/interface/ISendEmail.service';
-import { User } from 'src/modules/user/entity/user.entity';
+import { User } from '../../../modules/user/entity/user.entity';
 
 @injectable()
 export class AuthService implements IAuthService {
   constructor(
     @inject(TYPES.IUserService) private userService: IUserService,
-    @inject(TYPES.IUserService)
+    @inject(TYPES.IUserEmailVerificationService)
     private userEmailVerificationService: IUserEmailVerificationService,
     @inject(TYPES.ISendEMailService)
     private readonly sendEmailService: ISendEmailService,
@@ -41,6 +41,7 @@ export class AuthService implements IAuthService {
     const hashedPassword = await bcrypt.hash(password, salt);
 
     const newUser = { email, password: hashedPassword };
+
     const user = await this.userService.createUser(newUser);
 
     // create a token, save the verification
@@ -49,6 +50,13 @@ export class AuthService implements IAuthService {
 
     // send verification email
     await this.sendEmailService.sendVerificationEmail(email, verificationToken);
+  }
+
+  async emailVerification(token: string) {
+    const email = await this.userEmailVerificationService.verify(token);
+    const user = await this.userService.findOneByEmail(email);
+    const jwtToken = await this.generateJWT(user);
+    return jwtToken;
   }
 
   generateJWT(user: User) {

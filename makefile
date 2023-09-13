@@ -1,7 +1,9 @@
+db:
+	docker-compose -f docker-compose.yml --env-file env/.env.dev build --no-cache
 du:
-	docker-compose -f docker-compose.yml --env-file .env.dev up
+	docker-compose -f docker-compose.yml --env-file env/.env.dev up
 dd:
-	docker-compose -f docker-compose.yml --env-file .env.dev down
+	docker-compose -f docker-compose.yml --env-file env/.env.dev down
 mg:
 	docker-compose -f docker-compose.yml  run dev npm run typeorm:generate src/migrations/table-init
 mc:

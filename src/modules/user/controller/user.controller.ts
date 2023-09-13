@@ -10,11 +10,17 @@ import {
 import { TYPES } from '../../../core/type.core';
 import { IUserService } from '../interfaces/IUser.service';
 import { UpdateEmailDto } from '../dto/update-email.dto';
+import { ISendEmailService } from '../../../modules/sendMail/interface/ISendEmail.service';
+import { DtoValidationMiddleware } from '../../../middlewares/dto-validation.middleware';
+import { UpdatePasswordDto } from '../dto/update-password.dto';
+import { ResetPasswordDto } from '../dto/reset-password.dto';
 
 @controller('/users')
 export class UserController {
   constructor(
     @inject(TYPES.IUserService) private readonly userService: IUserService,
+    @inject(TYPES.ISendEMailService)
+    private readonly sendEmailService: ISendEmailService,
   ) {}
 
   @httpGet('/:userId')
@@ -30,48 +36,57 @@ export class UserController {
     });
   }
 
-  @httpPost('/:userId/email-update')
-  public async updateUserEmail(
+  @httpPost('/:userId/email-update', DtoValidationMiddleware(UpdateEmailDto))
+  public async updateEmail(
     @requestParam('userId') id: number,
     @requestBody() updateEmailDto: UpdateEmailDto,
     req: Request,
     res: Response,
   ) {
-    const { newEmail } = updateEmailDto;
-    await this.userService.updateEmail(id, newEmail);
+    const { email } = updateEmailDto;
+    await this.userService.updateEmail(id, email);
     return res.status(200);
   }
 
   @httpGet('/email-update/verification')
-  public async verifyUserNewEmail(
+  public async verifyNewEmail(
     @requestParam('token') token: string,
     req: Request,
     res: Response,
   ) {
-    // Implement logic to verify a user's new email address using the provided token
-    // Return appropriate responses for success or error cases
+    this.userService.verifyUserWithToken(token);
+    return res.status(200);
   }
 
-  @httpPost('/:userId/password-update')
-  public async updateUserPassword(
+  @httpPost(
+    '/:userId/password-update',
+    DtoValidationMiddleware(UpdatePasswordDto),
+  )
+  public async updatePassword(
     @requestParam('userId') id: number,
     @requestBody()
-    passwordData: { password: string; password_confirmation: string },
+    updatePasswordDto: UpdatePasswordDto,
     req: Request,
     res: Response,
   ) {
-    // Implement logic to update the user's password
-    // Return appropriate responses for success or error cases
+    const { password } = updatePasswordDto;
+    this.userService.updatePassword(id, password);
+    return res.status(200);
   }
 
-  @httpPost('/password-update/request')
-  public async sendPasswordChangeEmail(
-    @requestBody() emailData: { email: string },
+  @httpPost(
+    '/:userId/password-update/request',
+    DtoValidationMiddleware(ResetPasswordDto),
+  )
+  public async sendPasswordResetEmail(
+    @requestParam('userId') id: number,
+    @requestBody() resetPasswordDto: ResetPasswordDto,
     req: Request,
     res: Response,
   ) {
-    // Implement logic to send a password change email to a user who forgot their password
-    // Return appropriate responses for success or error cases
+    const { email } = resetPasswordDto;
+    this.sendEmailService.sendPasswordResetLinkEmail(id, email);
+    return res.status(200);
   }
 
   @httpGet('/password-update/verification')
@@ -80,18 +95,7 @@ export class UserController {
     req: Request,
     res: Response,
   ) {
-    // Implement logic to verify the token for a password update
-    // Return appropriate responses for success or error cases
-  }
-
-  @httpPost('/password-update/save')
-  public async saveUserNewPassword(
-    @requestBody()
-    newPasswordData: { password: string; password_confirmation: string },
-    req: Request,
-    res: Response,
-  ) {
-    // Implement logic to save a user's new password
-    // Return appropriate responses for success or error cases
+    this.userService.verifyUserWithToken(token);
+    return res.status(200);
   }
 }

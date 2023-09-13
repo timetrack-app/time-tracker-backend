@@ -8,8 +8,8 @@ import { IUserEmailVerificationRepository } from '../interface/IUserEmailVerific
 import {
   InternalServerErrorException,
   NotFoundException,
-} from 'src/common/errors/all.exception';
-import { IUserService } from 'src/modules/user/interfaces/IUser.service';
+} from '../../../common/errors/all.exception';
+import { IUserService } from '../../../modules/user/interfaces/IUser.service';
 
 @injectable()
 export class UserEmailVerificationService
@@ -18,7 +18,6 @@ export class UserEmailVerificationService
   constructor(
     @inject(TYPES.IUserRepository)
     private readonly userEmailVerificationRepository: IUserEmailVerificationRepository,
-    private readonly userService: IUserService,
   ) {}
 
   async createVerificationToken(email: string) {
@@ -34,14 +33,14 @@ export class UserEmailVerificationService
     }
   }
 
-  async verifyUser(token: string | ParsedQs | string[] | ParsedQs[]) {
+  async verify(token: string | ParsedQs | string[] | ParsedQs[]) {
     try {
       const verification = await this.userEmailVerificationRepository.find(
         token,
       );
       if (!verification) throw new NotFoundException('Verification failed.');
       const { email } = verification;
-      return await this.userService.verifyUserWithEmail(email);
+      return email;
     } catch (error) {
       throw new InternalServerErrorException(error.message);
     }
