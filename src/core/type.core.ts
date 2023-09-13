@@ -10,6 +10,6 @@ export const TYPES = {
     'IUserEmailVerificationRepository',
   ),
   IUserEmailVerificationService: Symbol.for('IUserEmailVerificationService'),
-  ISendEMailService: Symbol('ISendEMailService'),
-  PassportService: Symbol('PassportService'),
+  ISendEMailService: Symbol.for('ISendEMailService'),
+  IPassportService: Symbol.for('IPassportService'),
 };

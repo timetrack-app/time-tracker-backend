@@ -24,7 +24,7 @@ export class AuthService implements IAuthService {
     @inject(TYPES.IUserEmailVerificationService)
     private userEmailVerificationService: IUserEmailVerificationService,
     @inject(TYPES.ISendEMailService)
-    private readonly sendEmailService: ISendEmailService,
+    private sendEmailService: ISendEmailService,
   ) {}
 
   async registerUser(registerDto: AuthRegisterDto): Promise<void> {
@@ -84,9 +84,7 @@ export class AuthService implements IAuthService {
     }
 
     // Generate new JWT
-    const newToken = jwt.sign({ userId: user.id }, process.env.JWT_SECRET_KEY, {
-      expiresIn: authConfig.jwtTokenExpiresIn,
-    });
+    const newToken = this.generateJWT(user);
     return newToken;
   }
 }

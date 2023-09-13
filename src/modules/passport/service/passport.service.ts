@@ -1,46 +1,16 @@
 import passport from 'passport';
 import { inject, injectable } from 'inversify';
-import { Strategy as LocalStrategy } from 'passport-local';
 import { ExtractJwt, Strategy as JwtStrategy } from 'passport-jwt';
-import bcrypt from 'bcryptjs';
-import { IUserRepository } from '../../user/interfaces/IUser.repository';
 import { TYPES } from '../../../core/type.core';
 
+import { IUserService } from '../../../modules/user/interfaces/IUser.service';
+import { IPassportService } from '../interface/IPassport.service';
+
 @injectable()
-export class PassportService {
-  constructor(
-    @inject(TYPES.IUserRepository)
-    private readonly userRepository: IUserRepository,
-  ) {}
+export class PassportService implements IPassportService {
+  constructor(@inject(TYPES.IUserService) private userService: IUserService) {}
 
   public init() {
-    // passport.use(
-    //   'local-login',
-    //   new LocalStrategy(
-    //     {
-    //       usernameField: 'email',
-    //       passwordField: 'password',
-    //     },
-    //     async (email, password, done) => {
-    //       try {
-    //         // Find the user by email
-    //         const user = await this.userRepository.findOneByEmail(email);
-    //         // If the user doesn't exist or the password is incorrect, return an error
-    //         if (!user || !(await bcrypt.compare(password, user.password))) {
-    //           return done(null, false, {
-    //             message: 'Incorrect email or password',
-    //           });
-    //         }
-
-    //         // If the user exists and the password is correct, return the user
-    //         return done(null, user);
-    //       } catch (error) {
-    //         return done(error);
-    //       }
-    //     },
-    //   ),
-    // );
-
     passport.use(
       'jwt',
       new JwtStrategy(
@@ -51,7 +21,7 @@ export class PassportService {
         async (jwtPayload, done) => {
           try {
             // Find the user by ID from the JWT payload
-            const user = await this.userRepository.findOneById(jwtPayload.id);
+            const user = await this.userService.findOneById(jwtPayload.id);
 
             // If the user doesn't exist, return an error
             if (!user) {
@@ -66,5 +36,9 @@ export class PassportService {
         },
       ),
     );
+  }
+
+  jwtAuthenticate() {
+    return passport.authenticate('jwt', { session: false });
   }
 }

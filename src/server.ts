@@ -16,12 +16,12 @@ import {
   MethodNotAllowedException,
   RequestTimeoutException,
 } from './common/errors/all.exception';
-import { PassportService } from './modules/passport/service/passport.service';
 import { TYPES } from './core/type.core';
 import { ISendEmailService } from './modules/sendMail/interface/ISendEmail.service';
+import { IPassportService } from './modules/Passport/interface/IPassport.service';
 
-const passportConfig = container.get<PassportService>(TYPES.PassportService);
-passportConfig.init();
+const passportService = container.get<IPassportService>(TYPES.IPassportService);
+passportService.init();
 
 const sendEmailService = container.get<ISendEmailService>(
   TYPES.ISendEMailService,
@@ -33,6 +33,10 @@ server.setConfig((app) => {
   app.use(express.urlencoded({ extended: true }));
   app.use(express.json());
   app.use(passport.initialize());
+  // protect /users route
+  app.use('/users', passportService.jwtAuthenticate());
+  // protect /work-sessions route
+  app.use('/work-sessions', passportService.jwtAuthenticate());
 });
 
 const errorResponse = (

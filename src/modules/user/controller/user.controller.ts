@@ -14,7 +14,6 @@ import { ISendEmailService } from '../../../modules/sendMail/interface/ISendEmai
 import { DtoValidationMiddleware } from '../../../middlewares/dto-validation.middleware';
 import { UpdatePasswordDto } from '../dto/update-password.dto';
 import { ResetPasswordDto } from '../dto/reset-password.dto';
-
 @controller('/users')
 export class UserController {
   constructor(

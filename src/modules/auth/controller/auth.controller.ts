@@ -13,9 +13,6 @@ import { DtoValidationMiddleware } from '../../../middlewares/dto-validation.mid
 import { AuthLoginDto } from '../dto/auth-login.dto';
 import { AuthRegisterDto } from '../dto/auth-register.dto';
 import { InternalServerErrorException } from '../../../common/errors/all.exception';
-import { authConfig } from '../config/config';
-import { IUserEmailVerificationService } from '../../../modules/userEmailVerification/interface/IUserEmailVerification.service';
-
 @controller('/auth')
 export class AuthController {
   constructor(

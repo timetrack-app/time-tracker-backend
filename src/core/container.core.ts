@@ -23,12 +23,13 @@ import { IUserService } from '../modules/user/interfaces/IUser.service';
 import { UserService } from '../modules/user/service/user.service';
 
 /* Passport Import */
-import { PassportService } from './../modules/passport/service/passport.service';
+import { PassportService } from '../modules/Passport/service/passport.service';
 import { IUserEmailVerificationRepository } from '../modules/userEmailVerification/interface/IUserEmailVerification.repository';
 import { UserEmailVerificationRepository } from '../modules/userEmailVerification/repository/userEmailVerification.repository';
 import { IUserEmailVerificationService } from '../modules/userEmailVerification/interface/IUserEmailVerification.service';
 import { UserEmailVerificationService } from '../modules/userEmailVerification/service/userEmailVerification.service';
 import { SendEmailService } from '../modules/sendMail/service/sendEMail.service';
+import { IPassportService } from '../modules/Passport/interface/IPassport.service';
 
 const container = new Container();
 
@@ -58,6 +59,6 @@ container
 container.bind<ISendEmailService>(TYPES.ISendEMailService).to(SendEmailService);
 
 /* Passport bind */
-container.bind<PassportService>(TYPES.PassportService).to(PassportService);
+container.bind<IPassportService>(TYPES.IPassportService).to(PassportService);
 
 export default container;
