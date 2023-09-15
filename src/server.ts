@@ -34,9 +34,9 @@ server.setConfig((app) => {
   app.use(express.json());
   app.use(passport.initialize());
   // protect /users route
-  app.use('/users', passportService.jwtAuthenticate());
-  // protect /work-sessions route
-  app.use('/work-sessions', passportService.jwtAuthenticate());
+  // app.use('/users', passportService.jwtAuthenticate());
+  // // protect /work-sessions route
+  // app.use('/work-sessions', passportService.jwtAuthenticate());
 });
 
 const errorResponse = (

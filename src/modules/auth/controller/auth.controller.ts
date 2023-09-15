@@ -1,9 +1,10 @@
-import { Request, Response, query } from 'express';
+import { Request, Response } from 'express';
 import { inject } from 'inversify';
 import {
   controller,
   httpGet,
   httpPost,
+  queryParam,
   requestBody,
   requestParam,
 } from 'inversify-express-utils';
@@ -25,17 +26,18 @@ export class AuthController {
     req: Request,
     res: Response,
   ) {
+    console.log('body', body);
     await this.authService.registerUser(body);
-
-    return res.status(200);
+    return res.status(200).json();
   }
 
   @httpGet('/email-verification')
   public async emailVerification(
-    @requestParam('token') token: string,
+    @queryParam('token') token: string,
     req: Request,
     res: Response,
   ) {
+    console.log('token as a param', token);
     const jwtToken = await this.authService.emailVerification(token);
     return res.status(200).json({ token: jwtToken });
   }

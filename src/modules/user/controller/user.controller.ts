@@ -4,6 +4,7 @@ import {
   controller,
   httpGet,
   httpPost,
+  queryParam,
   requestBody,
   requestParam,
 } from 'inversify-express-utils';
@@ -14,6 +15,7 @@ import { ISendEmailService } from '../../../modules/sendMail/interface/ISendEmai
 import { DtoValidationMiddleware } from '../../../middlewares/dto-validation.middleware';
 import { UpdatePasswordDto } from '../dto/update-password.dto';
 import { ResetPasswordDto } from '../dto/reset-password.dto';
+import { NotFoundException } from '../../../common/errors/all.exception';
 @controller('/users')
 export class UserController {
   constructor(
@@ -29,6 +31,7 @@ export class UserController {
     res: Response,
   ) {
     const user = await this.userService.findOneById(id);
+    if (!user) throw new NotFoundException('User not found');
     const { email } = user;
     return res.status(200).json({
       email,
@@ -43,18 +46,18 @@ export class UserController {
     res: Response,
   ) {
     const { email } = updateEmailDto;
-    await this.userService.updateEmail(id, email);
-    return res.status(200);
+    await this.userService.updateEmailAndSendVerification(id, email);
+    return res.status(200).json();
   }
 
   @httpGet('/email-update/verification')
   public async verifyNewEmail(
-    @requestParam('token') token: string,
+    @queryParam('token') token: string,
     req: Request,
     res: Response,
   ) {
     this.userService.verifyUserWithToken(token);
-    return res.status(200);
+    return res.status(200).json();
   }
 
   @httpPost(
@@ -70,7 +73,7 @@ export class UserController {
   ) {
     const { password } = updatePasswordDto;
     this.userService.updatePassword(id, password);
-    return res.status(200);
+    return res.status(200).json();
   }
 
   @httpPost(
@@ -84,17 +87,18 @@ export class UserController {
     res: Response,
   ) {
     const { email } = resetPasswordDto;
-    this.sendEmailService.sendPasswordResetLinkEmail(id, email);
-    return res.status(200);
+    // check if email is valid, and send an email to user
+    await this.userService.handlePasswordResetRequest(id, email);
+    return res.status(200).json();
   }
 
   @httpGet('/password-update/verification')
   public async verifyUserNewPassword(
-    @requestParam('token') token: string,
+    @queryParam('token') token: string,
     req: Request,
     res: Response,
   ) {
     this.userService.verifyUserWithToken(token);
-    return res.status(200);
+    return res.status(200).json();
   }
 }

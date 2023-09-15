@@ -18,15 +18,23 @@ export class UserEmailVerificationRepository
   async create(dto: CreateEmailVerificationDto) {
     const { email, verificationToken } = dto;
     const repo = await this.database.getRepository(UserEmailVerification);
-    const verification = repo.save({ email, verificationToken });
-    return verification;
+    const verification = repo.create({ email, verificationToken });
+    console.log('created verification', verification);
+
+    return repo.save(verification);
   }
 
-  async find(
-    verificationToken: string | ParsedQs | string[] | ParsedQs[],
+  async findOneByToken(
+    verificationToken: string,
   ): Promise<UserEmailVerification> {
     const repo = await this.database.getRepository(UserEmailVerification);
-    const result = await repo.findOneBy({ verificationToken });
+    const result = await repo.findOne({ where: { verificationToken } });
+    return result;
+  }
+
+  async findOneByEmail(email: string): Promise<UserEmailVerification | null> {
+    const repo = await this.database.getRepository(UserEmailVerification);
+    const result = await repo.findOne({ where: { email } });
     return result;
   }
 }

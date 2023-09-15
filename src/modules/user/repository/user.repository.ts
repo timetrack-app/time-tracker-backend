@@ -12,9 +12,8 @@ export class UserRepository implements IUserRepository {
   ) {}
 
   async create(createUserDto: CreateUserDto) {
-    const { email, password } = createUserDto;
     const repo = await this.database.getRepository(User);
-    const user = repo.create({ email, password });
+    const user = repo.create(createUserDto);
     return repo.save(user);
   }
 

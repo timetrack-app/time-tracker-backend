@@ -16,7 +16,7 @@ export class UserEmailVerification {
   email: string;
 
   @Column({ nullable: false, type: 'varchar' })
-  verificationToken: string | ParsedQs | string[] | ParsedQs[];
+  verificationToken: string;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

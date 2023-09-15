@@ -10,6 +10,7 @@ services:
     networks:
       - timetracker_app_api
   mailhog:
+    container_name: mailhog
     image: mailhog/mailhog:latest
     restart: always
     ports:

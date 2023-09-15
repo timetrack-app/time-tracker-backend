@@ -4,7 +4,8 @@ import { UserEmailVerification } from '../entity/userEmailVerification.entity';
 
 export interface IUserEmailVerificationRepository {
   create(dto: CreateEmailVerificationDto): Promise<UserEmailVerification>;
-  find(
+  findOneByToken(
     verificationToken: string | ParsedQs | string[] | ParsedQs[],
   ): Promise<UserEmailVerification>;
+  findOneByEmail(email: string): Promise<UserEmailVerification | null>;
 }
