@@ -26,7 +26,8 @@ export class SendEmailService implements ISendEmailService {
       host: 'mailhog',
       port: 1025,
     });
-    console.log('mailOption', mailOpt);
+    // mail sending cause an error and can't send it, so log the email
+    console.log('Email content', mailOpt);
     /** To be Fixed : Mail sending with mailHog is causing an error**/
 
     // try {

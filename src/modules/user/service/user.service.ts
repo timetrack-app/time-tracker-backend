@@ -6,7 +6,6 @@ import { User } from '../entity/user.entity';
 import { IUserService } from '../interfaces/IUser.service';
 import { CreateUserDto } from '../dto/create-user.dto';
 import {
-  BadRequestException,
   InternalServerErrorException,
   NotFoundException,
   ValidationErrorException,
@@ -27,7 +26,6 @@ export class UserService implements IUserService {
 
   async createUser(createUserDto: CreateUserDto): Promise<User> {
     try {
-      console.log('createUserDto', createUserDto);
       const user = await this.userRepository.create(createUserDto);
       return user;
     } catch (error) {
@@ -51,15 +49,12 @@ export class UserService implements IUserService {
       const updatedUser = this.userRepository.update(user);
       return updatedUser;
     } catch (error) {
-      console.log('updateUser error', error);
       throw new InternalServerErrorException('error on updating user');
     }
   }
 
   async verifyUserWithToken(token: string): Promise<User> {
-    console.log('userservice received token', token);
     const email = await this.userEmailVerificationService.verify(token);
-    console.log('verify', email);
     const user = await this.findOneByEmail(email);
     if (!user)
       throw new NotFoundException(`wrong email input. email : ${email}`);
@@ -73,12 +68,9 @@ export class UserService implements IUserService {
         email,
         isVerified: false,
       });
-      console.log(email);
       // generate a email verification token
       const token =
         await this.userEmailVerificationService.createVerificationToken(email);
-      console.log('verifi token', token);
-
       // using the token, send verification email to the user
       await this.sendEmailService.sendNewEmailConfirmationEmail(email, token);
       //update user's email and set user verification status
@@ -115,7 +107,6 @@ export class UserService implements IUserService {
 
   async handlePasswordResetRequest(id: number, email: string) {
     const user = await this.findOneByEmail(email);
-    console.log('foolish', user);
     if (!user) throw new ValidationErrorException('This email is invalid');
     this.sendEmailService.sendPasswordResetLinkEmail(id, email);
   }

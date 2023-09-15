@@ -41,12 +41,10 @@ export class AuthService implements IAuthService {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
     const newUser = { email, password: hashedPassword };
-    console.log('newUser', newUser);
     await this.userService.createUser(newUser);
     // create a token, save the verification
     const verificationToken =
       await this.userEmailVerificationService.createVerificationToken(email);
-    console.log('token', verificationToken);
 
     // send verification email
     await this.sendEmailService.sendVerificationEmail(email, verificationToken);
@@ -54,9 +52,7 @@ export class AuthService implements IAuthService {
 
   async emailVerification(token: string) {
     if (!token) throw new ValidationErrorException('token is not received.');
-    console.log('received token', token);
     const user = await this.userService.verifyUserWithToken(token);
-    console.log('after verification', user);
     if (!user) {
       throw new NotFoundException('User not found');
     }
@@ -74,12 +70,10 @@ export class AuthService implements IAuthService {
   async login(authLoginDto: AuthLoginDto): Promise<string> {
     const { email, password } = authLoginDto;
     const user = await this.userService.findOneByEmail(email);
-    console.log('user on login', user);
     if (!user) {
       throw new ValidationErrorException('Email is invalid.');
     }
     const isPasswordValid = await bcrypt.compare(password, user.password);
-    console.log(isPasswordValid, password, user.password);
 
     if (!isPasswordValid) {
       throw new ValidationErrorException('Password is incorrect.');

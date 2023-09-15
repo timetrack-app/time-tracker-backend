@@ -6,7 +6,6 @@ import {
   httpPost,
   queryParam,
   requestBody,
-  requestParam,
 } from 'inversify-express-utils';
 import { TYPES } from '../../../core/type.core';
 import { IAuthService } from '../interfaces/IAuth.service';
@@ -26,7 +25,6 @@ export class AuthController {
     req: Request,
     res: Response,
   ) {
-    console.log('body', body);
     await this.authService.registerUser(body);
     return res.status(200).json();
   }
@@ -37,7 +35,6 @@ export class AuthController {
     req: Request,
     res: Response,
   ) {
-    console.log('token as a param', token);
     const jwtToken = await this.authService.emailVerification(token);
     return res.status(200).json({ token: jwtToken });
   }

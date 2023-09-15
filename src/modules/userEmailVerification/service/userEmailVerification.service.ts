@@ -33,7 +33,6 @@ export class UserEmailVerificationService
       email,
       verificationToken,
     });
-    console.log(verification);
     return verificationToken;
   }
 
@@ -46,11 +45,8 @@ export class UserEmailVerificationService
 
   async verify(token: string | ParsedQs | string[] | ParsedQs[]) {
     try {
-      console.log('verifi service token', token);
       const verification =
         await this.userEmailVerificationRepository.findOneByToken(token);
-      console.log('verification instance', verification);
-
       if (!verification) throw new NotFoundException('Verification failed.');
       const { email } = verification;
       return email;

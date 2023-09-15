@@ -1,4 +1,3 @@
-import { ParsedQs } from 'qs';
 import { inject, injectable } from 'inversify';
 
 import { IUserEmailVerificationRepository } from '../interface/IUserEmailVerification.repository';
@@ -19,7 +18,6 @@ export class UserEmailVerificationRepository
     const { email, verificationToken } = dto;
     const repo = await this.database.getRepository(UserEmailVerification);
     const verification = repo.create({ email, verificationToken });
-    console.log('created verification', verification);
 
     return repo.save(verification);
   }

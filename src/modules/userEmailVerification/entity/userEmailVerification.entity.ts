@@ -1,4 +1,3 @@
-import { ParsedQs } from 'qs';
 import {
   Entity,
   PrimaryGeneratedColumn,
