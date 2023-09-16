@@ -3,7 +3,7 @@ import { inject, injectable } from 'inversify';
 import { ExtractJwt, Strategy as JwtStrategy } from 'passport-jwt';
 import { TYPES } from '../../../core/type.core';
 
-import { IUserService } from '../../../modules/user/interfaces/IUser.service';
+import { IUserService } from '../../user/interfaces/IUser.service';
 import { IPassportService } from '../interface/IPassport.service';
 
 @injectable()

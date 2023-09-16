@@ -18,7 +18,7 @@ import {
 } from './common/errors/all.exception';
 import { TYPES } from './core/type.core';
 import { ISendEmailService } from './modules/sendMail/interface/ISendEmail.service';
-import { IPassportService } from './modules/Passport/interface/IPassport.service';
+import { IPassportService } from './modules/passport/interface/IPassport.service';
 
 const passportService = container.get<IPassportService>(TYPES.IPassportService);
 passportService.init();
