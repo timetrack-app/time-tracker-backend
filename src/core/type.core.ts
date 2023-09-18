@@ -1,6 +1,8 @@
 export const TYPES = {
+  // general
   Logger: Symbol.for('Logger'),
   IDatabaseService: Symbol.for('IDatabaseService'),
+  // user, auth
   UserController: Symbol.for('UserController'),
   IAuthRepository: Symbol.for('IAuthRepository'),
   IAuthService: Symbol.for('IAuthService'),
@@ -12,4 +14,10 @@ export const TYPES = {
   IUserEmailVerificationService: Symbol.for('IUserEmailVerificationService'),
   ISendEMailService: Symbol.for('ISendEMailService'),
   IPassportService: Symbol.for('IPassportService'),
+  // work session
+  IWorkSessionService: Symbol.for('IWorkSessionService'),
+  IWorkSessionRepository: Symbol.for('IWorkSessionRepository'),
+  // template
+  ITemplateService: Symbol.for('ITemplateService'),
+  ITemplateRepository: Symbol.for('ITemplateRepository'),
 };
