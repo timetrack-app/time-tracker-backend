@@ -10,6 +10,7 @@ import { ITemplateRepository } from "src/modules/template/interfaces/ITemplate.r
 import { CreateWorkSessionFromTemplateDto } from "../dto/create-work-session-from-template-dto";
 import { InternalServerErrorException } from "src/common/errors/all.exception";
 import { Logger } from "src/common/services/logger.service";
+import { UpdateWorkSessionDto } from "../dto/update-work-session-dto";
 
 /**
  *
@@ -35,13 +36,16 @@ export class WorkSessionService implements IWorkSessionService {
 
     try {
       const user = await this.userRepository.findOneById(userId);
+
       const createWorkSessionDto = new CreateWorkSessionDto();
       createWorkSessionDto.user = user;
 
+      // create without template
       if (!templateId) {
         return this.workSessionRepository.create(createWorkSessionDto);
       }
 
+      // create from template
       const template = await this.templateRepository.findOneById(templateId);
       const createFromTemplateDto = new CreateWorkSessionFromTemplateDto();
       createFromTemplateDto.user = user;
@@ -51,6 +55,15 @@ export class WorkSessionService implements IWorkSessionService {
     } catch (error) {
       this.logger.error(`Failed to create new work session. Error: ${error}`);
       throw new InternalServerErrorException('Failed to create a work session.');
+    }
+  }
+
+  async updateWorkSession(updateWorkSessionDto: UpdateWorkSessionDto): Promise<WorkSession> {
+    try {
+      return this.workSessionRepository.update(updateWorkSessionDto.workSessionId);
+    } catch (error) {
+      this.logger.error(`Failed to create new work session. Error: ${error}`);
+      throw new InternalServerErrorException(`Failed to update a work session.`);
     }
   }
 }

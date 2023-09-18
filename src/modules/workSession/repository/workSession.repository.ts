@@ -7,6 +7,7 @@ import { CreateWorkSessionDto } from '../dto/create-work-session.dto';
 import { CreateWorkSessionFromTemplateDto } from '../dto/create-work-session-from-template-dto';
 import { Tab } from '../entity/tab.entity';
 import { List } from '../entity/list.entity';
+import { Repository, UpdateResult } from 'typeorm';
 
 /**
  *
@@ -20,6 +21,15 @@ export class WorkSessionRepository implements IWorkSessionRepository {
     @inject(TYPES.IDatabaseService) private readonly database: IDatabaseService,
   ) {}
 
+  private async getWorkSessionRepo(): Promise<Repository<WorkSession>> {
+    return await this.database.getRepository(WorkSession);
+  };
+
+  async findOneById(workSessionId: number): Promise<WorkSession> {
+    const repo = await this.getWorkSessionRepo();
+    return repo.findOneBy({ id: workSessionId });
+  }
+
   /**
    * Create new WorkSession(no template)
    *
@@ -28,7 +38,7 @@ export class WorkSessionRepository implements IWorkSessionRepository {
    * @memberof WorkSessionRepository
    */
   async create(createWorkSessionDto: CreateWorkSessionDto): Promise<WorkSession> {
-    const repo = await this.database.getRepository(WorkSession);
+    const repo = await this.getWorkSessionRepo();
 
     const workSession = repo.create({
       user: createWorkSessionDto.user,
@@ -96,6 +106,30 @@ export class WorkSessionRepository implements IWorkSessionRepository {
         throw new Error(error)
     } finally {
         await queryRunner.release();
+    }
+  }
+
+  async update(workSessionId: number): Promise<WorkSession> {
+    const repo = await this.getWorkSessionRepo();
+
+    try {
+      // https://github.com/typeorm/typeorm/issues/4920#issuecomment-813765677
+      const updatedResult: UpdateResult = await repo
+        .createQueryBuilder()
+        .update(WorkSession)
+        .set({ endAt: new Date(), })
+        .where('id = :id', { id: workSessionId })
+        .returning('*')
+        .updateEntity(true)
+        .execute();
+
+      if (updatedResult.affected && updatedResult.affected > 0) {
+        return updatedResult.raw[0] as WorkSession;
+      }
+
+      throw new Error();
+    } catch (error) {
+      throw error;
     }
   }
 }

@@ -1,7 +1,8 @@
 import { WorkSession } from "../entity/workSession.entity";
-import { CreateWorkSessionDto } from "../dto/create-work-session.dto";
 import { CreateWorkSessionServiceDto } from "../dto/create-work-session-service-dto";
+import { UpdateWorkSessionDto } from "../dto/update-work-session-dto";
 
 export interface IWorkSessionService {
-  createWorkSession(createWorkSessionServiceDto: CreateWorkSessionServiceDto): Promise<WorkSession>
+  createWorkSession(createWorkSessionServiceDto: CreateWorkSessionServiceDto): Promise<WorkSession>;
+  updateWorkSession(updateWorkSessionDto: UpdateWorkSessionDto): Promise<WorkSession>;
 };
