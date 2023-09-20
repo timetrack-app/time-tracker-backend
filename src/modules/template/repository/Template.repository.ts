@@ -1,11 +1,11 @@
 import { inject, injectable } from 'inversify';
 import { ITemplateRepository } from '../interfaces/ITemplate.repository';
-import { TYPES } from 'src/core/type.core';
-import { IDatabaseService } from 'src/core/interface/IDatabase.service';
+import { TYPES } from '../../../core/type.core';
+import { IDatabaseService } from '../../..//core/interface/IDatabase.service';
 import { Template } from '../entity/template.entity';
 
 @injectable()
-class TemplateRepository implements ITemplateRepository {
+export class TemplateRepository implements ITemplateRepository {
   constructor(
     @inject(TYPES.IDatabaseService)
     private readonly database: IDatabaseService,

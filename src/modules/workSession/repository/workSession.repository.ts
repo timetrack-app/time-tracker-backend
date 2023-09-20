@@ -1,8 +1,8 @@
 import { inject, injectable } from 'inversify';
-import { TYPES } from 'src/core/type.core';
+import { TYPES } from '../../../core/type.core';
 import { WorkSession } from '../entity/workSession.entity';
 import { IWorkSessionRepository } from '../interfaces/IWorkSession.repository';
-import { IDatabaseService } from 'src/core/interface/IDatabase.service';
+import { IDatabaseService } from '../../../core/interface/IDatabase.service';
 import { CreateWorkSessionDto } from '../dto/create-work-session.dto';
 import { CreateWorkSessionFromTemplateDto } from '../dto/create-work-session-from-template-dto';
 import { Tab } from '../entity/tab.entity';

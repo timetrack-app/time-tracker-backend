@@ -1,20 +1,27 @@
-import { inject } from 'inversify';
-import { controller, httpPost, requestBody, requestParam } from 'inversify-express-utils';
-import { TYPES } from 'src/core/type.core';
-import { IWorkSessionService } from '../interfaces/IWorkSession.service';
 import { Request, Response } from 'express';
+import { inject } from 'inversify';
+import {
+  controller,
+  httpGet,
+  httpPost,
+  requestBody,
+  requestParam,
+} from 'inversify-express-utils';
+import { TYPES } from '../../../core/type.core';
+import { IWorkSessionService } from '../interfaces/IWorkSession.service';
 import { CreateWorkSessionControllerDto } from '../dto/create-work-session-controller-dto';
 import { CreateWorkSessionServiceDto } from '../dto/create-work-session-service-dto';
-import { DtoValidationMiddleware } from 'src/middlewares/dto-validation.middleware';
+import { DtoValidationMiddleware } from '../../../middlewares/dto-validation.middleware';
 
-@controller('/users')
+@controller('/users/:userId/work-sessions')
+// @controller('/sessions')
 export class WorkSessionController {
   constructor(
     @inject(TYPES.IWorkSessionService)
     private readonly workSessionService: IWorkSessionService,
   ) {}
 
-  @httpPost('/:userId/work-sessions', DtoValidationMiddleware(CreateWorkSessionControllerDto))
+  @httpPost('/', DtoValidationMiddleware(CreateWorkSessionControllerDto))
   public async createWorkSession(
     @requestParam('userId') userId: number,
     @requestBody() reqBody: CreateWorkSessionControllerDto,
@@ -25,6 +32,15 @@ export class WorkSessionController {
     dto.userId = userId;
     dto.templateId = reqBody.templateId;
 
-    await this.workSessionService.createWorkSession(dto);
+    // TODO: if the user has unfinished work session, throw error
+
+    try {
+      const workSession = await this.workSessionService.createWorkSession(dto);
+      // TODO: Add latest: boolean property to return value
+      // TODO: if latest: true then return 200, else 204
+      return res.status(204).json(workSession);
+    } catch (error) {
+      // TODO: error handling
+    }
   }
 }
