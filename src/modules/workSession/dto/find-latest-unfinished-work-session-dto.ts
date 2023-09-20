@@ -1,6 +1,6 @@
 import { IsNumber } from 'class-validator';
 
-export class FindLatestWorkSessionDto {
+export class FindLatestUnfinishedWorkSessionDto {
   @IsNumber()
   userId: number;
 };

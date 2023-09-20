@@ -8,6 +8,7 @@ import { CreateWorkSessionFromTemplateDto } from '../dto/create-work-session-fro
 import { Tab } from '../entity/tab.entity';
 import { List } from '../entity/list.entity';
 import { Repository, UpdateResult } from 'typeorm';
+import { FindLatestUnfinishedWorkSessionDto } from '../dto/find-latest-unfinished-work-session-dto';
 
 /**
  *
@@ -28,6 +29,25 @@ export class WorkSessionRepository implements IWorkSessionRepository {
   async findOneById(workSessionId: number): Promise<WorkSession> {
     const repo = await this.getWorkSessionRepo();
     return repo.findOneBy({ id: workSessionId });
+  }
+
+  /**
+   * Find the latest unfinished WorkSession
+   *
+   * @param {FindLatestUnfinishedWorkSessionDto} findLatestUnfinishedWorkSessionDto
+   * @return {*}  {(Promise<WorkSession | null>)}
+   * @memberof WorkSessionRepository
+   */
+  async findLatestUnfinished(findLatestUnfinishedWorkSessionDto: FindLatestUnfinishedWorkSessionDto): Promise<WorkSession | null> {
+    const repo = await this.getWorkSessionRepo();
+
+    const latestWorkSession = await repo
+      .createQueryBuilder('workSession')
+      .where("workSession.user_id = :userId", { userId: findLatestUnfinishedWorkSessionDto.userId })
+      .andWhere('workSession.end_at = :endAt', { endAt: null })
+      .getOne()
+
+    return latestWorkSession;
   }
 
   /**

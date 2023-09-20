@@ -12,9 +12,10 @@ import { IWorkSessionService } from '../interfaces/IWorkSession.service';
 import { CreateWorkSessionControllerDto } from '../dto/create-work-session-controller-dto';
 import { CreateWorkSessionServiceDto } from '../dto/create-work-session-service-dto';
 import { DtoValidationMiddleware } from '../../../middlewares/dto-validation.middleware';
+import { CreateWorkSessionReturnType } from '../types';
+import { InternalServerErrorException } from 'src/common/errors/all.exception';
 
 @controller('/users/:userId/work-sessions')
-// @controller('/sessions')
 export class WorkSessionController {
   constructor(
     @inject(TYPES.IWorkSessionService)
@@ -26,21 +27,23 @@ export class WorkSessionController {
     @requestParam('userId') userId: number,
     @requestBody() reqBody: CreateWorkSessionControllerDto,
     _: Request,
-    res: Response,
+    res: Response<CreateWorkSessionReturnType>,
   ) {
     const dto = new CreateWorkSessionServiceDto();
     dto.userId = userId;
     dto.templateId = reqBody.templateId;
 
-    // TODO: if the user has unfinished work session, throw error
-
     try {
-      const workSession = await this.workSessionService.createWorkSession(dto);
-      // TODO: Add latest: boolean property to return value
-      // TODO: if latest: true then return 200, else 204
-      return res.status(204).json(workSession);
+      const latestWorkSession = await this.workSessionService.createWorkSession(dto);
+
+      const statusCode = latestWorkSession.isUnfinished ? 200 : 204;
+
+      return res.status(statusCode).json({
+        isUnfinished: latestWorkSession.isUnfinished,
+        workSession: latestWorkSession.workSession,
+      });
     } catch (error) {
-      // TODO: error handling
+      throw new InternalServerErrorException('Failed to create new WorkSession.');
     }
   }
 }
