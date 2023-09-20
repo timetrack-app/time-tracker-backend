@@ -31,6 +31,14 @@ import { UserEmailVerificationService } from '../modules/userEmailVerification/s
 import { SendEmailService } from '../modules/sendMail/service/sendEMail.service';
 import { IPassportService } from '../modules/passport/interface/IPassport.service';
 
+/* WorkSession import */
+import { IWorkSessionService } from '../modules/workSession/interfaces/IWorkSession.service';
+import { WorkSessionService } from '../modules/workSession/service/workSession.service';
+import { IWorkSessionRepository } from '../modules/workSession/interfaces/IWorkSession.repository';
+import { WorkSessionRepository } from '../modules/workSession/repository/workSession.repository';
+import { ITemplateRepository } from '../modules/template/interfaces/ITemplate.repository';
+import { TemplateRepository } from '../modules/template/repository/Template.repository';
+
 const container = new Container();
 
 container.bind<IDatabaseService>(TYPES.IDatabaseService).to(DatabaseService);
@@ -60,5 +68,12 @@ container.bind<ISendEmailService>(TYPES.ISendEMailService).to(SendEmailService);
 
 /* Passport bind */
 container.bind<IPassportService>(TYPES.IPassportService).to(PassportService);
+
+/* WorkSession bind */
+container.bind<IWorkSessionService>(TYPES.IWorkSessionService).to(WorkSessionService);
+container.bind<IWorkSessionRepository>(TYPES.IWorkSessionRepository).to(WorkSessionRepository);
+
+/* Template bind */
+container.bind<ITemplateRepository>(TYPES.ITemplateRepository).to(TemplateRepository);
 
 export default container;
