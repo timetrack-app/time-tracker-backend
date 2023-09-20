@@ -44,7 +44,7 @@ export class WorkSessionRepository implements IWorkSessionRepository {
     const latestWorkSession = await repo
       .createQueryBuilder('workSession')
       .where("workSession.user_id = :userId", { userId: findLatestUnfinishedWorkSessionDto.userId })
-      .andWhere('workSession.end_at = :endAt', { endAt: null })
+      .andWhere('workSession.end_at IS NULL')
       .getOne()
 
     return latestWorkSession;

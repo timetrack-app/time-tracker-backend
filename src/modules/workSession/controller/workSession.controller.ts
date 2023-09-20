@@ -13,7 +13,8 @@ import { CreateWorkSessionControllerDto } from '../dto/create-work-session-contr
 import { CreateWorkSessionServiceDto } from '../dto/create-work-session-service-dto';
 import { DtoValidationMiddleware } from '../../../middlewares/dto-validation.middleware';
 import { CreateWorkSessionReturnType } from '../types';
-import { InternalServerErrorException } from 'src/common/errors/all.exception';
+import { InternalServerErrorException } from '../../../common/errors/all.exception';
+import { FindLatestUnfinishedWorkSessionDto } from '../dto/find-latest-unfinished-work-session-dto';
 
 @controller('/users/:userId/work-sessions')
 export class WorkSessionController {
@@ -21,6 +22,19 @@ export class WorkSessionController {
     @inject(TYPES.IWorkSessionService)
     private readonly workSessionService: IWorkSessionService,
   ) {}
+
+  @httpGet('/latest')
+  public async findLatestUnfinishedWorkSession(
+    @requestParam('userId') userId: number,
+    _: Request,
+    res: Response,
+  ) {
+    const dto = new FindLatestUnfinishedWorkSessionDto();
+    dto.userId = Number(userId);
+    const workSession = await this.workSessionService.getLatestUnfinishedWorkSession(dto);
+
+    return res.status(200).json({ workSession });
+  }
 
   @httpPost('/', DtoValidationMiddleware(CreateWorkSessionControllerDto))
   public async createWorkSession(
