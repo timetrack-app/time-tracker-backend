@@ -4,6 +4,7 @@ import {
   controller,
   httpGet,
   httpPost,
+  httpPut,
   requestBody,
   requestParam,
 } from 'inversify-express-utils';
@@ -15,6 +16,7 @@ import { DtoValidationMiddleware } from '../../../middlewares/dto-validation.mid
 import { CreateWorkSessionReturnType } from '../types';
 import { InternalServerErrorException } from '../../../common/errors/all.exception';
 import { FindLatestUnfinishedWorkSessionDto } from '../dto/find-latest-unfinished-work-session-dto';
+import { EndWorkSessionDto } from '../dto/end-work-session-dto';
 
 @controller('/users/:userId/work-sessions')
 export class WorkSessionController {
@@ -59,5 +61,19 @@ export class WorkSessionController {
     } catch (error) {
       throw new InternalServerErrorException('Failed to create new WorkSession.');
     }
+  }
+
+  @httpPut('/:workSessionId/end')
+  public async endWorkSession(
+    @requestParam('userId') _userId: number,
+    @requestParam('workSessionId') workSessionId: number,
+    _req: Request,
+    res: Response,
+  ) {
+    const dto = new EndWorkSessionDto();
+    dto.workSessionId = workSessionId;
+    const workSession = await this.workSessionService.endWorkSession(dto);
+
+    return res.status(200).json({...workSession});
   }
 }
