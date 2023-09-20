@@ -10,7 +10,7 @@ import { ITemplateRepository } from "../../../modules/template/interfaces/ITempl
 import { CreateWorkSessionFromTemplateDto } from "../dto/create-work-session-from-template-dto";
 import { InternalServerErrorException } from "../../../common/errors/all.exception";
 import { Logger } from "../../../common/services/logger.service";
-import { UpdateWorkSessionDto } from "../dto/update-work-session-dto";
+import { EndWorkSessionDto } from "../dto/end-work-session-dto";
 import { FindLatestUnfinishedWorkSessionDto } from "../dto/find-latest-unfinished-work-session-dto";
 import { CreateWorkSessionServiceReturnDto } from "../dto/create-work-session-service-return-dto";
 
@@ -98,9 +98,9 @@ export class WorkSessionService implements IWorkSessionService {
     }
   }
 
-  async updateWorkSession(updateWorkSessionDto: UpdateWorkSessionDto): Promise<WorkSession> {
+  async endWorkSession(endWorkSessionDto: EndWorkSessionDto): Promise<WorkSession> {
     try {
-      return this.workSessionRepository.update(updateWorkSessionDto.workSessionId);
+      return this.workSessionRepository.update(endWorkSessionDto.workSessionId);
     } catch (error) {
       this.logger.error(`Failed to create new work session. Error: ${error}`);
       throw new InternalServerErrorException(`Failed to update a work session.`);

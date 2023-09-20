@@ -1,6 +1,6 @@
 import { IsNumber } from 'class-validator';
 
-export class UpdateWorkSessionDto {
+export class EndWorkSessionDto {
   @IsNumber()
   workSessionId: number
 };
