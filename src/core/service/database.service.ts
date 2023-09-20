@@ -1,6 +1,6 @@
 import { config } from 'dotenv';
 import { inject, injectable } from 'inversify';
-import { DataSource, ObjectType, Repository } from 'typeorm';
+import { DataSource, EntityManager, ObjectType, Repository } from 'typeorm';
 import { TYPES } from '../type.core';
 import { Logger } from '../../common/services/logger.service';
 
@@ -10,6 +10,8 @@ import { appDataSource } from '../../datasource.config';
 @injectable()
 export class DatabaseService implements IDatabaseService {
   private static myDataSource: DataSource;
+  private static myEntityManager: EntityManager;
+
   constructor(@inject(TYPES.Logger) private readonly logger: Logger) {}
 
   private async getConnection(): Promise<DataSource> {
@@ -28,10 +30,23 @@ export class DatabaseService implements IDatabaseService {
     return DatabaseService.myDataSource;
   }
 
+  private async getEntityManager(): Promise<EntityManager> {
+    if (DatabaseService.myEntityManager) return DatabaseService.myEntityManager;
+
+    const connection = await this.getConnection();
+    DatabaseService.myEntityManager = connection.createEntityManager();
+
+    return DatabaseService.myEntityManager;
+  }
+
   public async getRepository<Entity>(
     entity: ObjectType<Entity>,
   ): Promise<Repository<Entity>> {
     const connection = await this.getConnection();
     return await connection.getRepository(entity);
+  }
+
+  public async getManager(): Promise<EntityManager> {
+    return await this.getEntityManager();
   }
 }
