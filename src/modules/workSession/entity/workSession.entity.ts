@@ -22,7 +22,7 @@ export class WorkSession {
   @Column({ name: 'start_at', nullable: false, type: 'timestamp' })
   startAt: Date;
 
-  @Column({ name: 'end_at', nullable: false, type: 'timestamp' })
+  @Column({ name: 'end_at', nullable: true, type: 'timestamp' })
   endAt: Date;
 
   @CreateDateColumn({ name: 'created_at' })
