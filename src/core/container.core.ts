@@ -37,7 +37,7 @@ import { WorkSessionService } from '../modules/workSession/service/workSession.s
 import { IWorkSessionRepository } from '../modules/workSession/interfaces/IWorkSession.repository';
 import { WorkSessionRepository } from '../modules/workSession/repository/workSession.repository';
 import { ITemplateRepository } from '../modules/template/interfaces/ITemplate.repository';
-import { TemplateRepository } from '../modules/template/repository/Template.repository';
+import { TemplateRepository } from '../modules/template/repository/template.repository';
 
 const container = new Container();
 
