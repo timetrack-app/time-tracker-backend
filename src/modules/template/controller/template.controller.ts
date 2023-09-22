@@ -26,11 +26,7 @@ export class TemplateController {
     dto.name = reqBody.name;
     dto.tabs = reqBody.tabs;
 
-    try {
-      const template = await this.templateService.createTemplate(dto);
-      return res.status(204).json({ ...template });
-    } catch (error) {
-      throw new InternalServerErrorException('Failed to create a new Template.');
-    }
+    const template = await this.templateService.createTemplate(dto);
+    return res.status(204).json({ ...template });
   }
 }
