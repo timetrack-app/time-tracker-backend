@@ -1,0 +1,28 @@
+import { inject, injectable } from 'inversify';
+import { CreateTemplateDto } from '../dto/create-template-dto';
+import { Template } from '../entity/template.entity';
+import { ITemplateService } from '../interfaces/ITemplate.service';
+import { TYPES } from 'src/core/type.core';
+import { ITemplateRepository } from '../interfaces/ITemplate.repository';
+import { Logger } from 'winston';
+import { InternalServerErrorException } from 'src/common/errors/all.exception';
+
+@injectable()
+export class TemplateService implements ITemplateService {
+  constructor(
+    @inject(TYPES.ITemplateRepository)
+    private readonly templateRepository: ITemplateRepository,
+    @inject(TYPES.Logger)
+    private readonly logger: Logger,
+  ) {}
+
+  async createTemplate(createTemplateDto: CreateTemplateDto): Promise<Template> {
+    try {
+      const template = await this.templateRepository.create(createTemplateDto);
+      return template;
+    } catch (error) {
+      this.logger.error(`Failed to create a new Template. Error: ${error}`);
+      throw new InternalServerErrorException('Failed to create a new Template');
+    }
+  }
+}
