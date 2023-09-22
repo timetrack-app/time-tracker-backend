@@ -14,7 +14,6 @@ import { CreateWorkSessionRequestDto } from '../dto/create-work-session-request-
 import { CreateWorkSessionServiceDto } from '../dto/create-work-session-service-dto';
 import { DtoValidationMiddleware } from '../../../middlewares/dto-validation.middleware';
 import { CreateWorkSessionReturnType } from '../types';
-import { InternalServerErrorException } from '../../../common/errors/all.exception';
 import { FindLatestUnfinishedWorkSessionDto } from '../dto/find-latest-unfinished-work-session-dto';
 import { EndWorkSessionDto } from '../dto/end-work-session-dto';
 
