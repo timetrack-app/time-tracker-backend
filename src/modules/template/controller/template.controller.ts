@@ -1,11 +1,11 @@
 import { inject } from 'inversify';
-import { controller, httpPost, requestBody, requestParam } from 'inversify-express-utils';
+import { controller, httpDelete, httpPost, requestBody, requestParam } from 'inversify-express-utils';
 import { TYPES } from 'src/core/type.core';
 import { ITemplateService } from '../interfaces/ITemplate.service';
 import { Request, Response } from 'express';
 import { CreateTemplateRequestDto } from '../dto/create-template-request-dto';
 import { CreateTemplateDto } from '../dto/create-template-dto';
-import { InternalServerErrorException } from 'src/common/errors/all.exception';
+import { DeleteTemplateDto } from '../dto/delete-template-dto';
 
 @controller('/users/:userId/templates')
 export class TemplateController {
@@ -28,5 +28,21 @@ export class TemplateController {
 
     const template = await this.templateService.createTemplate(dto);
     return res.status(204).json({ ...template });
+  }
+
+  @httpDelete('/:templateId')
+  public async DeleteTemplateDto(
+    @requestParam('userId') userId: number,
+    @requestParam('templateId') templateId: number,
+    _: Request,
+    res: Response,
+  ) {
+    const dto = new DeleteTemplateDto()
+    dto.userId = userId;
+    dto.templateId = templateId;
+
+    await this.templateService.deleteTemplate(dto);
+
+    return res.status(204).json({});
   }
 }

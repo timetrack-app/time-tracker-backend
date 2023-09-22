@@ -1,9 +1,9 @@
-import { IsNumber } from 'class-validator';
+import { IsInt } from 'class-validator';
 
 export class DeleteTemplateDto {
-  @IsNumber()
+  @IsInt()
   userId: number;
 
-  @IsNumber()
+  @IsInt()
   templateId: number;
 }

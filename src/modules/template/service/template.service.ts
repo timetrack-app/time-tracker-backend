@@ -6,6 +6,7 @@ import { TYPES } from 'src/core/type.core';
 import { ITemplateRepository } from '../interfaces/ITemplate.repository';
 import { Logger } from 'winston';
 import { InternalServerErrorException } from 'src/common/errors/all.exception';
+import { DeleteTemplateDto } from '../dto/delete-template-dto';
 
 @injectable()
 export class TemplateService implements ITemplateService {
@@ -23,6 +24,15 @@ export class TemplateService implements ITemplateService {
     } catch (error) {
       this.logger.error(`Failed to create a new Template. Error: ${error}`);
       throw new InternalServerErrorException('Failed to create a new Template');
+    }
+  }
+
+  async deleteTemplate(deleteTemplateDto: DeleteTemplateDto): Promise<void> {
+    try {
+      await this.deleteTemplate(deleteTemplateDto);
+    } catch (error) {
+      this.logger.error(`Failed to delete a Template. Error: ${error}`);
+      throw new InternalServerErrorException('Failed to delete a Template.');
     }
   }
 }

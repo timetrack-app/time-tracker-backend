@@ -6,6 +6,7 @@ import { Template } from '../entity/template.entity';
 import { CreateTemplateDto } from '../dto/create-template-dto';
 import { TemplateTab } from '../entity/templateTab.entity';
 import { TemplateList } from '../entity/templateList.entity';
+import { DeleteTemplateDto } from '../dto/delete-template-dto';
 
 @injectable()
 export class TemplateRepository implements ITemplateRepository {
@@ -76,5 +77,17 @@ export class TemplateRepository implements ITemplateRepository {
     } finally {
       await queryRunner.release();
     }
+  }
+
+  async delete(deleteTemplateDto: DeleteTemplateDto): Promise<void> {
+    const repo = await this.database.getRepository(Template);
+
+     await repo
+      .createQueryBuilder()
+      .delete()
+      .from(Template)
+      .where('id = :id', { id: deleteTemplateDto.templateId })
+      .andWhere('user_id = :userId', { userId: deleteTemplateDto.userId })
+      .execute()
   }
 }
