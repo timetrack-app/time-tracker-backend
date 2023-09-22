@@ -8,7 +8,7 @@ import { WorkSession } from "../entity/workSession.entity";
 import { CreateWorkSessionServiceDto } from "../dto/create-work-session-service-dto";
 import { ITemplateRepository } from "../../../modules/template/interfaces/ITemplate.repository";
 import { CreateWorkSessionFromTemplateDto } from "../dto/create-work-session-from-template-dto";
-import { InternalServerErrorException } from "../../../common/errors/all.exception";
+import { InternalServerErrorException, NotFoundException } from "../../../common/errors/all.exception";
 import { Logger } from "../../../common/services/logger.service";
 import { EndWorkSessionDto } from "../dto/end-work-session-dto";
 import { FindLatestUnfinishedWorkSessionDto } from "../dto/find-latest-unfinished-work-session-dto";
@@ -41,7 +41,12 @@ export class WorkSessionService implements IWorkSessionService {
    * @memberof WorkSessionService
    */
   async getLatestUnfinishedWorkSession(findLatestUnfinishedWorkSessionDto: FindLatestUnfinishedWorkSessionDto): Promise<WorkSession> {
-    return await this.workSessionRepository.findLatestUnfinished(findLatestUnfinishedWorkSessionDto);
+    try {
+      return await this.workSessionRepository.findLatestUnfinished(findLatestUnfinishedWorkSessionDto);
+    } catch (error) {
+      this.logger.error(`Failed to get the latest unfinished WorkSession. Error: ${error}`);
+      throw new NotFoundException('Failed to get the latest unfinished WorkSession.');
+    }
   }
 
   /**

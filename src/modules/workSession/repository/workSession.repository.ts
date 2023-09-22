@@ -147,9 +147,9 @@ export class WorkSessionRepository implements IWorkSessionRepository {
         return updatedResult.raw[0] as WorkSession;
       }
 
-      throw new Error();
+      throw new Error(`Failed to update the WorkSession with id:${workSessionId}.`);
     } catch (error) {
-      throw error;
+      throw new Error(error);
     }
   }
 }
