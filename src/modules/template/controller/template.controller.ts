@@ -6,6 +6,7 @@ import { Request, Response } from 'express';
 import { CreateTemplateRequestDto } from '../dto/create-template-request-dto';
 import { CreateTemplateDto } from '../dto/create-template-dto';
 import { DeleteTemplateDto } from '../dto/delete-template-dto';
+import { DtoValidationMiddleware } from 'src/middlewares/dto-validation.middleware';
 
 @controller('/users/:userId/templates')
 export class TemplateController {
@@ -14,7 +15,7 @@ export class TemplateController {
     private readonly templateService: ITemplateService,
   ) {}
 
-  @httpPost('/')
+  @httpPost('/', DtoValidationMiddleware(CreateTemplateRequestDto))
   public async createTemplate(
     @requestParam('userId') userId: number,
     @requestBody() reqBody: CreateTemplateRequestDto,
