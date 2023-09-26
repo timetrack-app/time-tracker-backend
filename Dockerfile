@@ -14,4 +14,4 @@ RUN npm install --no-package-lock
 COPY . .
 
 EXPOSE 3000
-CMD npm run start:dev
+CMD npm run start:watch
