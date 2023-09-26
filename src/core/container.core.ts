@@ -37,7 +37,9 @@ import { WorkSessionService } from '../modules/workSession/service/workSession.s
 import { IWorkSessionRepository } from '../modules/workSession/interfaces/IWorkSession.repository';
 import { WorkSessionRepository } from '../modules/workSession/repository/workSession.repository';
 import { ITemplateRepository } from '../modules/template/interfaces/ITemplate.repository';
-import { TemplateRepository } from '../modules/template/repository/Template.repository';
+import { TemplateRepository } from '../modules/template/repository/template.repository';
+import { ITemplateService } from '../modules/template/interfaces/ITemplate.service';
+import { TemplateService } from '../modules/template/service/template.service';
 
 const container = new Container();
 
@@ -74,6 +76,7 @@ container.bind<IWorkSessionService>(TYPES.IWorkSessionService).to(WorkSessionSer
 container.bind<IWorkSessionRepository>(TYPES.IWorkSessionRepository).to(WorkSessionRepository);
 
 /* Template bind */
+container.bind<ITemplateService>(TYPES.ITemplateService).to(TemplateService);
 container.bind<ITemplateRepository>(TYPES.ITemplateRepository).to(TemplateRepository);
 
 export default container;

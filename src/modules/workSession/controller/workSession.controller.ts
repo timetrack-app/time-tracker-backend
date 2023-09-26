@@ -10,11 +10,10 @@ import {
 } from 'inversify-express-utils';
 import { TYPES } from '../../../core/type.core';
 import { IWorkSessionService } from '../interfaces/IWorkSession.service';
-import { CreateWorkSessionControllerDto } from '../dto/create-work-session-controller-dto';
+import { CreateWorkSessionRequestDto } from '../dto/create-work-session-request-dto';
 import { CreateWorkSessionServiceDto } from '../dto/create-work-session-service-dto';
 import { DtoValidationMiddleware } from '../../../middlewares/dto-validation.middleware';
 import { CreateWorkSessionReturnType } from '../types';
-import { InternalServerErrorException } from '../../../common/errors/all.exception';
 import { FindLatestUnfinishedWorkSessionDto } from '../dto/find-latest-unfinished-work-session-dto';
 import { EndWorkSessionDto } from '../dto/end-work-session-dto';
 
@@ -38,10 +37,10 @@ export class WorkSessionController {
     return res.status(200).json({ workSession });
   }
 
-  @httpPost('/', DtoValidationMiddleware(CreateWorkSessionControllerDto))
+  @httpPost('/', DtoValidationMiddleware(CreateWorkSessionRequestDto))
   public async createWorkSession(
     @requestParam('userId') userId: number,
-    @requestBody() reqBody: CreateWorkSessionControllerDto,
+    @requestBody() reqBody: CreateWorkSessionRequestDto,
     _: Request,
     res: Response<CreateWorkSessionReturnType>,
   ) {
@@ -49,18 +48,15 @@ export class WorkSessionController {
     dto.userId = userId;
     dto.templateId = reqBody.templateId;
 
-    try {
-      const latestWorkSession = await this.workSessionService.createWorkSession(dto);
+    const latestWorkSession = await this.workSessionService.createWorkSession(dto);
 
-      const statusCode = latestWorkSession.isUnfinished ? 200 : 204;
+    const statusCode = latestWorkSession.isUnfinished ? 200 : 204;
 
-      return res.status(statusCode).json({
-        isUnfinished: latestWorkSession.isUnfinished,
-        workSession: latestWorkSession.workSession,
-      });
-    } catch (error) {
-      throw new InternalServerErrorException('Failed to create new WorkSession.');
-    }
+    return res.status(statusCode).json({
+      isUnfinished: latestWorkSession.isUnfinished,
+      workSession: latestWorkSession.workSession,
+    });
+
   }
 
   @httpPut('/:workSessionId/end')
@@ -72,6 +68,7 @@ export class WorkSessionController {
   ) {
     const dto = new EndWorkSessionDto();
     dto.workSessionId = workSessionId;
+
     const workSession = await this.workSessionService.endWorkSession(dto);
 
     return res.status(200).json({...workSession});

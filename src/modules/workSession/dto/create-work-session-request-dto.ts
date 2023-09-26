@@ -1,6 +1,6 @@
 import { IsNumber, IsOptional } from 'class-validator';
 
-export class CreateWorkSessionControllerDto {
+export class CreateWorkSessionRequestDto {
   @IsOptional()
   @IsNumber()
   templateId: number
