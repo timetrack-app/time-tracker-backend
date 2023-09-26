@@ -1,7 +1,9 @@
-import { IsInt, IsString, IsArray, ValidateNested, IsOptional } from 'class-validator';
+import { IsInt, IsString, IsArray, ValidateNested, IsOptional, IsNotEmpty } from 'class-validator';
+import { Type } from 'class-transformer';
 
 class ListDto {
   @IsString()
+  @IsNotEmpty()
   name: string;
 
   @IsInt()
@@ -10,6 +12,7 @@ class ListDto {
 
 class TabDto {
   @IsString()
+  @IsNotEmpty()
   name: string;
 
   @IsInt()
@@ -18,15 +21,18 @@ class TabDto {
   @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
+  @Type(() => ListDto)
   lists?: ListDto[];
 }
 
 export class CreateTemplateRequestDto {
   @IsString()
+  @IsNotEmpty()
   name: string;
 
   @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
+  @Type(() => TabDto)
   tabs?: TabDto[];
 }
