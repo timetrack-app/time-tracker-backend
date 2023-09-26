@@ -1,12 +1,12 @@
 import { inject } from 'inversify';
 import { controller, httpDelete, httpPost, requestBody, requestParam } from 'inversify-express-utils';
-import { TYPES } from 'src/core/type.core';
+import { TYPES } from '../../../core/type.core';
 import { ITemplateService } from '../interfaces/ITemplate.service';
 import { Request, Response } from 'express';
 import { CreateTemplateRequestDto } from '../dto/create-template-request-dto';
 import { CreateTemplateDto } from '../dto/create-template-dto';
 import { DeleteTemplateDto } from '../dto/delete-template-dto';
-import { DtoValidationMiddleware } from 'src/middlewares/dto-validation.middleware';
+import { DtoValidationMiddleware } from '../../../middlewares/dto-validation.middleware';
 
 @controller('/users/:userId/templates')
 export class TemplateController {

@@ -2,10 +2,10 @@ import { inject, injectable } from 'inversify';
 import { CreateTemplateDto } from '../dto/create-template-dto';
 import { Template } from '../entity/template.entity';
 import { ITemplateService } from '../interfaces/ITemplate.service';
-import { TYPES } from 'src/core/type.core';
+import { TYPES } from '../../../core/type.core';
 import { ITemplateRepository } from '../interfaces/ITemplate.repository';
 import { Logger } from 'winston';
-import { InternalServerErrorException } from 'src/common/errors/all.exception';
+import { InternalServerErrorException } from '../../../common/errors/all.exception';
 import { DeleteTemplateDto } from '../dto/delete-template-dto';
 
 @injectable()

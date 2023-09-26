@@ -38,8 +38,8 @@ import { IWorkSessionRepository } from '../modules/workSession/interfaces/IWorkS
 import { WorkSessionRepository } from '../modules/workSession/repository/workSession.repository';
 import { ITemplateRepository } from '../modules/template/interfaces/ITemplate.repository';
 import { TemplateRepository } from '../modules/template/repository/template.repository';
-import { ITemplateService } from 'src/modules/template/interfaces/ITemplate.service';
-import { TemplateService } from 'src/modules/template/service/template.service';
+import { ITemplateService } from '../modules/template/interfaces/ITemplate.service';
+import { TemplateService } from '../modules/template/service/template.service';
 
 const container = new Container();
 
