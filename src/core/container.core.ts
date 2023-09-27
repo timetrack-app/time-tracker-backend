@@ -40,6 +40,10 @@ import { ITemplateRepository } from '../modules/template/interfaces/ITemplate.re
 import { TemplateRepository } from '../modules/template/repository/template.repository';
 import { ITemplateService } from '../modules/template/interfaces/ITemplate.service';
 import { TemplateService } from '../modules/template/service/template.service';
+import { ITabService } from 'src/modules/tab/interface/ITab.service';
+import { TabService } from 'src/modules/tab/service/tab.service';
+import { TabRepository } from 'src/modules/tab/repository/tab.repository';
+import { ITabRepository } from 'src/modules/tab/interface/ITan.repositoy';
 
 const container = new Container();
 
@@ -72,11 +76,21 @@ container.bind<ISendEmailService>(TYPES.ISendEMailService).to(SendEmailService);
 container.bind<IPassportService>(TYPES.IPassportService).to(PassportService);
 
 /* WorkSession bind */
-container.bind<IWorkSessionService>(TYPES.IWorkSessionService).to(WorkSessionService);
-container.bind<IWorkSessionRepository>(TYPES.IWorkSessionRepository).to(WorkSessionRepository);
+container
+  .bind<IWorkSessionService>(TYPES.IWorkSessionService)
+  .to(WorkSessionService);
+container
+  .bind<IWorkSessionRepository>(TYPES.IWorkSessionRepository)
+  .to(WorkSessionRepository);
 
 /* Template bind */
 container.bind<ITemplateService>(TYPES.ITemplateService).to(TemplateService);
-container.bind<ITemplateRepository>(TYPES.ITemplateRepository).to(TemplateRepository);
+container
+  .bind<ITemplateRepository>(TYPES.ITemplateRepository)
+  .to(TemplateRepository);
+
+/* Tab bind */
+container.bind<ITabService>(TYPES.ITabService).to(TabService);
+container.bind<ITabRepository>(TYPES.ITabRepository).to(TabRepository);
 
 export default container;
