@@ -8,7 +8,7 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { Tab } from './tab.entity';
+import { Tab } from '../../tab/entity/tab.entity';
 import { Task } from './task.entity';
 
 @Entity('lists')

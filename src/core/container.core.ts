@@ -43,7 +43,7 @@ import { TemplateService } from '../modules/template/service/template.service';
 import { ITabService } from 'src/modules/tab/interface/ITab.service';
 import { TabService } from 'src/modules/tab/service/tab.service';
 import { TabRepository } from 'src/modules/tab/repository/tab.repository';
-import { ITabRepository } from 'src/modules/tab/interface/ITan.repositoy';
+import { ITabRepository } from 'src/modules/tab/interface/ITab.repository';
 
 const container = new Container();
 

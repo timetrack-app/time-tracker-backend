@@ -5,7 +5,7 @@ import { IWorkSessionRepository } from '../interfaces/IWorkSession.repository';
 import { IDatabaseService } from '../../../core/interface/IDatabase.service';
 import { CreateWorkSessionDto } from '../dto/create-work-session.dto';
 import { CreateWorkSessionFromTemplateDto } from '../dto/create-work-session-from-template-dto';
-import { Tab } from '../entity/tab.entity';
+import { Tab } from '../../tab/entity/tab.entity';
 import { List } from '../entity/list.entity';
 import { Repository, UpdateResult } from 'typeorm';
 import { FindLatestUnfinishedWorkSessionDto } from '../dto/find-latest-unfinished-work-session-dto';
@@ -24,7 +24,7 @@ export class WorkSessionRepository implements IWorkSessionRepository {
 
   private async getWorkSessionRepo(): Promise<Repository<WorkSession>> {
     return await this.database.getRepository(WorkSession);
-  };
+  }
 
   async findOneById(workSessionId: number): Promise<WorkSession> {
     const repo = await this.getWorkSessionRepo();
@@ -38,14 +38,18 @@ export class WorkSessionRepository implements IWorkSessionRepository {
    * @return {*}  {(Promise<WorkSession | null>)}
    * @memberof WorkSessionRepository
    */
-  async findLatestUnfinished(findLatestUnfinishedWorkSessionDto: FindLatestUnfinishedWorkSessionDto): Promise<WorkSession | null> {
+  async findLatestUnfinished(
+    findLatestUnfinishedWorkSessionDto: FindLatestUnfinishedWorkSessionDto,
+  ): Promise<WorkSession | null> {
     const repo = await this.getWorkSessionRepo();
 
     const latestWorkSession = await repo
       .createQueryBuilder('workSession')
-      .where("workSession.user_id = :userId", { userId: findLatestUnfinishedWorkSessionDto.userId })
+      .where('workSession.user_id = :userId', {
+        userId: findLatestUnfinishedWorkSessionDto.userId,
+      })
       .andWhere('workSession.end_at IS NULL')
-      .getOne()
+      .getOne();
 
     return latestWorkSession;
   }
@@ -57,7 +61,9 @@ export class WorkSessionRepository implements IWorkSessionRepository {
    * @return {*}  {Promise<WorkSession>}
    * @memberof WorkSessionRepository
    */
-  async create(createWorkSessionDto: CreateWorkSessionDto): Promise<WorkSession> {
+  async create(
+    createWorkSessionDto: CreateWorkSessionDto,
+  ): Promise<WorkSession> {
     const repo = await this.getWorkSessionRepo();
 
     const workSession = repo.create({
@@ -75,7 +81,9 @@ export class WorkSessionRepository implements IWorkSessionRepository {
    * @return {*}  {Promise<WorkSession>}
    * @memberof WorkSessionRepository
    */
-  async createFromTemplate(createWorkSessionFromTemplateDto: CreateWorkSessionFromTemplateDto): Promise<WorkSession> {
+  async createFromTemplate(
+    createWorkSessionFromTemplateDto: CreateWorkSessionFromTemplateDto,
+  ): Promise<WorkSession> {
     const entityManager = await this.database.getManager();
     const workSessionRepo = await this.database.getRepository(WorkSession);
     const tabRepo = await this.database.getRepository(Tab);
@@ -105,9 +113,9 @@ export class WorkSessionRepository implements IWorkSessionRepository {
           tab,
           name: templateList.name,
           displayOrder: templateList.displayOrder,
-        })
+        }),
       );
-      tab.lists = lists
+      tab.lists = lists;
 
       tabs.push(tab);
     });
@@ -122,10 +130,10 @@ export class WorkSessionRepository implements IWorkSessionRepository {
 
       return workSession;
     } catch (error) {
-        await queryRunner.rollbackTransaction();
-        throw new Error(error)
+      await queryRunner.rollbackTransaction();
+      throw new Error(error);
     } finally {
-        await queryRunner.release();
+      await queryRunner.release();
     }
   }
 
@@ -137,7 +145,7 @@ export class WorkSessionRepository implements IWorkSessionRepository {
       const updatedResult: UpdateResult = await repo
         .createQueryBuilder()
         .update(WorkSession)
-        .set({ endAt: new Date(), })
+        .set({ endAt: new Date() })
         .where('id = :id', { id: workSessionId })
         .returning('*')
         .updateEntity(true)
@@ -147,7 +155,9 @@ export class WorkSessionRepository implements IWorkSessionRepository {
         return updatedResult.raw[0] as WorkSession;
       }
 
-      throw new Error(`Failed to update the WorkSession with id:${workSessionId}.`);
+      throw new Error(
+        `Failed to update the WorkSession with id:${workSessionId}.`,
+      );
     } catch (error) {
       throw new Error(error);
     }

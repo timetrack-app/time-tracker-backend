@@ -23,5 +23,5 @@ export const TYPES = {
 
   // tab
   ITabService: Symbol.for('ITabService'),
-  ITabRepository: Symbol.for('ITabService'),
+  ITabRepository: Symbol.for('ITabRepository'),
 };

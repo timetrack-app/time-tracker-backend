@@ -8,16 +8,13 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { WorkSession } from './workSession.entity';
-import { List } from './list.entity';
+import { WorkSession } from '../../workSession/entity/workSession.entity';
+import { List } from '../../workSession/entity/list.entity';
 
 @Entity('tabs')
 export class Tab {
   @PrimaryGeneratedColumn()
   id: number;
-
-  @Column({ name: 'work_session_id', nullable: false })
-  workSessionId: number;
 
   @Column({ nullable: false })
   name: string;
