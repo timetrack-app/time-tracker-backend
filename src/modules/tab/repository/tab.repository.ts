@@ -7,9 +7,9 @@ import { Tab } from '../entity/tab.entity';
 import { NotFoundException } from '../../../common/errors/all.exception';
 import { Repository } from 'typeorm';
 import { ITabRepository } from '../interface/ITab.repository';
-import { IDatabaseService } from 'src/core/interface/IDatabase.service';
+import { IDatabaseService } from '../../../core/interface/IDatabase.service';
 import { CreateTabDto } from '../dto/CreateTab.dto';
-import { WorkSession } from 'src/modules/workSession/entity/workSession.entity';
+import { WorkSession } from '../../../modules/workSession/entity/workSession.entity';
 
 @injectable()
 export class TabRepository implements ITabRepository {

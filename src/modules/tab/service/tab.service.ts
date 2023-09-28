@@ -12,7 +12,7 @@ import {
 } from '../../../common/errors/all.exception';
 import { Logger } from '../../../common/services/logger.service';
 import { ITabService } from '../interface/ITab.service';
-import { IWorkSessionRepository } from 'src/modules/workSession/interfaces/IWorkSession.repository';
+import { IWorkSessionRepository } from '../../../modules/workSession/interfaces/IWorkSession.repository';
 
 @injectable()
 export class TabService implements ITabService {

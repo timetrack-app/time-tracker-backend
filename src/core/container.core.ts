@@ -40,10 +40,10 @@ import { ITemplateRepository } from '../modules/template/interfaces/ITemplate.re
 import { TemplateRepository } from '../modules/template/repository/template.repository';
 import { ITemplateService } from '../modules/template/interfaces/ITemplate.service';
 import { TemplateService } from '../modules/template/service/template.service';
-import { ITabService } from 'src/modules/tab/interface/ITab.service';
-import { TabService } from 'src/modules/tab/service/tab.service';
-import { TabRepository } from 'src/modules/tab/repository/tab.repository';
-import { ITabRepository } from 'src/modules/tab/interface/ITab.repository';
+import { ITabService } from '../modules/tab/interface/ITab.service';
+import { TabService } from '../modules/tab/service/tab.service';
+import { TabRepository } from '../modules/tab/repository/tab.repository';
+import { ITabRepository } from '../modules/tab/interface/ITab.repository';
 
 const container = new Container();
 
