@@ -20,4 +20,8 @@ export const TYPES = {
   // template
   ITemplateService: Symbol.for('ITemplateService'),
   ITemplateRepository: Symbol.for('ITemplateRepository'),
+
+  // tab
+  ITabService: Symbol.for('ITabService'),
+  ITabRepository: Symbol.for('ITabRepository'),
 };
