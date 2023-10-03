@@ -1,4 +1,3 @@
-import { config } from 'dotenv';
 import { inject, injectable } from 'inversify';
 import { DataSource, EntityManager, ObjectType, Repository } from 'typeorm';
 import { TYPES } from '../type.core';
