@@ -24,5 +24,9 @@ function generateUsersData(n = 1, object: Partial<User> = {}) {
   );
 }
 
-export const fakeUsers: Array<User> = generateUsersData(1);
-export const fakeUser: User = fakeUsers[0];
+export const fakeUsers = (size) => generateUsersData(size);
+
+export const fakeUser = (): User => {
+  const fakeUsers = generateUsersData(1);
+  return fakeUsers[0];
+};

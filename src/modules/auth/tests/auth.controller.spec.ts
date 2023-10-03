@@ -1,69 +1,60 @@
-// import { agent } from "../../../../tests/utils/supertest.utils";
-// import { TYPES } from "../../../core/type.core";
-// import container from "../../../core/container.core";
-// import { IAuthService } from "../interfaces/IAuth.service";
-// import { FakeAuthService, fakeUser } from "../../../../tests/utils/fake.service";
+import { agent } from '../../../../test/utils/supertest.utils';
+import { TYPES } from '../../../core/type.core';
+import container from '../../../core/container.core';
+import { IAuthService } from '../interfaces/IAuth.service';
+import { FakeAuthService } from '../../../../test/service/fakeAuth.service';
+import { fakeUser } from '../../../../test/factory/user.factory';
+import { AuthRegisterDto } from '../dto/auth-register.dto';
 
-// const userPayload: SignUpCredentialsDto = {
-//     email: fakeUser.email,
-//     password: 'abc'
-// }
+const userPayload: AuthRegisterDto = {
+  email: fakeUser().email,
+  password: 'password',
+  passwordConfirmation: 'password',
+};
 
-// describe('Auth Controller Test', () => {
-//     beforeEach(() => {
-//         container.rebind<IAuthService>(TYPES.IAuthService).to(FakeAuthService);
-//     });
+describe('Auth Controller Test', () => {
+  beforeEach(() => {
+    container.rebind<IAuthService>(TYPES.IAuthService).to(FakeAuthService);
+  });
 
-//     describe('Create A User', () => {
-//         it('Index', (done) => {
-//             agent.post('/auth/signup').send(userPayload).expect(201, done);
-//         });
+  describe('Create A User', () => {
+    it('Index', (done) => {
+      agent.post('/auth/register').send(userPayload).expect(200, done);
+    });
 
-//         it('Create', (done) => {
-//             agent.post('/auth/signup')
-//                 .send(userPayload)
-//                 .then((response) => {
-//                     expect(response.body.message).toStrictEqual('User successfully created !');
-//                     done();
-//                 })
-//                 .catch(error => {
-//                     console.log('error: ', error);
-//                     done();
-//                 })
-//         });
+    it('Create', (done) => {
+      agent
+        .post('/auth/register')
+        .send(userPayload)
+        .then((response) => {
+          expect(response.status).toBe(200);
+          done();
+        })
+        .catch((error) => {
+          console.log('Error on creating user: ', error);
+          done();
+        });
+    });
+  });
 
-//         it('400 statusCode without Validation', (done) => {
-//             agent.post('/auth/signup').send({
-//                 email: userPayload.email,
-//                 password: ''
-//             }).expect(400, done);
-//         });
+  describe('Sign In with a user', () => {
+    it('Index', (done) => {
+      agent.post('/auth/login').send(userPayload).expect(200, done);
+    });
 
-//     });
-
-//     describe('Sign In with a user', () => {
-//         it('Index', (done) => {
-//             agent.post('/auth/signin').send(userPayload).expect(200, done);
-//         });
-
-//         it('Email should be equal', (done) => {
-//             agent.post('/auth/signin')
-//                 .send(userPayload)
-//                 .then((response) => {
-//                     expect(response.body.results.email).toStrictEqual(userPayload.email);
-//                     done();
-//                 })
-//                 .catch(error => {
-//                     console.log('error: ', error);
-//                     done();
-//                 })
-//         });
-
-//         it('400 statusCode without Validation', (done) => {
-//             agent.post('/auth/signin').send({
-//                 email: userPayload.email,
-//                 password: ''
-//             }).expect(400, done);
-//         });
-//     });
-// });
+    it('Responding with token', (done) => {
+      agent
+        .post('/auth/login')
+        .send(userPayload)
+        .then((response) => {
+          expect(response.status).toBe(200);
+          expect(response.body.token).toBeDefined();
+          done();
+        })
+        .catch((error) => {
+          console.log('Error on responding with token: ', error);
+          done();
+        });
+    });
+  });
+});

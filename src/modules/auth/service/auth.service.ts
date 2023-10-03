@@ -41,6 +41,7 @@ export class AuthService implements IAuthService {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
     const newUser = { email, password: hashedPassword };
+
     await this.userService.createUser(newUser);
     // create a token, save the verification
     const verificationToken =
@@ -69,10 +70,12 @@ export class AuthService implements IAuthService {
 
   async login(authLoginDto: AuthLoginDto): Promise<string> {
     const { email, password } = authLoginDto;
+
     const user = await this.userService.findOneByEmail(email);
     if (!user) {
       throw new ValidationErrorException('Email is invalid.');
     }
+
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
