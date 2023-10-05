@@ -56,56 +56,47 @@ export class UserService implements IUserService {
   async verifyUserWithToken(token: string): Promise<User> {
     const email = await this.userEmailVerificationService.verify(token);
     const user = await this.findOneByEmail(email);
-    if (!user)
-      throw new NotFoundException(`wrong email input. email : ${email}`);
-    return await this.updateUser(user, { isVerified: true });
+    const verifiedUser = await this.updateUser(user, { isVerified: true });
+    return verifiedUser;
   }
 
   async updateEmailAndSendVerification(id: number, email: string) {
-    try {
-      const user = await this.findOneById(id);
-      await this.updateUser(user, {
-        email,
-        isVerified: false,
-      });
-      // generate a email verification token
-      const token =
-        await this.userEmailVerificationService.createVerificationToken(email);
-      // using the token, send verification email to the user
-      await this.sendEmailService.sendNewEmailConfirmationEmail(email, token);
-      //update user's email and set user verification status
-    } catch (error) {
-      throw new InternalServerErrorException(error.message);
-    }
+    const user = await this.findOneById(id);
+    if (!user) throw new NotFoundException('User with this id not found.');
+    await this.updateUser(user, {
+      email,
+      isVerified: false,
+    });
+    // generate a email verification token
+    const token =
+      await this.userEmailVerificationService.createVerificationToken(email);
+    // using the token, send verification email to the user
+    await this.sendEmailService.sendNewEmailConfirmationEmail(email, token);
+    //update user's email and set user verification status
   }
 
   async updatePassword(id: number, password: string) {
-    try {
-      const user = await this.findOneById(id);
-      //update user's email and set user verification status
-      // hash
-      const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash(password, salt);
-      await this.updateUser(user, {
-        password: hashedPassword,
-      });
-      const { email } = user;
-      // generate a email verification token
-      const token = await this.userEmailVerificationService.findTokenWithEmail(
-        email,
-      );
-      // using the token, send verification email to the user
-      await this.sendEmailService.sendNewPasswordConfirmationEmail(
-        email,
-        token,
-      );
-      //update user's email and set user verification status
-    } catch (error) {
-      throw new InternalServerErrorException(error.message);
-    }
+    const user = await this.findOneById(id);
+    if (!user) throw new NotFoundException('User with this id not found.');
+    //update user's email and set user verification status
+    // hash
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+    await this.updateUser(user, {
+      password: hashedPassword,
+    });
+    const { email } = user;
+    // generate a email verification token
+    const token = await this.userEmailVerificationService.findTokenWithEmail(
+      email,
+    );
+    // using the token, send verification email to the user
+    await this.sendEmailService.sendNewPasswordConfirmationEmail(email, token);
   }
 
   async handlePasswordResetRequest(id: number, email: string) {
+    if (!(await this.findOneById(id)))
+      throw new NotFoundException('User with this id not found.');
     const user = await this.findOneByEmail(email);
     if (!user) throw new ValidationErrorException('This email is invalid');
     this.sendEmailService.sendPasswordResetLinkEmail(id, email);

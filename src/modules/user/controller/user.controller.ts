@@ -11,7 +11,6 @@ import {
 import { TYPES } from '../../../core/type.core';
 import { IUserService } from '../interfaces/IUser.service';
 import { UpdateEmailDto } from '../dto/update-email.dto';
-import { ISendEmailService } from '../../../modules/sendMail/interface/ISendEmail.service';
 import { DtoValidationMiddleware } from '../../../middlewares/dto-validation.middleware';
 import { UpdatePasswordDto } from '../dto/update-password.dto';
 import { ResetPasswordDto } from '../dto/reset-password.dto';
@@ -20,8 +19,6 @@ import { NotFoundException } from '../../../common/errors/all.exception';
 export class UserController {
   constructor(
     @inject(TYPES.IUserService) private readonly userService: IUserService,
-    @inject(TYPES.ISendEMailService)
-    private readonly sendEmailService: ISendEmailService,
   ) {}
 
   @httpGet('/:userId')

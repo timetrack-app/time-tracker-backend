@@ -20,6 +20,7 @@ import { TYPES } from './core/type.core';
 import { ISendEmailService } from './modules/sendMail/interface/ISendEmail.service';
 import { IPassportService } from './modules/passport/interface/IPassport.service';
 
+export const server = new InversifyExpressServer(container);
 const passportService = container.get<IPassportService>(TYPES.IPassportService);
 passportService.init();
 
@@ -27,8 +28,6 @@ const sendEmailService = container.get<ISendEmailService>(
   TYPES.ISendEMailService,
 );
 sendEmailService.init();
-
-export const server = new InversifyExpressServer(container);
 server.setConfig((app) => {
   app.use(express.urlencoded({ extended: true }));
   app.use(express.json());
