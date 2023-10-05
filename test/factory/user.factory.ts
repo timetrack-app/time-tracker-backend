@@ -19,7 +19,7 @@ function generateUsersData(n = 1, object: Partial<User> = {}) {
       length: n,
     },
     (_, i) => {
-      return generateUserData({ id: i, ...object }) as User;
+      return generateUserData({ ...object }) as User;
     },
   );
 }
