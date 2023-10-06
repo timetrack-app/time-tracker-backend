@@ -1,4 +1,3 @@
-import { ISendEmailService } from './../modules/sendMail/interface/ISendEmail.service';
 import { Container } from 'inversify';
 import { TYPES } from './type.core';
 
@@ -24,26 +23,39 @@ import { UserService } from '../modules/user/service/user.service';
 
 /* Passport Import */
 import { PassportService } from '../modules/passport/service/passport.service';
+import { IPassportService } from '../modules/passport/interface/IPassport.service';
+
+/* UserEmailVerification Import */
 import { IUserEmailVerificationRepository } from '../modules/userEmailVerification/interface/IUserEmailVerification.repository';
 import { UserEmailVerificationRepository } from '../modules/userEmailVerification/repository/userEmailVerification.repository';
 import { IUserEmailVerificationService } from '../modules/userEmailVerification/interface/IUserEmailVerification.service';
 import { UserEmailVerificationService } from '../modules/userEmailVerification/service/userEmailVerification.service';
+
+/* SendEmail Import */
 import { SendEmailService } from '../modules/sendMail/service/sendEMail.service';
-import { IPassportService } from '../modules/passport/interface/IPassport.service';
+import { ISendEmailService } from 'src/modules/sendMail/interface/ISendEmail.service';
 
 /* WorkSession import */
 import { IWorkSessionService } from '../modules/workSession/interfaces/IWorkSession.service';
 import { WorkSessionService } from '../modules/workSession/service/workSession.service';
 import { IWorkSessionRepository } from '../modules/workSession/interfaces/IWorkSession.repository';
 import { WorkSessionRepository } from '../modules/workSession/repository/workSession.repository';
+
+/* Template import */
 import { ITemplateRepository } from '../modules/template/interfaces/ITemplate.repository';
 import { TemplateRepository } from '../modules/template/repository/template.repository';
 import { ITemplateService } from '../modules/template/interfaces/ITemplate.service';
 import { TemplateService } from '../modules/template/service/template.service';
+
+/* Tab import */
 import { ITabService } from '../modules/tab/interface/ITab.service';
 import { TabService } from '../modules/tab/service/tab.service';
 import { TabRepository } from '../modules/tab/repository/tab.repository';
 import { ITabRepository } from '../modules/tab/interface/ITab.repository';
+
+/* List import */
+import { IListService } from 'src/modules/list/interface/IList.service';
+import { ListService } from 'src/modules/list/service/list.service';
 
 const container = new Container();
 
@@ -92,5 +104,9 @@ container
 /* Tab bind */
 container.bind<ITabService>(TYPES.ITabService).to(TabService);
 container.bind<ITabRepository>(TYPES.ITabRepository).to(TabRepository);
+
+/* List bind */
+container.bind<IListService>(TYPES.IListService).to(ListService);
+container.bind<ITabRepository>(TYPES.IRepository).to(TabRepository);
 
 export default container;
