@@ -3,8 +3,6 @@
 import { inject, injectable } from 'inversify';
 import { TYPES } from '../../../core/type.core';
 import { Tab } from '../entity/tab.entity';
-
-import { NotFoundException } from '../../../common/errors/all.exception';
 import { Repository } from 'typeorm';
 import { ITabRepository } from '../interface/ITab.repository';
 import { IDatabaseService } from '../../../core/interface/IDatabase.service';
@@ -23,7 +21,8 @@ export class TabRepository implements ITabRepository {
 
   async findOneById(id: number) {
     const repo = await this.getTabRepo();
-    return repo.findOneBy({ id });
+    const tab = await repo.findOneBy({ id });
+    return tab;
   }
 
   async create(
@@ -40,22 +39,9 @@ export class TabRepository implements ITabRepository {
     return await repo.save(tab);
   }
 
-  async update(
-    tabId: number,
-    workSession: WorkSession,
-    attrs: Partial<Tab>,
-  ): Promise<Tab> {
+  async update(updatedTab: Tab): Promise<Tab> {
     const repo = await this.getTabRepo();
-    const existingTab = await repo.findOne({
-      where: { id: tabId, workSession },
-    });
-    if (!existingTab) {
-      throw new NotFoundException(
-        `Tab with ID ${tabId} not found for WorkSession ${workSession.id}`,
-      );
-    }
-    Object.assign(existingTab, attrs);
-    return await repo.save(existingTab);
+    return await repo.save(updatedTab);
   }
 
   async delete(id: number, workSession: WorkSession): Promise<void> {

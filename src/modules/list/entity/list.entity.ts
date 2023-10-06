@@ -8,13 +8,16 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { WorkSession } from '../../workSession/entity/workSession.entity';
-import { List } from '../../list/entity/list.entity';
+import { Tab } from '../../tab/entity/tab.entity';
+import { Task } from '../../workSession/entity/task.entity';
 
-@Entity('tabs')
-export class Tab {
+@Entity('lists')
+export class List {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @Column({ name: 'tab_id', nullable: false })
+  tabId: number;
 
   @Column({ nullable: false })
   name: string;
@@ -30,10 +33,10 @@ export class Tab {
 
   // Define the relations
 
-  @ManyToOne(() => WorkSession, (workSession) => workSession.tabs)
-  @JoinColumn({ name: 'work_session_id' })
-  workSession: WorkSession;
+  @ManyToOne(() => Tab, (tab) => tab.lists)
+  @JoinColumn({ name: 'tab_id' })
+  tab: Tab;
 
-  @OneToMany(() => List, (list) => list.tab)
-  lists: List[];
+  @OneToMany(() => Task, (task) => task.list)
+  tasks: Task[];
 }

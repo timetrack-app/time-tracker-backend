@@ -11,7 +11,6 @@ import {
 import { TYPES } from '../../../core/type.core';
 import { ITabService } from './../interface/ITab.service';
 import { CreateTabDto } from '../dto/CreateTab.dto';
-import { UpdateTabDto } from '../dto/UpdateTab.dto';
 import { Tab } from '../entity/tab.entity';
 
 @controller('/work-sessions/:workSessionId/tabs')
@@ -25,6 +24,7 @@ export class TabController {
   public async createTab(
     @requestParam('workSessionId') workSessionId: number,
     @requestBody() reqBody: CreateTabDto,
+    _: Request,
     res: Response,
   ) {
     const newTab = await this.tabService.createTab(workSessionId, reqBody);
@@ -36,6 +36,7 @@ export class TabController {
     @requestParam('workSessionId') workSessionId: number,
     @requestParam('tabId') tabId: number,
     @requestBody() reqBody: Partial<Tab>,
+    _: Request,
     res: Response,
   ) {
     const updatedTab = await this.tabService.updateTab(
@@ -50,6 +51,7 @@ export class TabController {
   public async deleteTab(
     @requestParam('workSessionId') workSessionId: number,
     @requestParam('tabId') tabId: number,
+    _: Request,
     res: Response,
   ) {
     await this.tabService.deleteTab(workSessionId, tabId);

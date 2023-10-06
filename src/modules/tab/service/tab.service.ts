@@ -29,10 +29,14 @@ export class TabService implements ITabService {
     workSessionId: number,
     createTabDto: CreateTabDto,
   ): Promise<Tab> {
-    try {
-      const workSession = await this.workSessionRepository.findOneById(
-        workSessionId,
+    const workSession = await this.workSessionRepository.findOneById(
+      workSessionId,
+    );
+    if (!workSession)
+      throw new NotFoundException(
+        `workSession with Id ${workSessionId} was not found`,
       );
+    try {
       return await this.tabRepository.create(workSession, createTabDto);
     } catch (error) {
       this.logger.error(`Failed to create a new tab. Error: ${error}`);
@@ -45,12 +49,20 @@ export class TabService implements ITabService {
     tabId: number,
     attrs: Partial<Tab>,
   ): Promise<Tab> {
-    // Implement the logic to update a tab here.
-    try {
-      const workSession = await this.workSessionRepository.findOneById(
-        workSessionId,
+    const workSession = await this.workSessionRepository.findOneById(
+      workSessionId,
+    );
+    if (!workSession)
+      throw new NotFoundException(
+        `WorkSession with ID ${workSessionId} not found`,
       );
-      return await this.tabRepository.update(tabId, workSession, attrs);
+    const existingTab = await this.tabRepository.findOneById(tabId);
+    if (!existingTab)
+      throw new NotFoundException(`Tab with ID ${tabId} not found`);
+
+    const updatedTab = Object.assign(existingTab, attrs);
+    try {
+      return await this.tabRepository.update(updatedTab);
     } catch (error) {
       this.logger.error(`Failed to update the tab. Error: ${error}`);
       throw new InternalServerErrorException('Failed to update a tab.');
@@ -58,11 +70,14 @@ export class TabService implements ITabService {
   }
 
   async deleteTab(workSessionId: number, tabId: number): Promise<void> {
-    // Implement the logic to delete a tab here.
-    try {
-      const workSession = await this.workSessionRepository.findOneById(
-        workSessionId,
+    const workSession = await this.workSessionRepository.findOneById(
+      workSessionId,
+    );
+    if (!workSession)
+      throw new NotFoundException(
+        `workSession with Id ${workSessionId} was not found`,
       );
+    try {
       await this.tabRepository.delete(tabId, workSession);
     } catch (error) {
       this.logger.error(`Failed to delete the tab. Error: ${error}`);
