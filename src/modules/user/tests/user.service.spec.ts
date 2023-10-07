@@ -16,8 +16,6 @@ const notExistingUser = fakeUser();
 
 const existingUser = fakeUser();
 
-console.log(notExistingUser);
-console.log(existingUser);
 const mockUserRepo: IUserRepository = {
   create: jest.fn((createUserDto: CreateUserDto) =>
     Promise.resolve(notExistingUser),
@@ -27,9 +25,6 @@ const mockUserRepo: IUserRepository = {
     return Promise.resolve(existingUser);
   }),
   findOneByEmail: jest.fn((email: string) => {
-    console.log(email);
-    console.log(notExistingUser.email);
-
     if (email === notExistingUser.email) return null;
     return Promise.resolve(existingUser);
   }), // Modify to simulate an existing user
@@ -159,7 +154,6 @@ describe('User Service Test', () => {
     const invalidId = notExistingUser.id;
     const validEmail = existingUser.email;
     const invalidEmail = notExistingUser.email;
-    console.log(invalidEmail);
 
     it('Should work fine when id and email is correct', async () => {
       await expect(

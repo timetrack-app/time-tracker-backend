@@ -1,11 +1,8 @@
-import { WorkSession } from './../../workSession/entity/workSession.entity';
-import { WorkSessionRepository } from './../../workSession/repository/workSession.repository';
 import { inject, injectable } from 'inversify';
 import { ITabRepository } from '../interface/ITab.repository';
 import { TYPES } from '../../../core/type.core';
 import { Tab } from '../entity/tab.entity';
 import { CreateTabDto } from '../dto/CreateTab.dto';
-import { UpdateTabDto } from '../dto/UpdateTab.dto';
 import {
   NotFoundException,
   InternalServerErrorException,
@@ -77,6 +74,9 @@ export class TabService implements ITabService {
       throw new NotFoundException(
         `workSession with Id ${workSessionId} was not found`,
       );
+    const existingTab = await this.tabRepository.findOneById(tabId);
+    if (!existingTab)
+      throw new NotFoundException(`Tab with ID ${tabId} not found`);
     try {
       await this.tabRepository.delete(tabId, workSession);
     } catch (error) {

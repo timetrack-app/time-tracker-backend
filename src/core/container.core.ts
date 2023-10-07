@@ -33,7 +33,7 @@ import { UserEmailVerificationService } from '../modules/userEmailVerification/s
 
 /* SendEmail Import */
 import { SendEmailService } from '../modules/sendMail/service/sendEMail.service';
-import { ISendEmailService } from 'src/modules/sendMail/interface/ISendEmail.service';
+import { ISendEmailService } from '../modules/sendMail/interface/ISendEmail.service';
 
 /* WorkSession import */
 import { IWorkSessionService } from '../modules/workSession/interfaces/IWorkSession.service';
@@ -54,8 +54,10 @@ import { TabRepository } from '../modules/tab/repository/tab.repository';
 import { ITabRepository } from '../modules/tab/interface/ITab.repository';
 
 /* List import */
-import { IListService } from 'src/modules/list/interface/IList.service';
-import { ListService } from 'src/modules/list/service/list.service';
+import { IListService } from '../modules/list/interface/IList.service';
+import { ListService } from '../modules/list/service/list.service';
+import { ListRepository } from '../modules/list/repository/list.repository';
+import { IListRepository } from '../modules/list/interface/IList.repository';
 
 const container = new Container();
 
@@ -107,6 +109,6 @@ container.bind<ITabRepository>(TYPES.ITabRepository).to(TabRepository);
 
 /* List bind */
 container.bind<IListService>(TYPES.IListService).to(ListService);
-container.bind<ITabRepository>(TYPES.IRepository).to(TabRepository);
+container.bind<IListRepository>(TYPES.IListRepository).to(ListRepository);
 
 export default container;

@@ -12,6 +12,7 @@ import { TYPES } from '../../../core/type.core';
 import { ITabService } from './../interface/ITab.service';
 import { CreateTabDto } from '../dto/CreateTab.dto';
 import { Tab } from '../entity/tab.entity';
+import { DtoValidationMiddleware } from '../../../middlewares/dto-validation.middleware';
 
 @controller('/work-sessions/:workSessionId/tabs')
 export class TabController {
@@ -20,7 +21,7 @@ export class TabController {
     private readonly tabService: ITabService,
   ) {}
 
-  @httpPost('/')
+  @httpPost('/', DtoValidationMiddleware(CreateTabDto))
   public async createTab(
     @requestParam('workSessionId') workSessionId: number,
     @requestBody() reqBody: CreateTabDto,
