@@ -51,7 +51,7 @@ describe('Tab Controller Test', () => {
 
   describe('Delete', () => {
     it('Delete a Tab', async () => {
-      await agent.delete(`/work-sessions/1/tabs/${tabId}`).expect(204);
+      await agent.delete(`${baseURL}/${tabId}`).expect(204);
     });
   });
 });

@@ -35,10 +35,10 @@ export class ListService implements IListService {
     );
     if (!workSession)
       throw new NotFoundException(
-        `WorkSession was not found with Id ${workSessionId}`,
+        `WorkSession with Id ${workSessionId} not found`,
       );
     const tab = await this.tabRepository.findOneById(tabId);
-    if (!tab) throw new NotFoundException(`Tab was not found with Id ${tabId}`);
+    if (!tab) throw new NotFoundException(`Tab with Id ${tabId} not found`);
     try {
       return await this.listRepository.create(tab, createListDto);
     } catch (error) {
@@ -58,14 +58,13 @@ export class ListService implements IListService {
     );
     if (!workSession)
       throw new NotFoundException(
-        `WorkSession was not found with Id ${workSessionId}`,
+        `WorkSession with Id ${workSessionId} not found`,
       );
     const tab = await this.tabRepository.findOneById(tabId);
-    if (!tab) throw new NotFoundException(`Tab was not found with Id ${tabId}`);
+    if (!tab) throw new NotFoundException(`Tab with Id ${tabId} not found`);
 
     const list = await this.listRepository.findOneById(listId);
-    if (!list)
-      throw new NotFoundException(`List was not found with Id ${listId}`);
+    if (!list) throw new NotFoundException(`List with Id ${listId} not found`);
     const updatedList = Object.assign(list, attrs);
     try {
       return await this.listRepository.update(updatedList);
@@ -83,12 +82,15 @@ export class ListService implements IListService {
     const workSession = await this.workSessionRepository.findOneById(
       workSessionId,
     );
+    if (!workSession)
+      throw new NotFoundException(
+        `WorkSession with Id ${workSessionId} not found`,
+      );
     const tab = await this.tabRepository.findOneById(tabId);
-    if (!tab) throw new NotFoundException(`Tab was not found with Id ${tabId}`);
+    if (!tab) throw new NotFoundException(`Tab with Id ${tabId} not found`);
 
     const list = await this.listRepository.findOneById(listId);
-    if (!list)
-      throw new NotFoundException(`List was not found with Id ${listId}`);
+    if (!list) throw new NotFoundException(`List with Id ${listId} not found`);
 
     try {
       await this.listRepository.delete(listId);

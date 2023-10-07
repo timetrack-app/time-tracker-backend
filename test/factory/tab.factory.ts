@@ -1,6 +1,5 @@
 import { faker } from '@faker-js/faker';
 import { Tab } from '../../src/modules/tab/entity/tab.entity';
-import { fakeWorkSession } from './workSession.factory';
 
 function generateTabData(obj: Partial<Tab> = {}): Tab {
   return {
