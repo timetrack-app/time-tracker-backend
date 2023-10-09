@@ -9,7 +9,7 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { WorkSession } from '../../workSession/entity/workSession.entity';
-import { List } from '../../workSession/entity/list.entity';
+import { List } from '../../list/entity/list.entity';
 
 @Entity('tabs')
 export class Tab {

@@ -6,7 +6,7 @@ import { IDatabaseService } from '../../../core/interface/IDatabase.service';
 import { CreateWorkSessionDto } from '../dto/create-work-session.dto';
 import { CreateWorkSessionFromTemplateDto } from '../dto/create-work-session-from-template-dto';
 import { Tab } from '../../tab/entity/tab.entity';
-import { List } from '../entity/list.entity';
+import { List } from '../../list/entity/list.entity';
 import { Repository, UpdateResult } from 'typeorm';
 import { FindLatestUnfinishedWorkSessionDto } from '../dto/find-latest-unfinished-work-session-dto';
 
