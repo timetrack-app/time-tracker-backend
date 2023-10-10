@@ -25,7 +25,11 @@ export const TYPES = {
   ITabService: Symbol.for('ITabService'),
   ITabRepository: Symbol.for('ITabRepository'),
 
-  // tab
+  // list
   IListService: Symbol.for('IListService'),
   IListRepository: Symbol.for('IListRepository'),
+
+  // task
+  ITaskService: Symbol.for('ITaskService'),
+  ITaskRepository: Symbol.for('ITaskRepository'),
 };

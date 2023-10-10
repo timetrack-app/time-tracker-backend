@@ -11,7 +11,7 @@ import { Logger } from '../../../common/services/logger.service';
 import { IListService } from '../interface/IList.service';
 import { IWorkSessionRepository } from '../../../modules/workSession/interfaces/IWorkSession.repository';
 import { fakeList } from '../../../../test/factory/list.factory';
-import { ITabRepository } from 'src/modules/tab/interface/ITab.repository';
+import { ITabRepository } from '../../../modules/tab/interface/ITab.repository';
 import { fakeTab } from '../../../../test/factory/tab.factory';
 
 describe('List Service Test', () => {

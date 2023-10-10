@@ -58,6 +58,10 @@ import { IListService } from '../modules/list/interface/IList.service';
 import { ListService } from '../modules/list/service/list.service';
 import { ListRepository } from '../modules/list/repository/list.repository';
 import { IListRepository } from '../modules/list/interface/IList.repository';
+import { ITaskService } from '../modules/task/interface/ITask.service';
+import { ITaskRepository } from '../modules/task/interface/ITask.repository';
+import { TaskService } from '../modules/task/service/task.service';
+import { TaskRepository } from '../modules/task/repository/task.repository';
 
 const container = new Container();
 
@@ -111,4 +115,7 @@ container.bind<ITabRepository>(TYPES.ITabRepository).to(TabRepository);
 container.bind<IListService>(TYPES.IListService).to(ListService);
 container.bind<IListRepository>(TYPES.IListRepository).to(ListRepository);
 
+/* Task bind */
+container.bind<ITaskService>(TYPES.ITaskService).to(TaskService);
+container.bind<ITaskRepository>(TYPES.ITaskRepository).to(TaskRepository);
 export default container;
