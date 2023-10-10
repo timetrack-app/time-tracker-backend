@@ -1,39 +1,43 @@
 import 'reflect-metadata';
-import { ListService } from '../service/task.service';
-import { IListRepository } from '../interface/ITask.repository';
-import { List } from '../entity/task.entity';
-import { CreateListDto } from '../dto/createTask.dto';
+import { TaskService } from '../service/task.service';
+import { ITaskRepository } from '../interface/ITask.repository';
+import { Task } from '../entity/task.entity';
+import { CreateTaskDto } from '../dto/createTask.dto';
 import {
   NotFoundException,
   InternalServerErrorException,
 } from '../../../common/errors/all.exception';
 import { Logger } from '../../../common/services/logger.service';
-import { IListService } from '../interface/ITask.service';
+import { ITaskService } from '../interface/ITask.service';
 import { IWorkSessionRepository } from '../../workSession/interfaces/IWorkSession.repository';
-import { fakeList } from '../../../../test/factory/list.factory';
-import { ITabRepository } from 'src/modules/tab/interface/ITab.repository';
+import { fakeTask } from '../../../../test/factory/task.factory';
+import { ITabRepository } from '../../../modules/tab/interface/ITab.repository';
 import { fakeTab } from '../../../../test/factory/tab.factory';
+import { fakeList } from '../../../../test/factory/list.factory';
+import { IListRepository } from '../../../modules/list/interface/IList.repository';
 
-describe('List Service Test', () => {
-  let listService: IListService;
+describe('Task Service Test', () => {
+  let taskService: ITaskService;
 
   // Dummy data implementation
-  const fakeListA = fakeList();
+  const fakeTaskA = fakeTask();
 
   const fakeTabA = fakeTab();
+
+  const fakeListA = fakeList();
 
   const validId = 1;
   const invalidId = 0;
 
   // Mock repositories and logger
-  const mockListRepository: IListRepository = {
-    create: jest.fn((workSession: any, createListDto: CreateListDto) =>
-      Promise.resolve(fakeListA),
+  const mockTaskRepository: ITaskRepository = {
+    create: jest.fn((workSession: any, createTaskDto: CreateTaskDto) =>
+      Promise.resolve(fakeTaskA),
     ),
     findOneById: jest.fn((id: number) =>
-      Promise.resolve(id === validId ? fakeListA : null),
+      Promise.resolve(id === validId ? fakeTaskA : null),
     ),
-    update: jest.fn((list: List) => Promise.resolve(fakeListA)),
+    update: jest.fn((task: Task) => Promise.resolve(fakeTaskA)),
     delete: jest.fn((id: number) => Promise.resolve()),
   };
 
@@ -49,37 +53,46 @@ describe('List Service Test', () => {
     ),
   } as unknown as ITabRepository;
 
+  const mockListRepository: IListRepository = {
+    findOneById: jest.fn((id: number) =>
+      Promise.resolve(id === validId ? fakeListA : null),
+    ),
+  } as unknown as IListRepository;
+
   const mockLogger: Logger = {
     error: jest.fn(),
   } as unknown as Logger;
 
   // Test starts from here
   beforeEach(() => {
-    listService = new ListService(
-      mockListRepository,
+    taskService = new TaskService(
+      mockTaskRepository,
       mockWorkSessionRepository,
       mockTabRepository,
+      mockListRepository,
       mockLogger,
     );
   });
 
-  describe('Create List', () => {
-    const createListDto: CreateListDto = {
-      name: 'List C',
+  describe('Create Task', () => {
+    const createTaskDto: CreateTaskDto = {
+      name: 'Task C',
       displayOrder: 3,
+      description: 'Task C',
     };
-    it('Should create a list', async () => {
-      const response = await listService.createList(
+    it('Should create a task', async () => {
+      const response = await taskService.createTask(
         validId,
         validId,
-        createListDto,
+        validId,
+        createTaskDto,
       );
-      expect(response).toEqual(fakeListA);
+      expect(response).toEqual(fakeTaskA);
     });
 
     it('Should throw NotFoundException when work session is not found', async () => {
       await expect(
-        listService.createList(invalidId, validId, createListDto),
+        taskService.createTask(invalidId, validId, validId, createTaskDto),
       ).rejects.toThrow(
         new NotFoundException('WorkSession with Id 0 not found'),
       );
@@ -87,37 +100,44 @@ describe('List Service Test', () => {
 
     it('Should throw NotFoundException when tab is not found', async () => {
       await expect(
-        listService.createList(validId, invalidId, createListDto),
+        taskService.createTask(validId, invalidId, validId, createTaskDto),
       ).rejects.toThrow(new NotFoundException('Tab with Id 0 not found'));
     });
 
-    it('Should throw InternalServerErrorException when list creation fails', async () => {
-      mockListRepository.create = jest.fn(() => {
+    it('Should throw NotFoundException when list is not found', async () => {
+      await expect(
+        taskService.createTask(validId, validId, invalidId, createTaskDto),
+      ).rejects.toThrow(new NotFoundException('List with Id 0 not found'));
+    });
+
+    it('Should throw InternalServerErrorException when task creation fails', async () => {
+      mockTaskRepository.create = jest.fn(() => {
         throw new Error('Test Error');
       });
       await expect(
-        listService.createList(validId, validId, {} as CreateListDto),
+        taskService.createTask(validId, validId, validId, {} as CreateTaskDto),
       ).rejects.toThrow(
-        new InternalServerErrorException('Failed to create a list.'),
+        new InternalServerErrorException('Failed to create a task.'),
       );
     });
   });
 
-  describe('Update List', () => {
-    it('Should update a list', async () => {
-      const attrs = { name: 'Updated List A' };
-      const response = await listService.updateList(
+  describe('Update Task', () => {
+    it('Should update a task', async () => {
+      const attrs = { name: 'Updated Task A' };
+      const response = await taskService.updateTask(
+        validId,
         validId,
         validId,
         validId,
         attrs,
       );
-      expect(response).toEqual(fakeListA);
+      expect(response).toEqual(fakeTaskA);
     });
 
     it('Should throw NotFoundException when work session is not found', async () => {
       await expect(
-        listService.updateList(invalidId, validId, validId, {}),
+        taskService.updateTask(invalidId, validId, validId, validId, {}),
       ).rejects.toThrow(
         new NotFoundException(`WorkSession with Id ${invalidId} not found`),
       );
@@ -125,7 +145,7 @@ describe('List Service Test', () => {
 
     it('Should throw NotFoundException when tab is not found', async () => {
       await expect(
-        listService.updateList(validId, invalidId, validId, {}),
+        taskService.updateTask(validId, invalidId, validId, validId, {}),
       ).rejects.toThrow(
         new NotFoundException(`Tab with Id ${invalidId} not found`),
       );
@@ -133,33 +153,41 @@ describe('List Service Test', () => {
 
     it('Should throw NotFoundException when list is not found', async () => {
       await expect(
-        listService.updateList(validId, validId, invalidId, {}),
+        taskService.updateTask(validId, validId, invalidId, validId, {}),
       ).rejects.toThrow(
         new NotFoundException(`List with Id ${invalidId} not found`),
       );
     });
 
-    it('Should throw InternalServerErrorException when list update fails', async () => {
-      mockListRepository.update = jest.fn(() => {
+    it('Should throw NotFoundException when task is not found', async () => {
+      await expect(
+        taskService.updateTask(validId, validId, validId, invalidId, {}),
+      ).rejects.toThrow(
+        new NotFoundException(`Task with Id ${invalidId} not found`),
+      );
+    });
+
+    it('Should throw InternalServerErrorException when task update fails', async () => {
+      mockTaskRepository.update = jest.fn(() => {
         throw new Error('Test Error');
       });
       await expect(
-        listService.updateList(validId, validId, validId, {}),
+        taskService.updateTask(validId, validId, validId, validId, {}),
       ).rejects.toThrow(
-        new InternalServerErrorException('Failed to update a list.'),
+        new InternalServerErrorException('Failed to update a task.'),
       );
     });
   });
 
-  describe('Delete List', () => {
-    it('Should delete a list', async () => {
-      await listService.deleteList(validId, validId, validId);
-      expect(mockListRepository.delete).toHaveBeenCalledWith(validId);
+  describe('Delete Task', () => {
+    it('Should delete a task', async () => {
+      await taskService.deleteTask(validId, validId, validId, validId);
+      expect(mockTaskRepository.delete).toHaveBeenCalledWith(validId);
     });
 
     it('Should throw NotFoundException when work session is not found', async () => {
       await expect(
-        listService.deleteList(invalidId, validId, validId),
+        taskService.deleteTask(invalidId, validId, validId, validId),
       ).rejects.toThrow(
         new NotFoundException(`WorkSession with Id ${invalidId} not found`),
       );
@@ -167,7 +195,7 @@ describe('List Service Test', () => {
 
     it('Should throw NotFoundException when tab is not found', async () => {
       await expect(
-        listService.deleteList(validId, invalidId, validId),
+        taskService.deleteTask(validId, invalidId, validId, validId),
       ).rejects.toThrow(
         new NotFoundException(`Tab with Id ${invalidId} not found`),
       );
@@ -175,20 +203,28 @@ describe('List Service Test', () => {
 
     it('Should throw NotFoundException when list is not found', async () => {
       await expect(
-        listService.deleteList(validId, validId, invalidId),
+        taskService.deleteTask(validId, validId, invalidId, validId),
       ).rejects.toThrow(
         new NotFoundException(`List with Id ${invalidId} not found`),
       );
     });
 
-    it('Should throw InternalServerErrorException when list deletion fails', async () => {
-      mockListRepository.delete = jest.fn(() => {
+    it('Should throw NotFoundException when task is not found', async () => {
+      await expect(
+        taskService.deleteTask(validId, validId, validId, invalidId),
+      ).rejects.toThrow(
+        new NotFoundException(`Task with Id ${invalidId} not found`),
+      );
+    });
+
+    it('Should throw InternalServerErrorException when task deletion fails', async () => {
+      mockTaskRepository.delete = jest.fn(() => {
         throw new Error('Test Error');
       });
       await expect(
-        listService.deleteList(validId, validId, validId),
+        taskService.deleteTask(validId, validId, validId, validId),
       ).rejects.toThrow(
-        new InternalServerErrorException('Failed to delete a list.'),
+        new InternalServerErrorException('Failed to delete a task.'),
       );
     });
   });

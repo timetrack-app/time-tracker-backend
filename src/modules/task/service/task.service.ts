@@ -11,7 +11,7 @@ import { Logger } from '../../../common/services/logger.service';
 import { ITaskService } from '../interface/ITask.service';
 import { IWorkSessionRepository } from '../../workSession/interfaces/IWorkSession.repository';
 import { ITabRepository } from '../../tab/interface/ITab.repository';
-import { IListRepository } from 'src/modules/list/interface/IList.repository';
+import { IListRepository } from '../../../modules/list/interface/IList.repository';
 
 @injectable()
 export class TaskService implements ITaskService {
@@ -57,8 +57,8 @@ export class TaskService implements ITaskService {
   async updateTask(
     workSessionId: number,
     tabId: number,
-    taskId: number,
     listId: number,
+    taskId: number,
     attrs: Partial<Task>,
   ): Promise<Task> {
     const workSession = await this.workSessionRepository.findOneById(

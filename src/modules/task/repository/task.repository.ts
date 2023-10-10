@@ -6,7 +6,7 @@ import { Repository } from 'typeorm';
 import { ITaskRepository } from '../interface/ITask.repository';
 import { IDatabaseService } from '../../../core/interface/IDatabase.service';
 import { CreateTaskDto } from '../dto/createTask.dto';
-import { List } from 'src/modules/list/entity/list.entity';
+import { List } from '../../../modules/list/entity/list.entity';
 
 @injectable()
 export class TaskRepository implements ITaskRepository {

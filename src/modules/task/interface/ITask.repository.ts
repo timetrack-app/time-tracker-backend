@@ -1,4 +1,4 @@
-import { List } from 'src/modules/list/entity/list.entity';
+import { List } from '../../../modules/list/entity/list.entity';
 import { CreateTaskDto } from '../dto/createTask.dto';
 import { Task } from '../entity/task.entity';
 

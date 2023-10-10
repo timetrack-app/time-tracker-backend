@@ -2,60 +2,62 @@ import 'reflect-metadata';
 import container from '../../../core/container.core';
 import { TYPES } from '../../../core/type.core';
 import { agent } from '../../../../test/utils/supertest.utils';
-import { CreateListDto } from '../dto/createTask.dto';
-import { IListService } from '../interface/ITask.service';
-import { FakeListService } from '../../../../test/service/fakeList.service';
-import { List } from '../entity/task.entity';
+import { CreateTaskDto } from '../dto/createTask.dto';
+import { ITaskService } from '../interface/ITask.service';
+import { FakeTaskService } from '../../../../test/service/fakeTask.service';
+import { Task } from '../entity/task.entity';
 
 const workSessionId = 1;
 const tabId = 1;
 const listId = 1;
-const baseURL = `/work-sessions/${workSessionId}/tabs/${tabId}/lists`;
+const taskId = 1;
+const baseURL = `/work-sessions/${workSessionId}/tabs/${tabId}/lists/${listId}/tasks`;
 
-describe('List Controller Test', () => {
+describe('Task Controller Test', () => {
   beforeAll(() => {
-    container.rebind<IListService>(TYPES.IListService).to(FakeListService);
+    container.rebind<ITaskService>(TYPES.ITaskService).to(FakeTaskService);
   });
 
-  describe('Create a List', () => {
+  describe('Create a Task', () => {
     it('Create', async () => {
-      const createListDto: CreateListDto = {
-        name: 'New List',
+      const createTaskDto: CreateTaskDto = {
+        name: 'New Task',
         displayOrder: 1,
+        description: 'new task',
       };
 
       const response = await agent
         .post(baseURL)
-        .send(createListDto)
+        .send(createTaskDto)
         .expect(200);
 
-      // Check the response for the created list data
-      const createdList = response.body;
-      expect(createdList.name).toBe('New List');
-      expect(createdList.displayOrder).toBe(1);
+      // Check the response for the created task data
+      const createdTask = response.body;
+      expect(createdTask.name).toBe('New Task');
+      expect(createdTask.displayOrder).toBe(1);
     });
   });
 
   describe('Update', () => {
-    it('Update a List', async () => {
-      const attrs: Partial<List> = {
-        name: 'Updated List Name',
+    it('Update a Task', async () => {
+      const attrs: Partial<Task> = {
+        name: 'Updated Task Name',
       };
 
       const response = await agent
-        .put(`${baseURL}/${listId}`)
+        .put(`${baseURL}/${taskId}`)
         .send(attrs)
         .expect(200);
 
-      // Check the response for the updated list data
-      const updatedList = response.body;
-      expect(updatedList.name).toBe('Updated List Name');
+      // Check the response for the updated task data
+      const updatedTask = response.body;
+      expect(updatedTask.name).toBe('Updated Task Name');
     });
   });
 
   describe('Delete', () => {
-    it('Delete a List', async () => {
-      await agent.delete(`${baseURL}/${listId}`).expect(204);
+    it('Delete a Task', async () => {
+      await agent.delete(`${baseURL}/${taskId}`).expect(204);
     });
   });
 });
