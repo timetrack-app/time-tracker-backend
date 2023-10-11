@@ -17,7 +17,7 @@ dps:
 dcps:
 	docker compose -f docker-compose-arm.yml --env-file env/.env.dev ps
 create db:
-	docker exec -it timetrack-app-db psql -U timetrackuser -d postgres -c "CREATE DATABASE timetrackdb;" && docker exec -it timetrack-app-db psql -U timetrackuser -d postgres -c "\q"
+	docker exec -it timetrack-app-db psql -U timetrackuser -d postgres -c "CREATE DATABASE timetrackdb;"
 migration create:
 	docker-compose -f docker-compose.yml   --env-file env/.env.dev run dev npm run typeorm:create src/migrations/table-init
 dc migration create:
