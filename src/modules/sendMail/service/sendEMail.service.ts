@@ -4,6 +4,7 @@ import nodemailer from 'nodemailer';
 import { ISendEmailService } from '../interface/ISendEmail.service';
 import { MailOptions } from '../types/types';
 import { InternalServerErrorException } from '../../../common/errors/all.exception';
+import { isInLocal, getAppBaseUrl } from '../../../common/utils/env.utils';
 
 @injectable()
 export class SendEmailService implements ISendEmailService {
@@ -13,6 +14,13 @@ export class SendEmailService implements ISendEmailService {
     sgMail.setApiKey(process.env.SENDGRID_API_KEY);
   }
 
+  /**
+   * For production environment
+   *
+   * @private
+   * @param {MailOptions} mailOpt
+   * @memberof SendEmailService
+   */
   private async sendMailWithSendGrid(mailOpt: MailOptions) {
     try {
       await sgMail.send(mailOpt);
@@ -21,28 +29,39 @@ export class SendEmailService implements ISendEmailService {
     }
   }
 
+  /**
+   * For local environment
+   *
+   * @private
+   * @param {MailOptions} mailOpt
+   * @memberof SendEmailService
+   */
   private async sendMailWithMailHog(mailOpt: MailOptions) {
     const transporter = nodemailer.createTransport({
       host: 'mailhog',
       port: 1025,
+      ignoreTLS: true ,
     });
-    // mail sending cause an error and can't send it, so log the email
-    console.log('Email content', mailOpt);
-    /** To be Fixed : Mail sending with mailHog is causing an error**/
 
-    // try {
-    //   await transporter.sendMail(mailOpt);
-    // } catch (error) {
-    //   console.log('error : ', error);
-
-    //   throw new InternalServerErrorException(
-    //     'Error with sendMailWithMailHog function',
-    //   );
-    // }
+    try {
+      await transporter.sendMail(mailOpt);
+    } catch (error) {
+      throw new InternalServerErrorException(
+        'Error with sendMailWithMailHog function',
+      );
+    }
   }
 
+  /**
+   * Send email address verification email to the user who've just registered
+   *
+   * @param {string} email
+   * @param {string} emailVerificationToken
+   * @memberof SendEmailService
+   */
   sendVerificationEmail(email: string, emailVerificationToken: string): void {
-    const url = `${process.env.WEB_DOMAIN}/auth/email-verification?token=${emailVerificationToken}`;
+    const url = `${getAppBaseUrl()}/auth/email-verification?token=${emailVerificationToken}`;
+
     const mailOpt: MailOptions = {
       from: process.env.SENDER_EMAIL,
       to: email,
@@ -50,9 +69,10 @@ export class SendEmailService implements ISendEmailService {
       text: `Click the following link to verify your email: ${url}`,
       html: `<p>Click the following link to verify your email:</p><p><a href="${url}">Verify Email</a></p>`,
     };
-    if (process.env.NODE_ENV === 'develop') this.sendMailWithMailHog(mailOpt);
-    else if (process.env.NODE_ENV === 'production')
-      this.sendMailWithSendGrid(mailOpt);
+
+    isInLocal()
+      ? this.sendMailWithMailHog(mailOpt)
+      : this.sendMailWithSendGrid(mailOpt);
   }
 
   sendNewEmailConfirmationEmail(

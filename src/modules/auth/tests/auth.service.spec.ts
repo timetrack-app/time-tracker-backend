@@ -166,7 +166,7 @@ describe('Auth Service Test', () => {
 
   describe('Email Verification', () => {
     it('Should verify email and return JWT token', async () => {
-      const response = await authService.emailVerification(verificationToken);
+      const response = await authService.verifyUser(verificationToken);
       expect(response).toBeDefined();
     });
 

@@ -9,6 +9,7 @@ import { AuthRegisterDto } from '../dto/auth-register.dto';
 import {
   ConflictException,
   ForbiddenException,
+  InternalServerErrorException,
   NotFoundException,
   ValidationErrorException,
 } from '../../../common/errors/all.exception';
@@ -28,6 +29,13 @@ export class AuthService implements IAuthService {
     private sendEmailService: ISendEmailService,
   ) {}
 
+  /**
+   * Create user and send a registration email
+   *
+   * @param {AuthRegisterDto} registerDto
+   * @return {*}  {Promise<void>}
+   * @memberof AuthService
+   */
   async registerUser(registerDto: AuthRegisterDto): Promise<void> {
     const { password, email } = registerDto;
 
@@ -37,7 +45,7 @@ export class AuthService implements IAuthService {
       throw new ConflictException('User with this email already exists.');
     }
 
-    // hash
+    // password hashing
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
     const newUser = { email, password: hashedPassword };
@@ -51,18 +59,26 @@ export class AuthService implements IAuthService {
     await this.sendEmailService.sendVerificationEmail(email, verificationToken);
   }
 
-  async emailVerification(token: string) {
-    if (!token) throw new ValidationErrorException('token is not received.');
-    const user = await this.userService.verifyUserWithToken(token);
-    if (!user) {
+  async verifyUser(token: string): Promise<User> {
+    if (!token) {
+      throw new ValidationErrorException('token is not received.');
+    }
+
+    const verifiedUser = await this.userService.verifyUserWithToken(token);
+    if (!verifiedUser) {
       throw new NotFoundException('User not found');
     }
-    const jwtToken = await this.generateJWT(user);
-    return jwtToken;
+
+    return verifiedUser;
   }
 
   generateJWT(user: User) {
-    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET_KEY, {
+    const jwtSecretKey = process.env.JWT_SECRET_KEY;
+    if (!jwtSecretKey) {
+      throw new InternalServerErrorException('Failed to generate authentication token.');
+    }
+
+    const token = jwt.sign({ userId: user.id }, jwtSecretKey, {
       expiresIn: authConfig.jwtTokenExpiresIn,
     });
     return token;

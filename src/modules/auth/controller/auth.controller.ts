@@ -35,7 +35,9 @@ export class AuthController {
     req: Request,
     res: Response,
   ) {
-    const jwtToken = await this.authService.emailVerification(token);
+    const verifiedUser = await this.authService.verifyUser(token);
+    const jwtToken = this.authService.generateJWT(verifiedUser);
+
     return res.status(200).json({ token: jwtToken });
   }
 

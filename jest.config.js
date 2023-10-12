@@ -6,4 +6,6 @@ module.exports = {
   moduleNameMapper: {
     '^test/(.*)$': '<rootDir>/src/test/$1',
   },
+  testRegex: "(/__tests__/.*|(\\.|/)(test|spec))\\.tsx?$",
+  testPathIgnorePatterns: ["/node_modules/", "/dist/"],
 };
