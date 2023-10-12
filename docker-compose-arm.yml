@@ -17,6 +17,8 @@ services:
     ports:
       - 1025:1025
       - 8025:8025
+    networks:
+      - timetracker_app_api
   dev:
     container_name: timetrack-app-dev
     image: timetrack-app-api
