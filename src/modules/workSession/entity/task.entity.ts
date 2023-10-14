@@ -6,8 +6,10 @@ import {
   UpdateDateColumn,
   ManyToOne,
   JoinColumn,
+  OneToOne,
 } from 'typeorm';
 import { List } from '../../list/entity/list.entity';
+import { WorkSession } from './workSession.entity';
 
 @Entity('tasks')
 export class Task {
@@ -40,4 +42,8 @@ export class Task {
   @ManyToOne(() => List, (list) => list.tasks)
   @JoinColumn({ name: 'list_id' })
   list: List;
+
+  @OneToOne(() => WorkSession, (workSession) => workSession.activeTask)
+  @JoinColumn({ name: 'workSession_id' })
+  workSession?;
 }
