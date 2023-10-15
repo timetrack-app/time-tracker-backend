@@ -41,8 +41,4 @@ export class WorkSession {
 
   @OneToMany(() => Tab, (tab) => tab.workSession)
   tabs: Tab[];
-
-  @OneToOne(() => Task, (task) => task.workSession)
-  @JoinColumn({ name: 'active_task_id' })
-  activeTask?: Task;
 }
