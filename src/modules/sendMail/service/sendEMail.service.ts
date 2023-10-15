@@ -75,6 +75,7 @@ export class SendEmailService implements ISendEmailService {
       : this.sendMailWithSendGrid(mailOpt);
   }
 
+  // To update user's email
   sendNewEmailConfirmationEmail(
     email: string,
     emailVerificationToken: string,
@@ -87,9 +88,10 @@ export class SendEmailService implements ISendEmailService {
       text: `Click the following link to verify the change of your email: ${url}`,
       html: `<p>Click the following link to verify your email:</p><p><a href="${url}">Verify Email</a></p>`,
     };
-    if (process.env.NODE_ENV === 'develop') this.sendMailWithMailHog(mailOpt);
-    else if (process.env.NODE_ENV === 'production')
-      this.sendMailWithSendGrid(mailOpt);
+
+    isInLocal()
+      ? this.sendMailWithMailHog(mailOpt)
+      : this.sendMailWithSendGrid(mailOpt);
   }
 
   sendNewPasswordConfirmationEmail(email: string, token: string): void {

@@ -35,6 +35,17 @@ export class UserController {
     });
   }
 
+  /**
+   * Send email to the user to update user's email
+   * The email contains a link with token(email update link)
+   *
+   * @param {number} id
+   * @param {UpdateEmailDto} updateEmailDto
+   * @param {Request} req
+   * @param {Response} res
+   * @return {*}
+   * @memberof UserController
+   */
   @httpPost('/:userId/email-update', DtoValidationMiddleware(UpdateEmailDto))
   public async updateEmail(
     @requestParam('userId') id: number,
@@ -42,11 +53,22 @@ export class UserController {
     req: Request,
     res: Response,
   ) {
+    // TODO: create new userEmailVerification()
+
     const { email } = updateEmailDto;
     await this.userService.updateEmailAndSendVerification(id, email);
     return res.status(200).json();
   }
 
+  /**
+   * Verify user's new email
+   *
+   * @param {string} token
+   * @param {Request} req
+   * @param {Response} res
+   * @return {*}
+   * @memberof UserController
+   */
   @httpGet('/email-update/verification')
   public async verifyNewEmail(
     @queryParam('token') token: string,
@@ -99,3 +121,5 @@ export class UserController {
     return res.status(200).json();
   }
 }
+
+// password update(email input) ->(req) email(contains url with token->click)->verify token->if 200 password update page -> update

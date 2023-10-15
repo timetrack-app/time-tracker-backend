@@ -60,24 +60,36 @@ export class UserService implements IUserService {
     return verifiedUser;
   }
 
+  /**
+   * Send email to the user to update user's email
+   * The email contains a link with token(email update link)
+   *
+   * @param {number} id
+   * @param {string} email
+   * @memberof UserService
+   */
   async updateEmailAndSendVerification(id: number, email: string) {
     const user = await this.findOneById(id);
     if (!user) throw new NotFoundException('User with this id not found.');
+
     await this.updateUser(user, {
       email,
       isVerified: false,
     });
+
     // generate a email verification token
-    const token =
+    const verificationToken =
       await this.userEmailVerificationService.createVerificationToken(email);
-    // using the token, send verification email to the user
-    await this.sendEmailService.sendNewEmailConfirmationEmail(email, token);
-    //update user's email and set user verification status
+
+    await this.userEmailVerificationService.createVerification(email, verificationToken);
+
+    await this.sendEmailService.sendNewEmailConfirmationEmail(email, verificationToken);
   }
 
   async updatePassword(id: number, password: string) {
     const user = await this.findOneById(id);
     if (!user) throw new NotFoundException('User with this id not found.');
+
     //update user's email and set user verification status
     // hash
     const salt = await bcrypt.genSalt(10);

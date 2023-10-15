@@ -29,6 +29,15 @@ export class AuthController {
     return res.status(200).json();
   }
 
+  /**
+   * Verify user registration email
+   *
+   * @param {string} token
+   * @param {Request} req
+   * @param {Response} res
+   * @return {*}
+   * @memberof AuthController
+   */
   @httpGet('/email-verification')
   public async emailVerification(
     @queryParam('token') token: string,
