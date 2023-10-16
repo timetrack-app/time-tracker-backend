@@ -11,6 +11,7 @@ import {
   NotFoundException,
 } from '../../../common/errors/all.exception';
 import { UserEmailVerification } from '../entity/userEmailVerification.entity';
+import { createToken } from '../../../common/utils/token.util';
 
 @injectable()
 export class UserEmailVerificationService
@@ -22,7 +23,7 @@ export class UserEmailVerificationService
   ) {}
 
   async createVerificationToken(email: string) {
-    const verificationToken = await crypto.randomBytes(32).toString('hex');
+    const verificationToken = await createToken();
     const isEmailAlreadyUsedInPast =
       await this.userEmailVerificationRepository.findOneByEmail(email);
     if (isEmailAlreadyUsedInPast) {
