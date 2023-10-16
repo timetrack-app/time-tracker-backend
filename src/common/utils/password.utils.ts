@@ -1,4 +1,20 @@
 import { createHash } from 'crypto';
+import bcrypt from 'bcryptjs';
+
+/**
+ *
+ *
+ * @param {string} password
+ * @return {Promise<string>}
+ */
+export const encryptPassword = async (password: string): Promise<string> => {
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(password, salt);
+
+  return hashedPassword;
+};
+
+// TODO: remove these if not necessary.
 
 const salt = 'random-private-key';
 

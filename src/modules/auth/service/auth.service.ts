@@ -18,6 +18,7 @@ import { IUserService } from '../../../modules/user/interfaces/IUser.service';
 import { IUserEmailVerificationService } from '../../../modules/userEmailVerification/interface/IUserEmailVerification.service';
 import { ISendEmailService } from '../../../modules/sendMail/interface/ISendEmail.service';
 import { User } from '../../../modules/user/entity/user.entity';
+import { encryptPassword } from '../../../common/utils/password.utils';
 
 @injectable()
 export class AuthService implements IAuthService {
@@ -45,9 +46,7 @@ export class AuthService implements IAuthService {
       throw new ConflictException('User with this email already exists.');
     }
 
-    // password hashing
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
+    const hashedPassword = await encryptPassword(password);
     const newUser = { email, password: hashedPassword };
 
     await this.userService.createUser(newUser);
