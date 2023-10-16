@@ -6,11 +6,11 @@
 export const getCurrentEnvironment = (): string => process.env.APP_ENV || 'development';
 
 /**
- * Check if it's local environment or not
+ * Check if it's production environment or not
  *
- * @return {boolean}  local environment or not
+ * @return {*}  {boolean}
  */
-export const isInLocal = (): boolean => getCurrentEnvironment() === 'local'
+export const isInProduction = (): boolean => getCurrentEnvironment() === 'production';
 
 /**
  *
