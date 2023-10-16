@@ -63,6 +63,12 @@ import { ITaskRepository } from '../modules/task/interface/ITask.repository';
 import { TaskService } from '../modules/task/service/task.service';
 import { TaskRepository } from '../modules/task/repository/task.repository';
 
+/* PasswordReset import */
+import { IPasswordResetRepository } from '../modules/passwordReset/interface/IPasswordReset.repository';
+import { PasswordResetRepository } from '../modules/passwordReset/repository/passwordReset.repository';
+import { IPasswordResetService } from '../modules/passwordReset/interface/IPasswordReset.service';
+import { PasswordResetService } from '../modules/passwordReset/service/passwordReset.Service';
+
 const container = new Container();
 
 container.bind<IDatabaseService>(TYPES.IDatabaseService).to(DatabaseService);
@@ -118,4 +124,9 @@ container.bind<IListRepository>(TYPES.IListRepository).to(ListRepository);
 /* Task bind */
 container.bind<ITaskService>(TYPES.ITaskService).to(TaskService);
 container.bind<ITaskRepository>(TYPES.ITaskRepository).to(TaskRepository);
+
+/* PasswordReset bind */
+container.bind<IPasswordResetService>(TYPES.IPasswordResetService).to(PasswordResetService);
+container.bind<IPasswordResetRepository>(TYPES.IPasswordResetRepository).to(PasswordResetRepository);
+
 export default container;

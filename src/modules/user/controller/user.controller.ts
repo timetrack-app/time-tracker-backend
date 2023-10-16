@@ -79,6 +79,16 @@ export class UserController {
     return res.status(200).json();
   }
 
+  /**
+   * Update logged in user's password
+   *
+   * @param {number} id
+   * @param {UpdatePasswordDto} updatePasswordDto
+   * @param {Request} req
+   * @param {Response} res
+   * @return {*}
+   * @memberof UserController
+   */
   @httpPost(
     '/:userId/password-update',
     DtoValidationMiddleware(UpdatePasswordDto),
@@ -95,12 +105,23 @@ export class UserController {
     return res.status(200).json();
   }
 
+  // TODO: fix
+
+  /**
+   * Send password reset email. No login needed
+   *
+   * @param {number} id
+   * @param {ResetPasswordDto} resetPasswordDto
+   * @param {Request} req
+   * @param {Response} res
+   * @return {*}
+   * @memberof UserController
+   */
   @httpPost(
-    '/:userId/password-update/request',
+    '/password-update/request',
     DtoValidationMiddleware(ResetPasswordDto),
   )
   public async sendPasswordResetEmail(
-    @requestParam('userId') id: number,
     @requestBody() resetPasswordDto: ResetPasswordDto,
     req: Request,
     res: Response,
@@ -120,6 +141,6 @@ export class UserController {
     this.userService.verifyUserWithToken(token);
     return res.status(200).json();
   }
-}
 
-// password update(email input) ->(req) email(contains url with token->click)->verify token->if 200 password update page -> update
+  // TODO: '/password-update/save'
+}

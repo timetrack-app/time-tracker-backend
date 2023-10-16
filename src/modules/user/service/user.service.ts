@@ -97,20 +97,29 @@ export class UserService implements IUserService {
     await this.updateUser(user, {
       password: hashedPassword,
     });
-    const { email } = user;
-    // generate a email verification token
-    const token = await this.userEmailVerificationService.findTokenWithEmail(
-      email,
-    );
-    // using the token, send verification email to the user
-    await this.sendEmailService.sendNewPasswordConfirmationEmail(email, token);
+
+    // TODO: no need to do this in this function
+    // const { email } = user;
+    // // generate a email verification token
+    // const token = await this.userEmailVerificationService.findTokenWithEmail(
+    //   email,
+    // );
+    // // using the token, send verification email to the user
+    // await this.sendEmailService.sendNewPasswordConfirmationEmail(email, token);
   }
 
-  async handlePasswordResetRequest(id: number, email: string) {
-    if (!(await this.findOneById(id)))
-      throw new NotFoundException('User with this id not found.');
+  /**
+   * Send password reset email
+   *
+   * @param {string} email
+   * @memberof UserService
+   */
+  async handlePasswordResetRequest(email: string) {
     const user = await this.findOneByEmail(email);
-    if (!user) throw new ValidationErrorException('This email is invalid');
-    this.sendEmailService.sendPasswordResetLinkEmail(id, email);
+    if (!user) {
+      throw new ValidationErrorException('This email is invalid');
+    }
+
+    this.sendEmailService.sendPasswordResetLinkEmail(email);
   }
 }

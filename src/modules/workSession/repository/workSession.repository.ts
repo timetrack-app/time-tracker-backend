@@ -137,6 +137,7 @@ export class WorkSessionRepository implements IWorkSessionRepository {
     }
   }
 
+  // TODO: should move transaction to service layer
   async update(workSessionId: number): Promise<WorkSession> {
     const repo = await this.getWorkSessionRepo();
 
