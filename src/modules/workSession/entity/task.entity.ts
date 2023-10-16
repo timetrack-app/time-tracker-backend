@@ -31,7 +31,7 @@ export class Task {
   @Column({ name: 'total_time', nullable: true })
   totalTime: number;
 
-  @Column({ nullable: false })
+  @Column({ nullable: true })
   isActive: boolean;
 
   @CreateDateColumn({ name: 'created_at' })
@@ -45,4 +45,7 @@ export class Task {
   @ManyToOne(() => List, (list) => list.tasks)
   @JoinColumn({ name: 'list_id' })
   list: List;
+
+  @OneToOne(() => WorkSession, (workSession) => workSession.activeTask)
+  workSession: WorkSession;
 }
