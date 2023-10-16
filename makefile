@@ -30,3 +30,6 @@ migration run:
 	docker-compose -f docker-compose.yml  --env-file env/.env.dev run dev npm run typeorm:run
 dc migration run:
 	docker compose -f docker-compose-arm.yml  --env-file env/.env.dev run dev npm run typeorm:run
+# make dc migration rollback migration=<migration-file-name>
+dc migration rollback:
+	docker compose -f docker-compose-arm.yml --env-file env/.env.dev run dev npm run typeorm:revert -- -n $(migration)
