@@ -45,18 +45,22 @@ export class WorkSessionService implements IWorkSessionService {
   async getLatestUnfinishedWorkSession(
     findLatestUnfinishedWorkSessionDto: FindLatestUnfinishedWorkSessionDto,
   ): Promise<WorkSession> {
+    let latestUnfinished: WorkSession;
     try {
-      return await this.workSessionRepository.findLatestUnfinished(
+      latestUnfinished = await this.workSessionRepository.findLatestUnfinished(
         findLatestUnfinishedWorkSessionDto,
       );
     } catch (error) {
       this.logger.error(
         `Failed to get the latest unfinished WorkSession. Error: ${error}`,
       );
+    }
+    if (!latestUnfinished) {
       throw new NotFoundException(
         'Failed to get the latest unfinished WorkSession.',
       );
     }
+    return latestUnfinished;
   }
 
   /**
@@ -71,7 +75,7 @@ export class WorkSessionService implements IWorkSessionService {
   async createWorkSession(
     createWorkSessionServiceDto: CreateWorkSessionServiceDto,
   ): Promise<CreateWorkSessionServiceReturnDto> {
-    const { userId, tabs, activeTask } = createWorkSessionServiceDto;
+    const { userId, tabs } = createWorkSessionServiceDto;
 
     const res = new CreateWorkSessionServiceReturnDto();
     res.isUnfinished = false;
@@ -96,7 +100,6 @@ export class WorkSessionService implements IWorkSessionService {
       createWorkSessionDto.user = user;
       // create without template
       createWorkSessionDto.tabs = tabs;
-      createWorkSessionDto.activeTask = activeTask;
       const workSession = await this.workSessionRepository.create(
         createWorkSessionDto,
       );

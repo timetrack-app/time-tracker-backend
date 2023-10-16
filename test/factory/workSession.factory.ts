@@ -1,13 +1,14 @@
 import { faker } from '@faker-js/faker';
 import { WorkSession } from '../../src/modules/workSession/entity/workSession.entity';
 import { fakeTabs } from './tab.factory';
+import { fakeUser } from './user.factory';
 
 function generateWorkSessionData(obj: Partial<WorkSession> = {}): WorkSession {
   return {
     id: faker.datatype.number(),
-    userId: faker.datatype.number(),
+    user: fakeUser(),
     tabs: fakeTabs(10),
-  } as unknown as WorkSession;
+  } as WorkSession;
 }
 
 function generateWorkSessionsData(n = 1, object: Partial<WorkSession> = {}) {

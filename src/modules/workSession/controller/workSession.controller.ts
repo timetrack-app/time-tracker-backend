@@ -49,7 +49,6 @@ export class WorkSessionController {
 
     dto.userId = userId;
     dto.tabs = reqBody.tabs;
-    dto.activeTask = reqBody.activeTask;
 
     const latestWorkSession = await this.workSessionService.createWorkSession(
       dto,

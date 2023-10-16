@@ -5,7 +5,6 @@ import { Task } from '../entity/task.entity';
 export class CreateWorkSessionServiceDto {
   @IsNumber()
   userId: number;
-  activeTask: Partial<Task>;
   @IsOptional()
   tabs: Tab[];
 }

@@ -5,5 +5,4 @@ import { Task } from '../entity/task.entity';
 export class CreateWorkSessionDto {
   user: User;
   tabs: Tab[];
-  activeTask: Partial<Task>;
 }

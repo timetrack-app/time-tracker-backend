@@ -5,7 +5,4 @@ import { IsNumber, IsOptional } from 'class-validator';
 export class CreateWorkSessionRequestDto {
   @IsOptional()
   tabs: Tab[];
-
-  @IsOptional()
-  activeTask: Partial<Task>;
 }
