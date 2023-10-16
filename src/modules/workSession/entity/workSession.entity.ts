@@ -11,7 +11,7 @@ import {
 } from 'typeorm';
 import { User } from '../../user/entity/user.entity';
 import { Tab } from '../../tab/entity/tab.entity';
-import { Task } from './task.entity';
+import { Task } from '../../task/entity/task.entity';
 
 @Entity('work_sessions')
 export class WorkSession {

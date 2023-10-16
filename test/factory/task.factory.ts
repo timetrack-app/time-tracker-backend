@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker';
-import { Task } from '../../src/modules/workSession/entity/task.entity';
+import { Task } from '../../src/modules/task/entity/task.entity';
 
 function generateTaskData(obj: Partial<Task> = {}): Task {
   return {

@@ -9,7 +9,7 @@ import {
   OneToOne,
 } from 'typeorm';
 import { List } from '../../list/entity/list.entity';
-import { WorkSession } from './workSession.entity';
+import { WorkSession } from '../../../modules/workSession/entity/workSession.entity';
 
 @Entity('tasks')
 export class Task {

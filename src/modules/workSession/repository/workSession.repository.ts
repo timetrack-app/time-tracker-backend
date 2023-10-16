@@ -8,7 +8,7 @@ import { Tab } from '../../tab/entity/tab.entity';
 import { List } from '../../list/entity/list.entity';
 import { Repository, UpdateResult } from 'typeorm';
 import { FindLatestUnfinishedWorkSessionDto } from '../dto/find-latest-unfinished-work-session-dto';
-import { Task } from '../entity/task.entity';
+import { Task } from '../../../modules/task/entity/task.entity';
 
 /**
  *
