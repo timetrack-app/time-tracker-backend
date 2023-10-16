@@ -1,18 +1,20 @@
-import { inject, injectable } from "inversify";
-import { IWorkSessionService } from "../interfaces/IWorkSession.service";
-import { TYPES } from "../../../core/type.core";
-import { IUserRepository } from "../../../modules/user/interfaces/IUser.repository";
-import { IWorkSessionRepository } from "../interfaces/IWorkSession.repository";
-import { CreateWorkSessionDto } from "../dto/create-work-session.dto";
-import { WorkSession } from "../entity/workSession.entity";
-import { CreateWorkSessionServiceDto } from "../dto/create-work-session-service-dto";
-import { ITemplateRepository } from "../../../modules/template/interfaces/ITemplate.repository";
-import { CreateWorkSessionFromTemplateDto } from "../dto/create-work-session-from-template-dto";
-import { InternalServerErrorException, NotFoundException } from "../../../common/errors/all.exception";
-import { Logger } from "../../../common/services/logger.service";
-import { EndWorkSessionDto } from "../dto/end-work-session-dto";
-import { FindLatestUnfinishedWorkSessionDto } from "../dto/find-latest-unfinished-work-session-dto";
-import { CreateWorkSessionServiceReturnDto } from "../dto/create-work-session-service-return-dto";
+import { inject, injectable } from 'inversify';
+import { IWorkSessionService } from '../interfaces/IWorkSession.service';
+import { TYPES } from '../../../core/type.core';
+import { IUserRepository } from '../../../modules/user/interfaces/IUser.repository';
+import { IWorkSessionRepository } from '../interfaces/IWorkSession.repository';
+import { CreateWorkSessionDto } from '../dto/create-work-session.dto';
+import { WorkSession } from '../entity/workSession.entity';
+import { CreateWorkSessionServiceDto } from '../dto/create-work-session-service-dto';
+import { ITemplateRepository } from '../../../modules/template/interfaces/ITemplate.repository';
+import {
+  InternalServerErrorException,
+  NotFoundException,
+} from '../../../common/errors/all.exception';
+import { Logger } from '../../../common/services/logger.service';
+import { EndWorkSessionDto } from '../dto/end-work-session-dto';
+import { FindLatestUnfinishedWorkSessionDto } from '../dto/find-latest-unfinished-work-session-dto';
+import { CreateWorkSessionServiceReturnDto } from '../dto/create-work-session-service-return-dto';
 
 /**
  *
@@ -40,12 +42,20 @@ export class WorkSessionService implements IWorkSessionService {
    * @return {*}  {Promise<WorkSession>}
    * @memberof WorkSessionService
    */
-  async getLatestUnfinishedWorkSession(findLatestUnfinishedWorkSessionDto: FindLatestUnfinishedWorkSessionDto): Promise<WorkSession> {
+  async getLatestUnfinishedWorkSession(
+    findLatestUnfinishedWorkSessionDto: FindLatestUnfinishedWorkSessionDto,
+  ): Promise<WorkSession> {
     try {
-      return await this.workSessionRepository.findLatestUnfinished(findLatestUnfinishedWorkSessionDto);
+      return await this.workSessionRepository.findLatestUnfinished(
+        findLatestUnfinishedWorkSessionDto,
+      );
     } catch (error) {
-      this.logger.error(`Failed to get the latest unfinished WorkSession. Error: ${error}`);
-      throw new NotFoundException('Failed to get the latest unfinished WorkSession.');
+      this.logger.error(
+        `Failed to get the latest unfinished WorkSession. Error: ${error}`,
+      );
+      throw new NotFoundException(
+        'Failed to get the latest unfinished WorkSession.',
+      );
     }
   }
 
@@ -58,57 +68,58 @@ export class WorkSessionService implements IWorkSessionService {
    * @return {*}  {Promise<CreateWorkSessionServiceReturnDto>}
    * @memberof WorkSessionService
    */
-  async createWorkSession(createWorkSessionServiceDto: CreateWorkSessionServiceDto): Promise<CreateWorkSessionServiceReturnDto> {
-    const { userId, templateId } = createWorkSessionServiceDto;
+  async createWorkSession(
+    createWorkSessionServiceDto: CreateWorkSessionServiceDto,
+  ): Promise<CreateWorkSessionServiceReturnDto> {
+    const { userId, tabs, activeTask } = createWorkSessionServiceDto;
 
     const res = new CreateWorkSessionServiceReturnDto();
     res.isUnfinished = false;
 
-    const latestUnfinishedWorkSessionDto = new FindLatestUnfinishedWorkSessionDto();
+    const latestUnfinishedWorkSessionDto =
+      new FindLatestUnfinishedWorkSessionDto();
     latestUnfinishedWorkSessionDto.userId = userId;
 
-    const latestWorkSession = await this.workSessionRepository.findLatestUnfinished(latestUnfinishedWorkSessionDto);
+    const latestWorkSession =
+      await this.workSessionRepository.findLatestUnfinished(
+        latestUnfinishedWorkSessionDto,
+      );
     if (latestWorkSession) {
       res.isUnfinished = true;
       res.workSession = latestWorkSession;
       return res;
     }
-
     // create new WorkSession
     try {
       const user = await this.userRepository.findOneById(userId);
-
       const createWorkSessionDto = new CreateWorkSessionDto();
       createWorkSessionDto.user = user;
-
       // create without template
-      if (!templateId) {
-        const workSession = await this.workSessionRepository.create(createWorkSessionDto);
-        res.workSession = workSession;
-        return res;
-      }
-
-      // create from template
-      const template = await this.templateRepository.findOneById(templateId);
-      const createFromTemplateDto = new CreateWorkSessionFromTemplateDto();
-      createFromTemplateDto.user = user;
-      createFromTemplateDto.templateTabs = template.tabs;
-
-      const workSession = await this.workSessionRepository.createFromTemplate(createFromTemplateDto);
+      createWorkSessionDto.tabs = tabs;
+      createWorkSessionDto.activeTask = activeTask;
+      const workSession = await this.workSessionRepository.create(
+        createWorkSessionDto,
+      );
       res.workSession = workSession;
       return res;
     } catch (error) {
       this.logger.error(`Failed to create new work session. Error: ${error}`);
-      throw new InternalServerErrorException('Failed to create a work session.');
+      throw new InternalServerErrorException(
+        'Failed to create a work session.',
+      );
     }
   }
 
-  async endWorkSession(endWorkSessionDto: EndWorkSessionDto): Promise<WorkSession> {
+  async endWorkSession(
+    endWorkSessionDto: EndWorkSessionDto,
+  ): Promise<WorkSession> {
     try {
       return this.workSessionRepository.update(endWorkSessionDto.workSessionId);
     } catch (error) {
       this.logger.error(`Failed to create new work session. Error: ${error}`);
-      throw new InternalServerErrorException(`Failed to update a work session.`);
+      throw new InternalServerErrorException(
+        `Failed to update a work session.`,
+      );
     }
   }
 }

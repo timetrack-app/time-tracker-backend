@@ -4,11 +4,11 @@ import { WorkSession } from '../entity/workSession.entity';
 import { IWorkSessionRepository } from '../interfaces/IWorkSession.repository';
 import { IDatabaseService } from '../../../core/interface/IDatabase.service';
 import { CreateWorkSessionDto } from '../dto/create-work-session.dto';
-import { CreateWorkSessionFromTemplateDto } from '../dto/create-work-session-from-template-dto';
 import { Tab } from '../../tab/entity/tab.entity';
 import { List } from '../../list/entity/list.entity';
 import { Repository, UpdateResult } from 'typeorm';
 import { FindLatestUnfinishedWorkSessionDto } from '../dto/find-latest-unfinished-work-session-dto';
+import { Task } from '../entity/task.entity';
 
 /**
  *
@@ -64,59 +64,47 @@ export class WorkSessionRepository implements IWorkSessionRepository {
   async create(
     createWorkSessionDto: CreateWorkSessionDto,
   ): Promise<WorkSession> {
-    const repo = await this.getWorkSessionRepo();
-
-    const workSession = repo.create({
-      user: createWorkSessionDto.user,
-      startAt: new Date(),
-    });
-
-    return repo.save(workSession);
-  }
-
-  /**
-   * Create new WorkSession from a template
-   *
-   * @param {CreateWorkSessionFromTemplateDto} createWorkSessionFromTemplateDto
-   * @return {*}  {Promise<WorkSession>}
-   * @memberof WorkSessionRepository
-   */
-  async createFromTemplate(
-    createWorkSessionFromTemplateDto: CreateWorkSessionFromTemplateDto,
-  ): Promise<WorkSession> {
     const entityManager = await this.database.getManager();
     const workSessionRepo = await this.database.getRepository(WorkSession);
     const tabRepo = await this.database.getRepository(Tab);
     const listRepo = await this.database.getRepository(List);
-
-    const { user, templateTabs } = createWorkSessionFromTemplateDto;
+    const taskRepo = await this.database.getRepository(Task);
 
     const workSession = workSessionRepo.create({
-      user,
+      user: createWorkSessionDto.user,
       startAt: new Date(),
     });
 
     // create tab and list instances from template
     const tabs: Tab[] = [];
-    templateTabs.forEach((templateTab) => {
-      const emptyLists: List[] = [];
-
+    createWorkSessionDto.tabs.forEach((t) => {
       const tab = tabRepo.create({
         workSession,
-        lists: emptyLists,
-        name: templateTab.name,
-        displayOrder: templateTab.displayOrder,
+        lists: [],
+        name: t.name,
+        displayOrder: t.displayOrder,
       });
 
-      const lists = templateTab.lists.map((templateList) =>
-        listRepo.create({
+      const lists = tab.lists.map((l) => {
+        const list = listRepo.create({
           tab,
-          name: templateList.name,
-          displayOrder: templateList.displayOrder,
-        }),
-      );
+          name: l.name,
+          displayOrder: l.displayOrder,
+        });
+        const tasks = l.tasks.map((t) => {
+          const task = taskRepo.create({
+            list,
+            name: t.name,
+            displayOrder: t.displayOrder,
+          });
+          // When task is active, set it as active task in the workSession instance
+          if (t.isActive) workSession.activeTask = task;
+          return task;
+        });
+        list.tasks = tasks;
+        return list;
+      });
       tab.lists = lists;
-
       tabs.push(tab);
     });
 
