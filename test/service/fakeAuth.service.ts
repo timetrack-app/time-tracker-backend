@@ -1,9 +1,10 @@
 import { injectable } from 'inversify';
-import { AuthLoginDto } from 'src/modules/auth/dto/auth-login.dto';
-import { AuthRegisterDto } from 'src/modules/auth/dto/auth-register.dto';
-import { IAuthService } from 'src/modules/auth/interfaces/IAuth.service';
-import { User } from 'src/modules/user/entity/user.entity';
 import { fakeUser } from '../../test/factory/user.factory';
+import { AuthLoginDto } from '../../src/modules/auth/dto/auth-login.dto';
+import { AuthRegisterDto } from '../../src/modules/auth/dto/auth-register.dto';
+import { IAuthService } from '../../src/modules/auth/interfaces/IAuth.service';
+import { User } from '../../src/modules/user/entity/user.entity';
+
 
 export const user: User = fakeUser();
 @injectable()

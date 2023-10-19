@@ -6,7 +6,6 @@ function generateTaskData(obj: Partial<Task> = {}): Task {
     id: faker.datatype.number(),
     name: faker.datatype.string(),
     displayOrder: faker.datatype.number(),
-    description: faker.datatype.string(),
   } as unknown as Task;
 }
 
@@ -23,7 +22,7 @@ function generateTasksData(n = 1, object: Partial<Task> = {}) {
 
 export const fakeTasks = (size) => generateTasksData(size);
 
-export const fakeTask = (): Task => {
-  const fakeTasks = generateTasksData(1);
+export const fakeTask = (isActive = false): Task => {
+  const fakeTasks = generateTasksData(1, { isActive });
   return fakeTasks[0];
 };

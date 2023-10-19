@@ -1,7 +1,7 @@
 import { injectable } from 'inversify';
-import { CreateUserDto } from 'src/modules/user/dto/create-user.dto';
-import { User } from 'src/modules/user/entity/user.entity';
-import { IUserService } from 'src/modules/user/interfaces/IUser.service';
+import { CreateUserDto } from '../../src/modules/user/dto/create-user.dto';
+import { User } from '../../src/modules/user/entity/user.entity';
+import { IUserService } from '../../src/modules/user/interfaces/IUser.service';
 import { fakeUser } from '../factory/user.factory';
 
 export const user: User = fakeUser();
