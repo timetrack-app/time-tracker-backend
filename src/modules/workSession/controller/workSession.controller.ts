@@ -32,7 +32,8 @@ export class WorkSessionController {
   ) {
     const dto = new FindLatestUnfinishedWorkSessionDto();
     dto.userId = Number(userId);
-    const workSession = await this.workSessionService.getLatestUnfinishedWorkSession(dto);
+    const workSession =
+      await this.workSessionService.getLatestUnfinishedWorkSession(dto);
 
     return res.status(200).json({ workSession });
   }
@@ -45,10 +46,13 @@ export class WorkSessionController {
     res: Response<CreateWorkSessionReturnType>,
   ) {
     const dto = new CreateWorkSessionServiceDto();
-    dto.userId = userId;
-    dto.templateId = reqBody.templateId;
 
-    const latestWorkSession = await this.workSessionService.createWorkSession(dto);
+    dto.userId = userId;
+    dto.tabs = reqBody.tabs;
+
+    const latestWorkSession = await this.workSessionService.createWorkSession(
+      dto,
+    );
 
     const statusCode = latestWorkSession.isUnfinished ? 200 : 204;
 
@@ -56,7 +60,6 @@ export class WorkSessionController {
       isUnfinished: latestWorkSession.isUnfinished,
       workSession: latestWorkSession.workSession,
     });
-
   }
 
   @httpPut('/:workSessionId/end')
@@ -71,6 +74,6 @@ export class WorkSessionController {
 
     const workSession = await this.workSessionService.endWorkSession(dto);
 
-    return res.status(200).json({...workSession});
+    return res.status(200).json({ ...workSession });
   }
 }

@@ -6,8 +6,10 @@ import {
   UpdateDateColumn,
   ManyToOne,
   JoinColumn,
+  OneToOne,
 } from 'typeorm';
 import { List } from '../../list/entity/list.entity';
+import { WorkSession } from '../../../modules/workSession/entity/workSession.entity';
 
 @Entity('tasks')
 export class Task {
@@ -29,6 +31,9 @@ export class Task {
   @Column({ name: 'total_time', nullable: true })
   totalTime: number;
 
+  @Column({ nullable: true })
+  isActive: boolean;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
@@ -40,4 +45,7 @@ export class Task {
   @ManyToOne(() => List, (list) => list.tasks)
   @JoinColumn({ name: 'list_id' })
   list: List;
+
+  @OneToOne(() => WorkSession, (workSession) => workSession.activeTask)
+  workSession: WorkSession;
 }

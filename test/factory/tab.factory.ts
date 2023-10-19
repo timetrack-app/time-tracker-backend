@@ -20,7 +20,7 @@ function generateTabsData(n = 1, object: Partial<Tab> = {}) {
   );
 }
 
-export const fakeTabs = (size) => generateTabsData(size);
+export const fakeTabs = (size: number) => generateTabsData(size);
 
 export const fakeTab = (): Tab => {
   const fakeTabs = generateTabsData(1);
