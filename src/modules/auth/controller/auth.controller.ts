@@ -13,6 +13,9 @@ import { DtoValidationMiddleware } from '../../../middlewares/dto-validation.mid
 import { AuthLoginDto } from '../dto/auth-login.dto';
 import { AuthRegisterDto } from '../dto/auth-register.dto';
 import { InternalServerErrorException } from '../../../common/errors/all.exception';
+
+// TODO: Add password rule
+
 @controller('/auth')
 export class AuthController {
   constructor(

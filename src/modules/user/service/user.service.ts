@@ -12,6 +12,8 @@ import {
 } from '../../../common/errors/all.exception';
 import { IUserEmailVerificationService } from '../../../modules/userEmailVerification/interface/IUserEmailVerification.service';
 import { ISendEmailService } from '../../../modules/sendMail/interface/ISendEmail.service';
+import { createToken } from 'src/common/utils/token.util';
+import { encryptPassword } from 'src/common/utils/password.utils';
 
 @injectable()
 export class UserService implements IUserService {
@@ -91,21 +93,10 @@ export class UserService implements IUserService {
     if (!user) throw new NotFoundException('User with this id not found.');
 
     //update user's email and set user verification status
-    // hash
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
+    const hashedPassword = await encryptPassword(password);
     await this.updateUser(user, {
       password: hashedPassword,
     });
-
-    // TODO: no need to do this in this function
-    // const { email } = user;
-    // // generate a email verification token
-    // const token = await this.userEmailVerificationService.findTokenWithEmail(
-    //   email,
-    // );
-    // // using the token, send verification email to the user
-    // await this.sendEmailService.sendNewPasswordConfirmationEmail(email, token);
   }
 
   /**
@@ -120,6 +111,29 @@ export class UserService implements IUserService {
       throw new ValidationErrorException('This email is invalid');
     }
 
-    this.sendEmailService.sendPasswordResetLinkEmail(email);
+    const token = await createToken();
+
+    this.sendEmailService.sendPasswordResetLinkEmail(email, token);
+  }
+
+  /**
+   * Update password by email.
+   * For changing password without login when a user forgot the password.
+   *
+   * @param {string} email
+   * @param {string} password
+   * @return {Promise<void>}
+   * @memberof UserService
+   */
+  async updatePasswordByEmail(email: string, password: string): Promise<void> {
+    const user = await this.findOneByEmail(email);
+    if (!user) {
+      throw new ValidationErrorException('This email is invalid');
+    }
+
+    const hashedPassword = await encryptPassword(password);
+    await this.updateUser(user, {
+      password: hashedPassword,
+    });
   }
 }
