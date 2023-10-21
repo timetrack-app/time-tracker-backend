@@ -49,9 +49,9 @@ export class AuthController {
     res: Response,
   ) {
     const verifiedUser = await this.authService.verifyUser(token);
-    const jwtToken = this.authService.generateJWT(verifiedUser);
+    const authToken = this.authService.generateJWT(verifiedUser);
 
-    return res.status(200).json({ token: jwtToken });
+    return res.status(200).json({ token: authToken });
   }
 
   @httpPost('/login', DtoValidationMiddleware(AuthLoginDto))
@@ -60,9 +60,9 @@ export class AuthController {
     req: Request,
     res: Response,
   ) {
-    const token = await this.authService.login(body);
+    const authToken = await this.authService.login(body);
 
-    return res.status(200).json({ token });
+    return res.status(200).json({ token: authToken });
   }
 
   @httpPost('/logout', AuthGuardMiddleware)

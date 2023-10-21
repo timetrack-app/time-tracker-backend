@@ -1,4 +1,5 @@
-import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn,  } from 'typeorm';
+import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import { User } from '../../../modules/user/entity/user.entity';
 
 @Entity('password_reset')
 export class PasswordReset {
@@ -14,4 +15,8 @@ export class PasswordReset {
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
+
+  // relation: users table
+  @ManyToOne(() => User, user => user.email)
+  user: User;
 }

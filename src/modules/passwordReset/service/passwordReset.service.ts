@@ -1,20 +1,29 @@
 import { inject, injectable } from 'inversify';
-import { IPasswordResetService } from '../interface/IPasswordReset.service';
 import { TYPES } from '../../../core/type.core';
+import { IDatabaseService } from '../../../core/interface/IDatabase.service';
+import { IPasswordResetService } from '../interface/IPasswordReset.service';
 import { IPasswordResetRepository } from '../interface/IPasswordReset.repository';
 import { ISendEmailService } from '../../../modules/sendMail/interface/ISendEmail.service';
-import { InternalServerErrorException } from '../../../common/errors/all.exception';
-import { IUserRepository } from '../../../modules/user/interfaces/IUser.repository';
+import { IUserService } from '../../../modules/user/interfaces/IUser.service';
+import { InternalServerErrorException, NotFoundException } from '../../../common/errors/all.exception';
+import { encryptPassword } from '../../../common/utils/password.utils';
+import { isTokenUnexpired } from '../../../common/utils/token.util';
+import { Logger } from '../../../common/services/logger.service';
+import { PasswordReset } from '../entity/passwordReset.entity';
 
 @injectable()
 export class PasswordResetService implements IPasswordResetService {
   constructor(
+    @inject(TYPES.IDatabaseService)
+    private readonly database: IDatabaseService,
     @inject(TYPES.IPasswordResetRepository)
     private readonly passwordResetRepository: IPasswordResetRepository,
-    @inject(TYPES.IUserRepository)
-    private readonly userRepository: IUserRepository,
+    @inject(TYPES.IUserService)
+    private readonly userService: IUserService,
     @inject(TYPES.ISendEMailService)
     private readonly sendEmailService: ISendEmailService,
+    @inject(TYPES.Logger)
+    private readonly logger: Logger,
   ) {}
 
   /**
@@ -25,6 +34,11 @@ export class PasswordResetService implements IPasswordResetService {
    * @memberof PasswordResetService
    */
   async requestPasswordReset(email: string): Promise<void> {
+    const user = await this.userService.findOneByEmail(email);
+    if (!user) {
+      throw new NotFoundException('The email address is invalid.')
+    }
+
     const record = await this.passwordResetRepository.create(email);
 
     this.sendEmailService.sendPasswordResetLinkEmail(email, record.token);
@@ -33,27 +47,62 @@ export class PasswordResetService implements IPasswordResetService {
   /**
    *
    *
-   * @param {string} email
+   * @param {string} token
+   * @return {Promise<PasswordReset>}
+   * @memberof PasswordResetService
+   */
+  async verifyToken(token: string): Promise<PasswordReset> {
+    const record = await this.passwordResetRepository.findLatestOneByToken(token);
+
+    if (!isTokenUnexpired(record.createdAt)) {
+      throw new InternalServerErrorException('The token is expired');
+    }
+
+    return record;
+  }
+
+  /**
+   * Update password
+   * Delete token record
+   *
+   * @param {string} token
+   * @param {string} password
+   * @return {Promise<void>}
+   * @memberof PasswordResetService
+   */
+  async updatePassword(token: string, password: string): Promise<void> {
+    const entityManager = await this.database.getManager();
+    const queryRunner = entityManager.queryRunner;
+
+    await queryRunner.startTransaction();
+    try {
+      const user = await this.passwordResetRepository.findUserByToken(token);
+
+      const passwordHash = await encryptPassword(password);
+      await this.userService.updateUser(user, {
+        password: passwordHash,
+      });
+
+      await this.deleteTokenRecord(token);
+
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      this.logger.error(`Failed to update the user's password. Error: ${error}`);
+      await queryRunner.rollbackTransaction();
+      throw new InternalServerErrorException("Failed to update the user's password.");
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  /**
+   *
+   *
    * @param {string} token
    * @return {Promise<void>}
    * @memberof PasswordResetService
    */
-  async verifyToken(email: string, token: string): Promise<void> {
-    const record = await this.passwordResetRepository.findLatestOne(email, token);
-
-    const now = new Date();
-    const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
-    const isTokenUnexpired = record.createdAt >= oneHourAgo && record.createdAt <= now;
-    if (!isTokenUnexpired) {
-      throw new InternalServerErrorException('The token is expired');
-    }
-  }
-
-  async updatePassword(email: string, password: string): Promise<void> {
-    // TODO: find user by email -> update
-    // TODO: update password
-    // TODO: delete token record
-
-    // TODO: transaction
+  async deleteTokenRecord(token: string): Promise<void> {
+    await this.passwordResetRepository.delete(token);
   }
 }

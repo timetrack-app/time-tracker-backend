@@ -13,9 +13,7 @@ import { IUserService } from '../interfaces/IUser.service';
 import { UpdateEmailDto } from '../dto/update-email.dto';
 import { DtoValidationMiddleware } from '../../../middlewares/dto-validation.middleware';
 import { UpdatePasswordDto } from '../dto/update-password.dto';
-import { ResetPasswordRequestDto } from '../dto/reset-password-request.dto';
 import { NotFoundException } from '../../../common/errors/all.exception';
-import { ResetPasswordDto } from '../dto/reset-password.dto';
 import { AuthGuardMiddleware } from '../../../middlewares/auth-guard.middleware';
 
 // TODO: Add password rule
@@ -62,8 +60,6 @@ export class UserController {
     req: Request,
     res: Response,
   ) {
-    // TODO: create new userEmailVerification()
-
     const { email } = updateEmailDto;
     await this.userService.updateEmailAndSendVerification(id, email);
     return res.status(200).json();
@@ -111,74 +107,6 @@ export class UserController {
   ) {
     const { password } = updatePasswordDto;
     this.userService.updatePassword(id, password);
-    return res.status(200).json();
-  }
-
-  /**
-   * Send password reset email
-   * No login needed
-   *
-   * @param {number} id
-   * @param {ResetPasswordRequestDto}
-   * @param {Request} req
-   * @param {Response} res
-   * @return {*}
-   * @memberof UserController
-   */
-  @httpPost(
-    '/password-update/request',
-    DtoValidationMiddleware(ResetPasswordRequestDto),
-  )
-  public async sendPasswordResetEmail(
-    @requestBody() resetPasswordDto: ResetPasswordRequestDto,
-    req: Request,
-    res: Response,
-  ) {
-    const { email } = resetPasswordDto;
-    // check if email is valid, and send an email to user
-    await this.userService.handlePasswordResetRequest(email);
-    return res.status(200).json();
-  }
-
-  /**
-   * Verify token in the query param of a link in a password update request email.
-   *
-   * @param {string} token
-   * @param {Request} req
-   * @param {Response} res
-   * @return {*}
-   * @memberof UserController
-   */
-  @httpGet('/password-update/verification')
-  public async verifyUserNewPassword(
-    @queryParam('token') token: string,
-    req: Request,
-    res: Response,
-  ) {
-    this.userService.verifyUserWithToken(token);
-    return res.status(200).json();
-  }
-
-  /**
-   * Password forgot
-   *
-   * @param {ResetPasswordDto} resetPasswordDto
-   * @param {Request} req
-   * @param {Response} res
-   * @return {*}
-   * @memberof UserController
-   */
-  @httpPost(
-    '/user/password-update/save',
-    DtoValidationMiddleware(ResetPasswordDto)
-  )
-  public async resetPassword(
-    @requestBody() resetPasswordDto: ResetPasswordDto,
-    req: Request,
-    res: Response,
-  ) {
-    const { email, password } = resetPasswordDto;
-    await this.userService.updatePasswordByEmail(email, password);
     return res.status(200).json();
   }
 }

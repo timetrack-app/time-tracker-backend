@@ -6,6 +6,7 @@ import { IPasswordResetRepository } from '../interface/IPasswordReset.repository
 import { PasswordReset } from '../entity/passwordReset.entity';
 import { createToken } from '../../../common/utils/token.util';
 import { NotFoundException } from '../../../common/errors/all.exception';
+import { User } from 'src/modules/user/entity/user.entity';
 
 @injectable()
 export class PasswordResetRepository implements IPasswordResetRepository {
@@ -15,6 +16,44 @@ export class PasswordResetRepository implements IPasswordResetRepository {
 
   private async getRepo(): Promise<Repository<PasswordReset>> {
     return await this.database.getRepository(PasswordReset);
+  }
+
+  /**
+   *
+   *
+   * @param {string} token
+   * @return {Promise<User>}
+   * @memberof PasswordResetRepository
+   */
+  async findUserByToken(token: string): Promise<User> {
+    const repo = await this.getRepo();
+    const recordWithUser = await repo.findOne({
+      where: { token },
+      relations: ['user'],
+    });
+
+    return recordWithUser.user;
+  }
+
+  /**
+   *
+   *
+   * @param {string} token
+   * @return {Promise<PasswordReset>}
+   * @memberof PasswordResetRepository
+   */
+  async findLatestOneByToken(token: string): Promise<PasswordReset> {
+    const repo = await this.getRepo();
+
+    const record = await repo.findOne({
+      where: { token },
+      order: { createdAt: 'DESC' },
+    });
+    if (!record) {
+      throw new NotFoundException('Record not found.');
+    }
+
+    return record;
   }
 
   /**
@@ -32,24 +71,17 @@ export class PasswordResetRepository implements IPasswordResetRepository {
     return await repo.create({ email, token });
   }
 
-  async findLatestOne(email: string, token: string): Promise<PasswordReset> {
+  /**
+   *
+   *
+   * @param {string} token
+   * @return {Promise<void>}
+   * @memberof PasswordResetRepository
+   */
+  async delete(token: string): Promise<void> {
     const repo = await this.getRepo();
 
-    const record = await repo.findOne({
-      where: { email, token },
-      order: { createdAt: 'DESC' },
-    });
-    if (!record) {
-      throw new NotFoundException('Record not found.');
-    }
-
-    return record;
-  }
-
-  async delete(email: string): Promise<void> {
-    const repo = await this.getRepo();
-
-    const res = await repo.delete({ email });
+    const res = await repo.delete({ token });
     if (res.affected === 0) {
       throw new NotFoundException('Record not found.');
     }
