@@ -1,4 +1,3 @@
-import bcrypt from 'bcryptjs';
 import { inject, injectable } from 'inversify';
 import { TYPES } from '../../../core/type.core';
 import { IUserRepository } from '../interfaces/IUser.repository';
@@ -12,8 +11,8 @@ import {
 } from '../../../common/errors/all.exception';
 import { IUserEmailVerificationService } from '../../../modules/userEmailVerification/interface/IUserEmailVerification.service';
 import { ISendEmailService } from '../../../modules/sendMail/interface/ISendEmail.service';
-import { createToken } from 'src/common/utils/token.util';
-import { encryptPassword } from 'src/common/utils/password.utils';
+import { createToken } from '../../../common/utils/token.util';
+import { encryptPassword } from '../../../common/utils/password.utils';
 
 @injectable()
 export class UserService implements IUserService {

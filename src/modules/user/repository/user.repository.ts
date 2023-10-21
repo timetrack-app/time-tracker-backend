@@ -5,7 +5,7 @@ import { User } from '../entity/user.entity';
 import { IUserRepository } from '../interfaces/IUser.repository';
 import { IDatabaseService } from '../../../core/interface/IDatabase.service';
 import { Repository, UpdateResult } from 'typeorm';
-import { encryptPassword } from 'src/common/utils/password.utils';
+import { encryptPassword } from '../../../common/utils/password.utils';
 
 @injectable()
 export class UserRepository implements IUserRepository {
