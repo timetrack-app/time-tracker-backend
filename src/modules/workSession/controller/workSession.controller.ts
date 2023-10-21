@@ -16,8 +16,9 @@ import { DtoValidationMiddleware } from '../../../middlewares/dto-validation.mid
 import { CreateWorkSessionReturnType } from '../types';
 import { FindLatestUnfinishedWorkSessionDto } from '../dto/find-latest-unfinished-work-session-dto';
 import { EndWorkSessionDto } from '../dto/end-work-session-dto';
+import { AuthGuardMiddleware } from '../../../middlewares/auth-guard.middleware';
 
-@controller('/users/:userId/work-sessions')
+@controller('/users/:userId/work-sessions', AuthGuardMiddleware)
 export class WorkSessionController {
   constructor(
     @inject(TYPES.IWorkSessionService)

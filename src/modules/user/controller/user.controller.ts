@@ -51,7 +51,11 @@ export class UserController {
    * @return {*}
    * @memberof UserController
    */
-  @httpPost('/:userId/email-update', DtoValidationMiddleware(UpdateEmailDto))
+  @httpPost(
+    '/:userId/email-update',
+    AuthGuardMiddleware,
+    DtoValidationMiddleware(UpdateEmailDto)
+  )
   public async updateEmail(
     @requestParam('userId') id: number,
     @requestBody() updateEmailDto: UpdateEmailDto,

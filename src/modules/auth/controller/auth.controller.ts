@@ -13,6 +13,7 @@ import { DtoValidationMiddleware } from '../../../middlewares/dto-validation.mid
 import { AuthLoginDto } from '../dto/auth-login.dto';
 import { AuthRegisterDto } from '../dto/auth-register.dto';
 import { InternalServerErrorException } from '../../../common/errors/all.exception';
+import { AuthGuardMiddleware } from '../../../middlewares/auth-guard.middleware';
 
 // TODO: Add password rule
 
@@ -64,7 +65,7 @@ export class AuthController {
     return res.status(200).json({ token });
   }
 
-  @httpPost('/logout')
+  @httpPost('/logout', AuthGuardMiddleware)
   public async logout(req: Request, res: Response) {
     try {
       return res.status(200).json();

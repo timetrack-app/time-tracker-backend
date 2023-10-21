@@ -7,8 +7,9 @@ import { CreateTemplateRequestDto } from '../dto/create-template-request-dto';
 import { CreateTemplateDto } from '../dto/create-template-dto';
 import { DeleteTemplateDto } from '../dto/delete-template-dto';
 import { DtoValidationMiddleware } from '../../../middlewares/dto-validation.middleware';
+import { AuthGuardMiddleware } from '../../../middlewares/auth-guard.middleware';
 
-@controller('/users/:userId/templates')
+@controller('/users/:userId/templates', AuthGuardMiddleware)
 export class TemplateController {
   constructor(
     @inject(TYPES.ITemplateService)

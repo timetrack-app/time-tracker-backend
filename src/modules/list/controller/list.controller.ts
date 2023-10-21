@@ -12,8 +12,12 @@ import { TYPES } from '../../../core/type.core';
 import { IListService } from './../interface/IList.service';
 import { CreateListDto } from '../dto/createList.dto';
 import { List } from '../entity/list.entity';
+import { AuthGuardMiddleware } from '../../../middlewares/auth-guard.middleware';
 
-@controller('/work-sessions/:workSessionId/tabs/:tabId/lists')
+@controller(
+  '/work-sessions/:workSessionId/tabs/:tabId/lists',
+  AuthGuardMiddleware
+)
 export class ListController {
   constructor(
     @inject(TYPES.IListService)
