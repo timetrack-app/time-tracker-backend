@@ -16,6 +16,7 @@ import { UpdatePasswordDto } from '../dto/update-password.dto';
 import { ResetPasswordRequestDto } from '../dto/reset-password-request.dto';
 import { NotFoundException } from '../../../common/errors/all.exception';
 import { ResetPasswordDto } from '../dto/reset-password.dto';
+import { AuthGuardMiddleware } from '../../../middlewares/auth-guard.middleware';
 
 // TODO: Add password rule
 
@@ -25,7 +26,7 @@ export class UserController {
     @inject(TYPES.IUserService) private readonly userService: IUserService,
   ) {}
 
-  @httpGet('/:userId')
+  @httpGet('/:userId', AuthGuardMiddleware)
   public async getUser(
     @requestParam('userId') id: number,
     req: Request,

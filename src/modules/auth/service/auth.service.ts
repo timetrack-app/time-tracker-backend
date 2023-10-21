@@ -19,6 +19,7 @@ import { IUserEmailVerificationService } from '../../../modules/userEmailVerific
 import { ISendEmailService } from '../../../modules/sendMail/interface/ISendEmail.service';
 import { User } from '../../../modules/user/entity/user.entity';
 import { encryptPassword } from '../../../common/utils/password.utils';
+import { getJwtSecret } from '../../../common/utils/env.utils';
 
 @injectable()
 export class AuthService implements IAuthService {
@@ -76,7 +77,7 @@ export class AuthService implements IAuthService {
   }
 
   generateJWT(user: User) {
-    const jwtSecretKey = process.env.JWT_SECRET_KEY;
+    const jwtSecretKey = getJwtSecret();
     if (!jwtSecretKey) {
       throw new InternalServerErrorException('Failed to generate authentication token.');
     }
