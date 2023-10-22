@@ -11,7 +11,7 @@ import {
   NotFoundException,
 } from '../../../common/errors/all.exception';
 import { UserEmailVerification } from '../entity/userEmailVerification.entity';
-import { createToken } from '../../../common/utils/token.util';
+import { createToken } from '../../../common/utils/token/token.utils';
 
 @injectable()
 export class UserEmailVerificationService

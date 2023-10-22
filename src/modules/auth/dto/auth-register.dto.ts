@@ -1,5 +1,5 @@
 import { IsEmail, IsString, MinLength, MaxLength } from 'class-validator';
-import { passwordMinLen, passwordMaxLen } from '../../../common/utils/password.utils';
+import { passwordMinLen, passwordMaxLen } from '../../../common/utils/password/password.utils';
 import { Match } from '../../../common/libs/class-validator/customDecorators/match';
 
 export class AuthRegisterDto {

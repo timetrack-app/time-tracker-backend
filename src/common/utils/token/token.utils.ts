@@ -16,11 +16,15 @@ export const createToken = async (): Promise<string> => {
  * Check if a token is expired or not
  *
  * @param {Date} tokenCreatedAt
- * @return {boolean} true if token is not expired
+ * @param {number} [lifeTimeMilliSec=tokenLifetimeMilliSec]
+ * @return {boolean} true if unexpired, false if expired
  */
-export const isTokenUnexpired = (tokenCreatedAt: Date): boolean => {
+export const isTokenUnexpired = (
+  tokenCreatedAt: Date,
+  lifeTimeMilliSec = tokenLifetimeMilliSec
+): boolean => {
   const now = new Date();
-  const lifeTimeMilliSecAgo = new Date(now.getTime() - tokenLifetimeMilliSec);
+  const lifeTimeMilliSecAgo = new Date(now.getTime() - lifeTimeMilliSec);
 
   return tokenCreatedAt >= lifeTimeMilliSecAgo && tokenCreatedAt <= now;
 };

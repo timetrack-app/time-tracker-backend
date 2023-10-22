@@ -6,8 +6,8 @@ import { IPasswordResetRepository } from '../interface/IPasswordReset.repository
 import { ISendEmailService } from '../../../modules/sendMail/interface/ISendEmail.service';
 import { IUserService } from '../../../modules/user/interfaces/IUser.service';
 import { InternalServerErrorException, NotFoundException } from '../../../common/errors/all.exception';
-import { encryptPassword } from '../../../common/utils/password.utils';
-import { isTokenUnexpired } from '../../../common/utils/token.util';
+import { encryptPassword } from '../../../common/utils/password/password.utils';
+import { isTokenUnexpired } from '../../../common/utils/token/token.utils';
 import { Logger } from '../../../common/services/logger.service';
 import { PasswordReset } from '../entity/passwordReset.entity';
 

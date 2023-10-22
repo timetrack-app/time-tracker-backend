@@ -11,8 +11,8 @@ import {
 } from '../../../common/errors/all.exception';
 import { IUserEmailVerificationService } from '../../../modules/userEmailVerification/interface/IUserEmailVerification.service';
 import { ISendEmailService } from '../../../modules/sendMail/interface/ISendEmail.service';
-import { createToken } from '../../../common/utils/token.util';
-import { encryptPassword } from '../../../common/utils/password.utils';
+import { createToken } from '../../../common/utils/token/token.utils';
+import { encryptPassword } from '../../../common/utils/password/password.utils';
 
 @injectable()
 export class UserService implements IUserService {

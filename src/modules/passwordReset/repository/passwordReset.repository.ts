@@ -4,7 +4,7 @@ import { TYPES } from '../../../core/type.core';
 import { IDatabaseService } from '../../../core/interface/IDatabase.service';
 import { IPasswordResetRepository } from '../interface/IPasswordReset.repository';
 import { PasswordReset } from '../entity/passwordReset.entity';
-import { createToken } from '../../../common/utils/token.util';
+import { createToken } from '../../../common/utils/token/token.utils';
 import { NotFoundException } from '../../../common/errors/all.exception';
 import { User } from 'src/modules/user/entity/user.entity';
 
