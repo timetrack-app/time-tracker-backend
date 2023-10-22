@@ -10,13 +10,11 @@ import {
 } from 'inversify-express-utils';
 import { TYPES } from '../../../core/type.core';
 import { IUserService } from '../interfaces/IUser.service';
-import { UpdateEmailDto } from '../dto/update-email.dto';
 import { DtoValidationMiddleware } from '../../../middlewares/dto-validation.middleware';
+import { AuthGuardMiddleware } from '../../../middlewares/auth-guard.middleware';
+import { UpdateEmailDto } from '../dto/update-email.dto';
 import { UpdatePasswordDto } from '../dto/update-password.dto';
 import { NotFoundException } from '../../../common/errors/all.exception';
-import { AuthGuardMiddleware } from '../../../middlewares/auth-guard.middleware';
-
-// TODO: Add password rule
 
 @controller('/users')
 export class UserController {
