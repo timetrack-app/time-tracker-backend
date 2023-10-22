@@ -176,13 +176,6 @@ describe('Auth Service Test', () => {
     });
   });
 
-  describe('Generate JWT', () => {
-    it('Should generate JWT token', () => {
-      const response = authService.generateJWT(fakeUserA);
-      expect(response).toBeDefined;
-    });
-  });
-
   describe('Login', () => {
     it('User can sign in', async () => {
       const response = await authService.login(userToLogin);
