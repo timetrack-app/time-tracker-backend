@@ -9,6 +9,4 @@ export interface IUserService {
   verifyUserWithToken(token: string): Promise<User>;
   updateEmailAndSendVerification(id: number, email: string): Promise<void>;
   updatePassword(id: number, password: string): Promise<void>;
-  handlePasswordResetRequest(email: string): Promise<void>;
-  updatePasswordByEmail(email: string, password: string): Promise<void>;
 }

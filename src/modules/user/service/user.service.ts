@@ -97,42 +97,4 @@ export class UserService implements IUserService {
       password: hashedPassword,
     });
   }
-
-  /**
-   * Send password reset email
-   *
-   * @param {string} email
-   * @memberof UserService
-   */
-  async handlePasswordResetRequest(email: string) {
-    const user = await this.findOneByEmail(email);
-    if (!user) {
-      throw new ValidationErrorException('This email is invalid');
-    }
-
-    const token = await createToken();
-
-    this.sendEmailService.sendPasswordResetLinkEmail(email, token);
-  }
-
-  /**
-   * Update password by email.
-   * For changing password without login when a user forgot the password.
-   *
-   * @param {string} email
-   * @param {string} password
-   * @return {Promise<void>}
-   * @memberof UserService
-   */
-  async updatePasswordByEmail(email: string, password: string): Promise<void> {
-    const user = await this.findOneByEmail(email);
-    if (!user) {
-      throw new ValidationErrorException('This email is invalid');
-    }
-
-    const hashedPassword = await encryptPassword(password);
-    await this.updateUser(user, {
-      password: hashedPassword,
-    });
-  }
 }

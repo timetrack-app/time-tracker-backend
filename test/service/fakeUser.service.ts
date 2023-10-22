@@ -28,7 +28,4 @@ export class FakeUserService implements IUserService {
   updatePassword(id: number, password: string): Promise<void> {
     return Promise.resolve();
   }
-  handlePasswordResetRequest(id: number, email: string): Promise<void> {
-    return Promise.resolve();
-  }
 }

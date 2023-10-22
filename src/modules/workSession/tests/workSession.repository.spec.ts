@@ -4,9 +4,9 @@ import { IDatabaseService } from '../../../core/interface/IDatabase.service';
 import { WorkSession } from '../entity/workSession.entity';
 import { CreateWorkSessionDto } from '../dto/create-work-session.dto';
 import { FindLatestUnfinishedWorkSessionDto } from '../dto/find-latest-unfinished-work-session-dto';
-import { fakeWorkSession } from 'test/factory/workSession.factory';
-import { fakeUser } from 'test/factory/user.factory';
-import { fakeTabs } from 'test/factory/tab.factory';
+import { fakeWorkSession } from '../../../../test/factory/workSession.factory';
+import { fakeUser } from '../../../../test/factory/user.factory';
+import { fakeTabs } from '../../../../test/factory/tab.factory';
 
 describe('WorkSession Repository Test', () => {
   let workSessionRepository: WorkSessionRepository;

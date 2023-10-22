@@ -67,7 +67,7 @@ import { TaskRepository } from '../modules/task/repository/task.repository';
 import { IPasswordResetRepository } from '../modules/passwordReset/interface/IPasswordReset.repository';
 import { PasswordResetRepository } from '../modules/passwordReset/repository/passwordReset.repository';
 import { IPasswordResetService } from '../modules/passwordReset/interface/IPasswordReset.service';
-import { PasswordResetService } from '../modules/passwordReset/service/passwordReset.Service';
+import { PasswordResetService } from '../modules/passwordReset/service/passwordReset.service';
 
 const container = new Container();
 

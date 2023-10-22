@@ -1,5 +1,4 @@
 import { ParsedQs } from 'qs';
-import { User } from '../../../modules/user/entity/user.entity';
 import { UserEmailVerification } from '../entity/userEmailVerification.entity';
 
 export interface IUserEmailVerificationService {

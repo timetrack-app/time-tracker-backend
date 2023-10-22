@@ -5,16 +5,15 @@ import { IUserRepository } from '../interfaces/IUser.repository';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { IUserEmailVerificationService } from '../../../modules/userEmailVerification/interface/IUserEmailVerification.service';
 import { ISendEmailService } from '../../../modules/sendMail/interface/ISendEmail.service';
-import {
-  NotFoundException,
-  ValidationErrorException,
-  InternalServerErrorException,
-} from '../../../common/errors/all.exception';
+import { NotFoundException } from '../../../common/errors/all.exception';
 import { fakeUser } from '../../../../test/factory/user.factory';
+import { fakeUserEmailVerificationData } from '../../../../test/factory/userEmailVerification.factory';
 
 const notExistingUser = fakeUser();
 
 const existingUser = fakeUser();
+
+const fakeUserEmailVerification = fakeUserEmailVerificationData
 
 const mockUserRepo: IUserRepository = {
   create: jest.fn((createUserDto: CreateUserDto) =>
@@ -33,6 +32,7 @@ const mockUserRepo: IUserRepository = {
 
 const mockEmailVerificationService: IUserEmailVerificationService = {
   createVerificationToken: jest.fn((email: string) => Promise.resolve('token')),
+  createVerification: jest.fn((email: string, verificationToken: string) => Promise.resolve(fakeUserEmailVerification)),
   findTokenWithEmail: jest.fn((email: string) => Promise.resolve('token')),
   verify: jest.fn((token: string) => Promise.resolve(existingUser.email)),
 };
@@ -48,7 +48,7 @@ const mockSendEmailService: ISendEmailService = {
   sendNewPasswordConfirmationEmail: jest.fn(
     (email: string, token: string) => {},
   ),
-  sendPasswordResetLinkEmail: jest.fn((id: number, email: string) => {}),
+  sendPasswordResetLinkEmail: jest.fn((email: string, token: string) => {}),
 };
 
 describe('User Service Test', () => {
@@ -146,31 +146,6 @@ describe('User Service Test', () => {
       await expect(
         userService.updatePassword(userId, newPassword),
       ).rejects.toThrow(new NotFoundException('User with this id not found.'));
-    });
-  });
-
-  describe('handlePasswordResetRequest', () => {
-    const validId = existingUser.id;
-    const invalidId = notExistingUser.id;
-    const validEmail = existingUser.email;
-    const invalidEmail = notExistingUser.email;
-
-    it('Should work fine when id and email is correct', async () => {
-      await expect(
-        await userService.handlePasswordResetRequest(validId, validEmail),
-      ).toBeUndefined();
-    });
-
-    it('Should throw an error when id is incorrect', async () => {
-      await expect(
-        userService.handlePasswordResetRequest(invalidId, validEmail),
-      ).rejects.toThrow(new NotFoundException('User with this id not found.'));
-    });
-
-    it('Should throw an error when email is invalid', async () => {
-      await expect(
-        userService.handlePasswordResetRequest(validId, invalidEmail),
-      ).rejects.toThrow(new ValidationErrorException('This email is invalid'));
     });
   });
 });

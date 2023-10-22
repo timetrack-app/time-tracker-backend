@@ -16,6 +16,7 @@ import {
   ForbiddenException,
   ValidationErrorException,
 } from '../../../common/errors/all.exception';
+import { generateVerificationData } from '../../../../test/factory/userEmailVerification.factory';
 
 describe('Auth Service Test', () => {
   let authService: AuthService;
@@ -88,15 +89,14 @@ describe('Auth Service Test', () => {
     updatePassword: jest.fn((id: number, password: string) =>
       Promise.resolve(),
     ),
-    handlePasswordResetRequest: jest.fn((id: number, email: string) =>
-      Promise.resolve(),
-    ),
   };
 
+  const fakeUserEmailVerification = generateVerificationData({ verificationToken: verificationToken })
   const mockEmailVerificationService: IUserEmailVerificationService = {
     createVerificationToken: jest.fn((email: string) =>
       Promise.resolve(verificationToken),
     ),
+    createVerification: jest.fn((email: string, verificationToken: string) => Promise.resolve(fakeUserEmailVerification)),
     findTokenWithEmail: jest.fn((email: string) => Promise.resolve('token')),
     verify: jest.fn((token: string | string[] | ParsedQs | ParsedQs[]) =>
       Promise.resolve('token'),
@@ -114,7 +114,7 @@ describe('Auth Service Test', () => {
     sendNewPasswordConfirmationEmail: jest.fn(
       (email: string, token: string) => {},
     ),
-    sendPasswordResetLinkEmail: jest.fn((id: number, email: string) => {}),
+    sendPasswordResetLinkEmail: jest.fn((email: string, token: string) => {}),
   };
 
   // test starts from here

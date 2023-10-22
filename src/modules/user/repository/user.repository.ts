@@ -4,8 +4,7 @@ import { TYPES } from '../../../core/type.core';
 import { User } from '../entity/user.entity';
 import { IUserRepository } from '../interfaces/IUser.repository';
 import { IDatabaseService } from '../../../core/interface/IDatabase.service';
-import { Repository, UpdateResult } from 'typeorm';
-import { encryptPassword } from '../../../common/utils/password.utils';
+import { Repository } from 'typeorm';
 
 @injectable()
 export class UserRepository implements IUserRepository {
@@ -39,23 +38,5 @@ export class UserRepository implements IUserRepository {
   async update(user: User): Promise<User> {
     const repo = await this.getRepo();
     return repo.save(user);
-  }
-
-  async updatePassword(email: string, password: string): Promise<User> {
-    const repo = await this.getRepo();
-    const hashedPassword = await encryptPassword(password);
-
-    const updateResult: UpdateResult = await repo
-      .createQueryBuilder()
-      .update(User)
-      .set({ password: hashedPassword })
-      .where('email = :email', { email })
-      .returning('*')
-      .updateEntity(true)
-      .execute();
-
-    if (updateResult.affected && updateResult.affected > 0) {
-      return updateResult.raw[0] as User;
-    }
   }
 }
