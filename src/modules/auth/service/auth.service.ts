@@ -13,13 +13,12 @@ import {
   NotFoundException,
   ValidationErrorException,
 } from '../../../common/errors/all.exception';
-import { authConfig } from '../config/config';
 import { IUserService } from '../../../modules/user/interfaces/IUser.service';
 import { IUserEmailVerificationService } from '../../../modules/userEmailVerification/interface/IUserEmailVerification.service';
 import { ISendEmailService } from '../../../modules/sendMail/interface/ISendEmail.service';
 import { User } from '../../../modules/user/entity/user.entity';
-import { encryptPassword } from '../../../common/utils/password.utils';
-import { getJwtSecret } from '../../../common/utils/env.utils';
+import { encryptPassword } from '../../../common/utils/password/password.utils';
+import { generateJWT } from '../../../common/utils/jwt/jwt.utils';
 
 @injectable()
 export class AuthService implements IAuthService {
@@ -76,18 +75,6 @@ export class AuthService implements IAuthService {
     return verifiedUser;
   }
 
-  generateJWT(user: User) {
-    const jwtSecretKey = getJwtSecret();
-    if (!jwtSecretKey) {
-      throw new InternalServerErrorException('Failed to generate authentication token.');
-    }
-
-    const token = jwt.sign({ userId: user.id }, jwtSecretKey, {
-      expiresIn: authConfig.jwtTokenExpiresIn,
-    });
-    return token;
-  }
-
   async login(authLoginDto: AuthLoginDto): Promise<string> {
     const { email, password } = authLoginDto;
 
@@ -108,7 +95,7 @@ export class AuthService implements IAuthService {
     }
 
     // Generate new JWT
-    const newToken = this.generateJWT(user);
+    const newToken = generateJWT(user);
     return newToken;
   }
 }

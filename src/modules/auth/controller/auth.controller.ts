@@ -13,6 +13,7 @@ import { DtoValidationMiddleware } from '../../../middlewares/dto-validation.mid
 import { AuthLoginDto } from '../dto/auth-login.dto';
 import { AuthRegisterDto } from '../dto/auth-register.dto';
 import { InternalServerErrorException } from '../../../common/errors/all.exception';
+import { generateJWT } from '../../../common/utils/jwt/jwt.utils';
 import { AuthGuardMiddleware } from '../../../middlewares/auth-guard.middleware';
 
 @controller('/auth')
@@ -47,7 +48,7 @@ export class AuthController {
     res: Response,
   ) {
     const verifiedUser = await this.authService.verifyUser(token);
-    const authToken = this.authService.generateJWT(verifiedUser);
+    const authToken = generateJWT(verifiedUser);
 
     return res.status(200).json({ token: authToken });
   }

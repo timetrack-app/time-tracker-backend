@@ -7,5 +7,4 @@ export interface IAuthService {
   registerUser(authRegisterDto: AuthRegisterDto): Promise<void>;
   login(authLoginDto: AuthLoginDto): Promise<string>;
   verifyUser(token: string): Promise<User>;
-  generateJWT(user: User): string;
 }
