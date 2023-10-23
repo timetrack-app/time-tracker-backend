@@ -12,8 +12,12 @@ import { TYPES } from '../../../core/type.core';
 import { ITaskService } from './../interface/ITask.service';
 import { CreateTaskDto } from '../dto/createTask.dto';
 import { Task } from '../entity/task.entity';
+import { AuthGuardMiddleware } from '../../../middlewares/auth-guard.middleware';
 
-@controller('/work-sessions/:workSessionId/tabs/:tabId/lists/:listId/tasks')
+@controller(
+  '/work-sessions/:workSessionId/tabs/:tabId/lists/:listId/tasks',
+  AuthGuardMiddleware
+)
 export class TaskController {
   constructor(
     @inject(TYPES.ITaskService)

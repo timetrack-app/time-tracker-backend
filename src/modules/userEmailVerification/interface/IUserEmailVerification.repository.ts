@@ -7,5 +7,8 @@ export interface IUserEmailVerificationRepository {
   findOneByToken(
     verificationToken: string | ParsedQs | string[] | ParsedQs[],
   ): Promise<UserEmailVerification>;
+  findLatestOneByToken(
+    verificationToken: string | ParsedQs | string[] | ParsedQs[],
+  ): Promise<UserEmailVerification>;
   findOneByEmail(email: string): Promise<UserEmailVerification | null>;
 }

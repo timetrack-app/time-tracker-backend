@@ -5,3 +5,5 @@ export type MailOptions = {
   text: string;
   html: string;
 };
+
+export type SendEmailFunc = (opt: MailOptions) => Promise<void>;

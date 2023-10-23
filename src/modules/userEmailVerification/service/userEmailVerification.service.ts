@@ -10,6 +10,8 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '../../../common/errors/all.exception';
+import { UserEmailVerification } from '../entity/userEmailVerification.entity';
+import { createToken } from '../../../common/utils/token/token.utils';
 
 @injectable()
 export class UserEmailVerificationService
@@ -21,7 +23,7 @@ export class UserEmailVerificationService
   ) {}
 
   async createVerificationToken(email: string) {
-    const verificationToken = await crypto.randomBytes(32).toString('hex');
+    const verificationToken = await createToken();
     const isEmailAlreadyUsedInPast =
       await this.userEmailVerificationRepository.findOneByEmail(email);
     if (isEmailAlreadyUsedInPast) {
@@ -29,11 +31,25 @@ export class UserEmailVerificationService
         "The email address you're trying to use is already in use or has been used in the past. Please choose a different email address.",
       );
     }
+
+    return verificationToken;
+  }
+
+  /**
+   * Create email verification record
+   *
+   * @param {string} email
+   * @param {string} verificationToken
+   * @return {*}  {Promise<UserEmailVerification>}
+   * @memberof UserEmailVerificationService
+   */
+  async createVerification(email: string, verificationToken: string): Promise<UserEmailVerification> {
     const verification = await this.userEmailVerificationRepository.create({
       email,
       verificationToken,
     });
-    return verificationToken;
+
+    return verification;
   }
 
   async findTokenWithEmail(email: string) {
@@ -46,7 +62,7 @@ export class UserEmailVerificationService
   async verify(token: string | ParsedQs | string[] | ParsedQs[]) {
     try {
       const verification =
-        await this.userEmailVerificationRepository.findOneByToken(token);
+        await this.userEmailVerificationRepository.findLatestOneByToken(token);
       if (!verification) throw new NotFoundException('Verification failed.');
       const { email } = verification;
       return email;

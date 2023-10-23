@@ -10,18 +10,19 @@ import {
 } from 'inversify-express-utils';
 import { TYPES } from '../../../core/type.core';
 import { IUserService } from '../interfaces/IUser.service';
-import { UpdateEmailDto } from '../dto/update-email.dto';
 import { DtoValidationMiddleware } from '../../../middlewares/dto-validation.middleware';
+import { AuthGuardMiddleware } from '../../../middlewares/auth-guard.middleware';
+import { UpdateEmailDto } from '../dto/update-email.dto';
 import { UpdatePasswordDto } from '../dto/update-password.dto';
-import { ResetPasswordDto } from '../dto/reset-password.dto';
 import { NotFoundException } from '../../../common/errors/all.exception';
+
 @controller('/users')
 export class UserController {
   constructor(
     @inject(TYPES.IUserService) private readonly userService: IUserService,
   ) {}
 
-  @httpGet('/:userId')
+  @httpGet('/:userId', AuthGuardMiddleware)
   public async getUser(
     @requestParam('userId') id: number,
     req: Request,
@@ -35,7 +36,22 @@ export class UserController {
     });
   }
 
-  @httpPost('/:userId/email-update', DtoValidationMiddleware(UpdateEmailDto))
+  /**
+   * Send email to the user to update user's email
+   * The email contains a link with token(email update link)
+   *
+   * @param {number} id
+   * @param {UpdateEmailDto} updateEmailDto
+   * @param {Request} req
+   * @param {Response} res
+   * @return {*}
+   * @memberof UserController
+   */
+  @httpPost(
+    '/:userId/email-update',
+    AuthGuardMiddleware,
+    DtoValidationMiddleware(UpdateEmailDto)
+  )
   public async updateEmail(
     @requestParam('userId') id: number,
     @requestBody() updateEmailDto: UpdateEmailDto,
@@ -47,6 +63,15 @@ export class UserController {
     return res.status(200).json();
   }
 
+  /**
+   * Verify user's new email
+   *
+   * @param {string} token
+   * @param {Request} req
+   * @param {Response} res
+   * @return {*}
+   * @memberof UserController
+   */
   @httpGet('/email-update/verification')
   public async verifyNewEmail(
     @queryParam('token') token: string,
@@ -57,6 +82,16 @@ export class UserController {
     return res.status(200).json();
   }
 
+  /**
+   * Update logged in user's password
+   *
+   * @param {number} id
+   * @param {UpdatePasswordDto} updatePasswordDto
+   * @param {Request} req
+   * @param {Response} res
+   * @return {*}
+   * @memberof UserController
+   */
   @httpPost(
     '/:userId/password-update',
     DtoValidationMiddleware(UpdatePasswordDto),
@@ -70,32 +105,6 @@ export class UserController {
   ) {
     const { password } = updatePasswordDto;
     this.userService.updatePassword(id, password);
-    return res.status(200).json();
-  }
-
-  @httpPost(
-    '/:userId/password-update/request',
-    DtoValidationMiddleware(ResetPasswordDto),
-  )
-  public async sendPasswordResetEmail(
-    @requestParam('userId') id: number,
-    @requestBody() resetPasswordDto: ResetPasswordDto,
-    req: Request,
-    res: Response,
-  ) {
-    const { email } = resetPasswordDto;
-    // check if email is valid, and send an email to user
-    await this.userService.handlePasswordResetRequest(id, email);
-    return res.status(200).json();
-  }
-
-  @httpGet('/password-update/verification')
-  public async verifyUserNewPassword(
-    @queryParam('token') token: string,
-    req: Request,
-    res: Response,
-  ) {
-    this.userService.verifyUserWithToken(token);
     return res.status(200).json();
   }
 }

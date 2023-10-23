@@ -13,8 +13,9 @@ import { ITabService } from './../interface/ITab.service';
 import { CreateTabDto } from '../dto/CreateTab.dto';
 import { Tab } from '../entity/tab.entity';
 import { DtoValidationMiddleware } from '../../../middlewares/dto-validation.middleware';
+import { AuthGuardMiddleware } from '../../../middlewares/auth-guard.middleware';
 
-@controller('/work-sessions/:workSessionId/tabs')
+@controller('/work-sessions/:workSessionId/tabs', AuthGuardMiddleware)
 export class TabController {
   constructor(
     @inject(TYPES.ITabService)

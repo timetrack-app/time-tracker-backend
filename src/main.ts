@@ -1,7 +1,8 @@
 import 'reflect-metadata';
 import { server } from './server';
+import { getAppPort } from './common/utils/env.utils';
 
-const port: number = Number(process.env.APP_PORT) || 3000;
+const port: number = getAppPort();
 
 server
   .build()

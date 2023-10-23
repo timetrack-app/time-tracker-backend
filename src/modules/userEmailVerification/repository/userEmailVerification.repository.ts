@@ -30,6 +30,26 @@ export class UserEmailVerificationRepository
     return result;
   }
 
+  /**
+   * Find the most recent record
+   *
+   * @param {string} verificationToken
+   * @return {*}  {Promise<UserEmailVerification>}
+   * @memberof UserEmailVerificationRepository
+   */
+  async findLatestOneByToken(
+    verificationToken: string,
+  ): Promise<UserEmailVerification> {
+    const repo = await this.database.getRepository(UserEmailVerification);
+
+    const result = await repo.findOne({
+      where: { verificationToken },
+      order: { createdAt: 'DESC' },
+    });
+
+    return result;
+  }
+
   async findOneByEmail(email: string): Promise<UserEmailVerification | null> {
     const repo = await this.database.getRepository(UserEmailVerification);
     const result = await repo.findOne({ where: { email } });

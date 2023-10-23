@@ -13,6 +13,9 @@ import { DtoValidationMiddleware } from '../../../middlewares/dto-validation.mid
 import { AuthLoginDto } from '../dto/auth-login.dto';
 import { AuthRegisterDto } from '../dto/auth-register.dto';
 import { InternalServerErrorException } from '../../../common/errors/all.exception';
+import { generateJWT } from '../../../common/utils/jwt/jwt.utils';
+import { AuthGuardMiddleware } from '../../../middlewares/auth-guard.middleware';
+
 @controller('/auth')
 export class AuthController {
   constructor(
@@ -29,14 +32,25 @@ export class AuthController {
     return res.status(200).json();
   }
 
+  /**
+   * Verify user registration email
+   *
+   * @param {string} token
+   * @param {Request} req
+   * @param {Response} res
+   * @return {*}
+   * @memberof AuthController
+   */
   @httpGet('/email-verification')
   public async emailVerification(
     @queryParam('token') token: string,
     req: Request,
     res: Response,
   ) {
-    const jwtToken = await this.authService.emailVerification(token);
-    return res.status(200).json({ token: jwtToken });
+    const verifiedUser = await this.authService.verifyUser(token);
+    const authToken = generateJWT(verifiedUser);
+
+    return res.status(200).json({ token: authToken });
   }
 
   @httpPost('/login', DtoValidationMiddleware(AuthLoginDto))
@@ -45,12 +59,12 @@ export class AuthController {
     req: Request,
     res: Response,
   ) {
-    const token = await this.authService.login(body);
+    const authToken = await this.authService.login(body);
 
-    return res.status(200).json({ token });
+    return res.status(200).json({ token: authToken });
   }
 
-  @httpPost('/logout')
+  @httpPost('/logout', AuthGuardMiddleware)
   public async logout(req: Request, res: Response) {
     try {
       return res.status(200).json();

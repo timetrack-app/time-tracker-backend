@@ -9,14 +9,16 @@ import { AuthRegisterDto } from '../dto/auth-register.dto';
 import {
   ConflictException,
   ForbiddenException,
+  InternalServerErrorException,
   NotFoundException,
   ValidationErrorException,
 } from '../../../common/errors/all.exception';
-import { authConfig } from '../config/config';
 import { IUserService } from '../../../modules/user/interfaces/IUser.service';
 import { IUserEmailVerificationService } from '../../../modules/userEmailVerification/interface/IUserEmailVerification.service';
 import { ISendEmailService } from '../../../modules/sendMail/interface/ISendEmail.service';
 import { User } from '../../../modules/user/entity/user.entity';
+import { encryptPassword } from '../../../common/utils/password/password.utils';
+import { generateJWT } from '../../../common/utils/jwt/jwt.utils';
 
 @injectable()
 export class AuthService implements IAuthService {
@@ -28,6 +30,13 @@ export class AuthService implements IAuthService {
     private sendEmailService: ISendEmailService,
   ) {}
 
+  /**
+   * Create user and send a registration email
+   *
+   * @param {AuthRegisterDto} registerDto
+   * @return {*}  {Promise<void>}
+   * @memberof AuthService
+   */
   async registerUser(registerDto: AuthRegisterDto): Promise<void> {
     const { password, email } = registerDto;
 
@@ -37,35 +46,33 @@ export class AuthService implements IAuthService {
       throw new ConflictException('User with this email already exists.');
     }
 
-    // hash
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
+    const hashedPassword = await encryptPassword(password);
     const newUser = { email, password: hashedPassword };
 
     await this.userService.createUser(newUser);
-    // create a token, save the verification
+
+    // create a token
     const verificationToken =
       await this.userEmailVerificationService.createVerificationToken(email);
+
+    // create verification record
+    await this.userEmailVerificationService.createVerification(email, verificationToken);
 
     // send verification email
     await this.sendEmailService.sendVerificationEmail(email, verificationToken);
   }
 
-  async emailVerification(token: string) {
-    if (!token) throw new ValidationErrorException('token is not received.');
-    const user = await this.userService.verifyUserWithToken(token);
-    if (!user) {
+  async verifyUser(token: string): Promise<User> {
+    if (!token) {
+      throw new ValidationErrorException('token is not received.');
+    }
+
+    const verifiedUser = await this.userService.verifyUserWithToken(token);
+    if (!verifiedUser) {
       throw new NotFoundException('User not found');
     }
-    const jwtToken = await this.generateJWT(user);
-    return jwtToken;
-  }
 
-  generateJWT(user: User) {
-    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET_KEY, {
-      expiresIn: authConfig.jwtTokenExpiresIn,
-    });
-    return token;
+    return verifiedUser;
   }
 
   async login(authLoginDto: AuthLoginDto): Promise<string> {
@@ -88,7 +95,7 @@ export class AuthService implements IAuthService {
     }
 
     // Generate new JWT
-    const newToken = this.generateJWT(user);
+    const newToken = generateJWT(user);
     return newToken;
   }
 }
