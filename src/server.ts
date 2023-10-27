@@ -37,10 +37,7 @@ server.setConfig((app) => {
   // cors was not working, so I added this for now
   app.use((req, res, next) => {
     // Allow requests from specific origins
-    res.setHeader(
-      'Access-Control-Allow-Origin',
-      'http://localhost:3000, http://localhost:3001, http://localhost:3002',
-    );
+    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3001');
     // Allow specific HTTP methods
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
 
