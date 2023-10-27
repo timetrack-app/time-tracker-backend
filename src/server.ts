@@ -51,6 +51,7 @@ server.setConfig((app) => {
     );
     // Allow credentials (cookies, etc.) to be sent with the request
     res.setHeader('Access-Control-Allow-Credentials', 'true');
+    next();
   });
 });
 
