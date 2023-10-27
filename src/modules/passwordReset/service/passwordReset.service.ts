@@ -5,7 +5,10 @@ import { IPasswordResetService } from '../interface/IPasswordReset.service';
 import { IPasswordResetRepository } from '../interface/IPasswordReset.repository';
 import { ISendEmailService } from '../../../modules/sendMail/interface/ISendEmail.service';
 import { IUserService } from '../../../modules/user/interfaces/IUser.service';
-import { InternalServerErrorException, NotFoundException } from '../../../common/errors/all.exception';
+import {
+  InternalServerErrorException,
+  NotFoundException,
+} from '../../../common/errors/all.exception';
 import { encryptPassword } from '../../../common/utils/password/password.utils';
 import { isTokenUnexpired } from '../../../common/utils/token/token.utils';
 import { Logger } from '../../../common/services/logger.service';
@@ -36,7 +39,7 @@ export class PasswordResetService implements IPasswordResetService {
   async requestPasswordReset(email: string): Promise<void> {
     const user = await this.userService.findOneByEmail(email);
     if (!user) {
-      throw new NotFoundException('The email address is invalid.')
+      throw new NotFoundException('The email address is invalid.');
     }
 
     const record = await this.passwordResetRepository.create(email);
@@ -52,7 +55,9 @@ export class PasswordResetService implements IPasswordResetService {
    * @memberof PasswordResetService
    */
   async verifyToken(token: string): Promise<PasswordReset> {
-    const record = await this.passwordResetRepository.findLatestOneByToken(token);
+    const record = await this.passwordResetRepository.findLatestOneByToken(
+      token,
+    );
 
     if (!isTokenUnexpired(record.createdAt)) {
       throw new InternalServerErrorException('The token is expired');
@@ -72,7 +77,7 @@ export class PasswordResetService implements IPasswordResetService {
    */
   async updatePassword(token: string, password: string): Promise<void> {
     const entityManager = await this.database.getManager();
-    const queryRunner = entityManager.queryRunner;
+    const queryRunner = entityManager.connection.createQueryRunner();
 
     await queryRunner.startTransaction();
     try {
@@ -87,9 +92,13 @@ export class PasswordResetService implements IPasswordResetService {
 
       await queryRunner.commitTransaction();
     } catch (error) {
-      this.logger.error(`Failed to update the user's password. Error: ${error}`);
+      this.logger.error(
+        `Failed to update the user's password. Error: ${error}`,
+      );
       await queryRunner.rollbackTransaction();
-      throw new InternalServerErrorException("Failed to update the user's password.");
+      throw new InternalServerErrorException(
+        "Failed to update the user's password.",
+      );
     } finally {
       await queryRunner.release();
     }

@@ -108,7 +108,7 @@ export class WorkSessionRepository implements IWorkSessionRepository {
       tabs.push(tab);
     });
 
-    const queryRunner = entityManager.queryRunner;
+    const queryRunner = entityManager.connection.createQueryRunner();
     await queryRunner.startTransaction();
     try {
       await queryRunner.manager.save(workSession);

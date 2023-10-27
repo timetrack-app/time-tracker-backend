@@ -28,7 +28,9 @@ export class TemplateRepository implements ITemplateRepository {
    * @return {*}  {Promise<Template>}
    * @memberof TemplateRepository
    */
-  private async createNewTemplateInstance(createTemplateDto: CreateTemplateDto): Promise<Template> {
+  private async createNewTemplateInstance(
+    createTemplateDto: CreateTemplateDto,
+  ): Promise<Template> {
     const templateRepo = await this.database.getRepository(Template);
     const templateTabRepo = await this.database.getRepository(TemplateTab);
     const templateListRepo = await this.database.getRepository(TemplateList);
@@ -50,10 +52,12 @@ export class TemplateRepository implements ITemplateRepository {
       });
 
       if (tabData.lists && tabData.lists.length) {
-        tab.lists = tabData.lists.map((listData) => templateListRepo.create({
-          templateTab: tab,
-          name: listData.name,
-        }));
+        tab.lists = tabData.lists.map((listData) =>
+          templateListRepo.create({
+            templateTab: tab,
+            name: listData.name,
+          }),
+        );
       }
 
       return tab;
@@ -65,7 +69,9 @@ export class TemplateRepository implements ITemplateRepository {
   async create(createTemplateDto: CreateTemplateDto): Promise<Template> {
     const template = await this.createNewTemplateInstance(createTemplateDto);
 
-    const queryRunner = (await this.database.getManager()).queryRunner;
+    const queryRunner = (
+      await this.database.getManager()
+    ).connection.createQueryRunner();
     await queryRunner.startTransaction();
     try {
       await queryRunner.manager.save(template);
@@ -82,12 +88,12 @@ export class TemplateRepository implements ITemplateRepository {
   async delete(deleteTemplateDto: DeleteTemplateDto): Promise<void> {
     const repo = await this.database.getRepository(Template);
 
-     await repo
+    await repo
       .createQueryBuilder()
       .delete()
       .from(Template)
       .where('id = :id', { id: deleteTemplateDto.templateId })
       .andWhere('user_id = :userId', { userId: deleteTemplateDto.userId })
-      .execute()
+      .execute();
   }
 }
