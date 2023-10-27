@@ -1,5 +1,7 @@
 import express, { Request, Response, NextFunction } from 'express';
 import passport from 'passport';
+import cors from 'cors';
+
 import { InversifyExpressServer } from 'inversify-express-utils';
 import container from './core/container.core';
 import {
@@ -28,10 +30,18 @@ const sendEmailService = container.get<ISendEmailService>(
   TYPES.ISendEMailService,
 );
 sendEmailService.init();
+
 server.setConfig((app) => {
   app.use(express.urlencoded({ extended: true }));
   app.use(express.json());
   app.use(passport.initialize());
+
+  // TODO: This is temporary. Fix later
+  const allowedOrigins = ['http://localhost:3000'];
+  const options: cors.CorsOptions = {
+    origin: allowedOrigins
+  };
+  app.use(cors(options));
 });
 
 const errorResponse = (
