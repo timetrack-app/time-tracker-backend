@@ -1,5 +1,6 @@
 import express, { Request, Response, NextFunction } from 'express';
 import passport from 'passport';
+import cors from 'cors';
 
 import { InversifyExpressServer } from 'inversify-express-utils';
 import container from './core/container.core';
@@ -34,24 +35,13 @@ server.setConfig((app) => {
   app.use(express.urlencoded({ extended: true }));
   app.use(express.json());
   app.use(passport.initialize());
-  // cors was not working, so I added this for now
-  app.use((req, res, next) => {
-    // Allow requests from specific origins
-    res.setHeader(
-      'Access-Control-Allow-Origin',
-      'http://localhost:3000, http://localhost:3001, http://localhost:3002',
-    );
-    // Allow specific HTTP methods
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
 
-    // Allow specific headers in the request
-    res.setHeader(
-      'Access-Control-Allow-Headers',
-      'Content-Type, Authorization',
-    );
-    // Allow credentials (cookies, etc.) to be sent with the request
-    res.setHeader('Access-Control-Allow-Credentials', 'true');
-  });
+  // TODO: This is temporary. Fix later
+  const allowedOrigins = ['http://localhost:3000'];
+  const options: cors.CorsOptions = {
+    origin: allowedOrigins
+  };
+  app.use(cors(options));
 });
 
 const errorResponse = (
