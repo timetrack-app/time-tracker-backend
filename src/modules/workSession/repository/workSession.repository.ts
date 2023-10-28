@@ -75,7 +75,6 @@ export class WorkSessionRepository implements IWorkSessionRepository {
       startAt: new Date(),
     });
 
-    // create tab and list instances from template
     const tabs: Tab[] = [];
     createWorkSessionDto.tabs.forEach((t) => {
       const tab = tabRepo.create({
@@ -85,7 +84,7 @@ export class WorkSessionRepository implements IWorkSessionRepository {
         displayOrder: t.displayOrder,
       });
 
-      const lists = tab.lists.map((l) => {
+      const lists = t.lists.map((l) => {
         const list = listRepo.create({
           tab,
           name: l.name,
@@ -96,6 +95,7 @@ export class WorkSessionRepository implements IWorkSessionRepository {
             list,
             name: t.name,
             displayOrder: t.displayOrder,
+            totalTime: t.totalTime,
           });
           // When task is active, set it as active task in the workSession instance
           if (t.isActive) workSession.activeTask = task;
@@ -107,6 +107,12 @@ export class WorkSessionRepository implements IWorkSessionRepository {
       tab.lists = lists;
       tabs.push(tab);
     });
+
+    console.log('tabs', tabs);
+    console.log('tabs[0].lists', tabs[0].lists);
+
+    workSession.tabs = tabs;
+    console.log(workSession, 'workSession');
 
     const queryRunner = entityManager.connection.createQueryRunner();
     await queryRunner.startTransaction();
