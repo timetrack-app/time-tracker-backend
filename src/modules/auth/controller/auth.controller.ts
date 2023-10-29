@@ -72,4 +72,25 @@ export class AuthController {
       throw new InternalServerErrorException('Logout was not successful');
     }
   }
+
+  /**
+   * Check if a user is logged in.
+   * If the user isn't logged in, AuthGuardMiddleware returns error.
+   *
+   * @param {Request} req
+   * @param {Response} res
+   * @return {*}
+   * @memberof AuthController
+   */
+  @httpGet('/is-authenticated', AuthGuardMiddleware)
+  public async isAuth(req: Request, res: Response) {
+    // if authenticated the User entity is set to req.user in AuthGuardMiddleware
+    const { id, email, isVerified } = req.user;
+
+    return res.status(200).json({
+      id,
+      email,
+      isVerified,
+    });
+  }
 }

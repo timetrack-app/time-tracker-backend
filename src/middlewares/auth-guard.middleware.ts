@@ -33,6 +33,8 @@ export const AuthGuardMiddleware = (req: Request, res: Response, next: NextFunct
       });
     }
 
+    req.user = user;
+
     next();
   })(req, res, next);
 };

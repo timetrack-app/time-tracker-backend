@@ -22,8 +22,7 @@ export class UserController {
     @inject(TYPES.IUserService) private readonly userService: IUserService,
   ) {}
 
-  // @httpGet('/:userId', AuthGuardMiddleware)
-  @httpGet('/:userId')
+  @httpGet('/:userId', AuthGuardMiddleware)
   public async getUser(
     @requestParam('userId') userId: number,
     req: Request,

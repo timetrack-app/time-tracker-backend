@@ -3,7 +3,6 @@ import { AuthLoginDto } from '../dto/auth-login.dto';
 import { AuthRegisterDto } from '../dto/auth-register.dto';
 
 export interface IAuthService {
-  // signIn(payload: SignInCredentialsDto): Promise<User>;
   registerUser(authRegisterDto: AuthRegisterDto): Promise<void>;
   login(authLoginDto: AuthLoginDto): Promise<string>;
   verifyUser(token: string): Promise<User>;

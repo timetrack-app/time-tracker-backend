@@ -27,7 +27,7 @@
     // "paths": {
     //   "test/*": ["test/*"]
     // }
-  }
+  },
   // "exclude": ["./**/*.spec.ts"],
-  // "include": ["src", ".eslintrc", "tests"]
+  "include": ["src/types.d.ts", "src", "test"]
 }
