@@ -31,6 +31,8 @@ describe('User Controller Test', () => {
         .expect(200)
         .then((response) => {
           expect(response.body.results.email).toStrictEqual(user.email);
+          expect(response.body.id).toBe(user.id);
+          expect(typeof response.body.isVerified).toBe('boolean');
           done();
         })
         .catch((error) => {

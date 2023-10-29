@@ -22,17 +22,20 @@ export class UserController {
     @inject(TYPES.IUserService) private readonly userService: IUserService,
   ) {}
 
-  @httpGet('/:userId', AuthGuardMiddleware)
+  // @httpGet('/:userId', AuthGuardMiddleware)
+  @httpGet('/:userId')
   public async getUser(
-    @requestParam('userId') id: number,
+    @requestParam('userId') userId: number,
     req: Request,
     res: Response,
   ) {
-    const user = await this.userService.findOneById(id);
+    const user = await this.userService.findOneById(userId);
     if (!user) throw new NotFoundException('User not found');
-    const { email } = user;
+    const { id, email, isVerified, } = user;
     return res.status(200).json({
+      id,
       email,
+      isVerified,
     });
   }
 
