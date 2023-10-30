@@ -45,11 +45,15 @@ export class WorkSessionRepository implements IWorkSessionRepository {
 
     const latestWorkSession = await repo
       .createQueryBuilder('workSession')
+      .leftJoinAndSelect('workSession.tabs', 'tab')
+      .leftJoinAndSelect('tab.lists', 'list')
+      .leftJoinAndSelect('list.tasks', 'task')
       .where('workSession.user_id = :userId', {
         userId: findLatestUnfinishedWorkSessionDto.userId,
       })
       .andWhere('workSession.end_at IS NULL')
       .getOne();
+    console.log('latest worksession from DB', latestWorkSession);
 
     return latestWorkSession;
   }
@@ -117,12 +121,15 @@ export class WorkSessionRepository implements IWorkSessionRepository {
     const queryRunner = entityManager.connection.createQueryRunner();
     await queryRunner.startTransaction();
     try {
-      await queryRunner.manager.save(workSession);
-      await queryRunner.manager.save(tabs);
+      console.log('workSession before saving', workSession);
 
+      const savedWorkSession = await queryRunner.manager.save(workSession);
+      const savedTabs = await queryRunner.manager.save(tabs);
       await queryRunner.commitTransaction();
+      console.log('savedWorkSession', savedWorkSession);
+      console.log('savedTabs', savedTabs);
 
-      return workSession;
+      return savedWorkSession;
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw new Error(error);

@@ -35,14 +35,14 @@ export class WorkSession {
 
   // Define the relations
 
-  @ManyToOne(() => User, (user) => user.workSessions)
+  @ManyToOne(() => User, (user) => user.workSessions, { nullable: false })
   @JoinColumn({ name: 'user_id' })
   user: User;
 
-  @OneToMany(() => Tab, (tab) => tab.workSession)
+  @OneToMany(() => Tab, (tab) => tab.workSession, { nullable: false })
   tabs: Tab[];
 
-  @OneToOne(() => Task, (task) => task.workSession)
+  @OneToOne(() => Task, (task) => task.workSession, { nullable: false })
   @JoinColumn({ name: 'active_task_id' })
   activeTask;
 }
