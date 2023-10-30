@@ -30,7 +30,9 @@ export class Tab {
 
   // Define the relations
 
-  @ManyToOne(() => WorkSession, (workSession) => workSession.tabs)
+  @ManyToOne(() => WorkSession, (workSession) => workSession.tabs, {
+    nullable: false,
+  })
   @JoinColumn({ name: 'work_session_id' })
   workSession: WorkSession;
 

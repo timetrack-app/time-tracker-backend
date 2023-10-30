@@ -33,7 +33,7 @@ export class List {
 
   // Define the relations
 
-  @ManyToOne(() => Tab, (tab) => tab.lists)
+  @ManyToOne(() => Tab, (tab) => tab.lists, { nullable: false })
   @JoinColumn({ name: 'tab_id' })
   tab: Tab;
 
