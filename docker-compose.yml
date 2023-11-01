@@ -9,6 +9,8 @@ services:
       - ./pgdata:/var/lib/postgresql/data
     networks:
       - timetracker_app_api
+    ports:
+      - 5432:5432
   mailhog:
     container_name: mailhog
     image: mailhog/mailhog:latest
@@ -29,7 +31,7 @@ services:
       - .:/app
       - /app/node_modules
     ports:
-      - '${APP_PORT}:${APP_PORT}'
+      - '4000:4000'
     depends_on:
       - db
     restart: unless-stopped

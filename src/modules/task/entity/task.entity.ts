@@ -42,7 +42,7 @@ export class Task {
 
   // Define the relations
 
-  @ManyToOne(() => List, (list) => list.tasks)
+  @ManyToOne(() => List, (list) => list.tasks, { nullable: false })
   @JoinColumn({ name: 'list_id' })
   list: List;
 
