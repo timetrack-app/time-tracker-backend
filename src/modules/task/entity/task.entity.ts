@@ -42,10 +42,10 @@ export class Task {
 
   // Define the relations
 
-  @ManyToOne(() => List, (list) => list.tasks)
+  @ManyToOne(() => List, (list) => list.tasks, { nullable: false })
   @JoinColumn({ name: 'list_id' })
   list: List;
 
-  @OneToOne(() => WorkSession, (workSession) => workSession.activeTask)
+  @OneToOne(() => WorkSession, (workSession) => workSession.activeTask,{nullable: true})
   workSession: WorkSession;
 }

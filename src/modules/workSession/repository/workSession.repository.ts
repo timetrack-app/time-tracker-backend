@@ -45,6 +45,9 @@ export class WorkSessionRepository implements IWorkSessionRepository {
 
     const latestWorkSession = await repo
       .createQueryBuilder('workSession')
+      .leftJoinAndSelect('workSession.tabs', 'tab')
+      .leftJoinAndSelect('tab.lists', 'list')
+      .leftJoinAndSelect('list.tasks', 'task')
       .where('workSession.user_id = :userId', {
         userId: findLatestUnfinishedWorkSessionDto.userId,
       })
@@ -65,64 +68,72 @@ export class WorkSessionRepository implements IWorkSessionRepository {
     createWorkSessionDto: CreateWorkSessionDto,
   ): Promise<WorkSession> {
     const entityManager = await this.database.getManager();
+    const queryRunner = entityManager.connection.createQueryRunner();
     const workSessionRepo = await this.database.getRepository(WorkSession);
     const tabRepo = await this.database.getRepository(Tab);
     const listRepo = await this.database.getRepository(List);
     const taskRepo = await this.database.getRepository(Task);
 
+    await queryRunner.startTransaction();
     const workSession = workSessionRepo.create({
       user: createWorkSessionDto.user,
       startAt: new Date(),
+      tabs: [],
     });
-
-    const tabs: Tab[] = [];
-    createWorkSessionDto.tabs.forEach((t) => {
-      const tab = tabRepo.create({
-        workSession,
-        lists: [],
-        name: t.name,
-        displayOrder: t.displayOrder,
-      });
-
-      const lists = t.lists.map((l) => {
-        const list = listRepo.create({
-          tab,
-          name: l.name,
-          displayOrder: l.displayOrder,
-        });
-        const tasks = l.tasks.map((t) => {
-          const task = taskRepo.create({
-            list,
-            name: t.name,
-            displayOrder: t.displayOrder,
-            totalTime: t.totalTime,
-          });
-          // When task is active, set it as active task in the workSession instance
-          if (t.isActive) workSession.activeTask = task;
-          return task;
-        });
-        list.tasks = tasks;
-        return list;
-      });
-      tab.lists = lists;
-      tabs.push(tab);
-    });
-
-    console.log('tabs', tabs);
-    console.log('tabs[0].lists', tabs[0].lists);
-
-    workSession.tabs = tabs;
-    console.log(workSession, 'workSession');
-
-    const queryRunner = entityManager.connection.createQueryRunner();
-    await queryRunner.startTransaction();
     try {
-      await queryRunner.manager.save(workSession);
-      await queryRunner.manager.save(tabs);
+      // save workSession
+      const savedWorkSession = await queryRunner.manager.save(workSession);
 
+      createWorkSessionDto.tabs.forEach(async (unsavedTab) => {
+        // Create tab instance
+        const tab = tabRepo.create({
+          workSession: savedWorkSession,
+          lists: [],
+          name: unsavedTab.name,
+          displayOrder: unsavedTab.displayOrder,
+        });
+        // save tab instance
+        await queryRunner.manager.save(tab).then(async (savedTab) => {
+          savedWorkSession.tabs.push(savedTab);
+          unsavedTab.lists.map(async (unsavedList) => {
+            // create list instance
+            const list = listRepo.create({
+              tab: savedTab,
+              name: unsavedList.name,
+              displayOrder: unsavedList.displayOrder,
+              tasks: [],
+            });
+            // save list instance
+            await queryRunner.manager.save(list).then(async (savedList) => {
+              savedTab.lists.push(savedList);
+              unsavedList.tasks.map(async (unsavedTask) => {
+                // create task instance
+                const task = taskRepo.create({
+                  list: savedList,
+                  name: unsavedTask.name,
+                  displayOrder: unsavedTask.displayOrder,
+                  totalTime: unsavedTask.totalTime,
+                });
+                // When task is active, set it as active task in the workSession instance
+                if (unsavedTask.isActive) {
+                  savedWorkSession.activeTask = task;
+                  task.workSession = savedWorkSession;
+                }
+                await queryRunner.manager.save(task).then((savedTask) => {
+                  savedList.tasks.push(savedTask);
+                });
+              });
+              // save list instance again, to update the tasks
+              await queryRunner.manager.save(savedList);
+            });
+          });
+          // save tab instance again, to update the lists
+          await queryRunner.manager.save(savedTab);
+        });
+      });
+      await queryRunner.manager.save(savedWorkSession);
       await queryRunner.commitTransaction();
-
-      return workSession;
+      return savedWorkSession;
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw new Error(error);
