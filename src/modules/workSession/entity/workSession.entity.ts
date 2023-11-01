@@ -42,7 +42,7 @@ export class WorkSession {
   @OneToMany(() => Tab, (tab) => tab.workSession, { nullable: false })
   tabs: Tab[];
 
-  @OneToOne(() => Task, (task) => task.workSession, { nullable: false })
+  @OneToOne(() => Task, (task) => task.workSession, { nullable: true })
   @JoinColumn({ name: 'active_task_id' })
   activeTask;
 }

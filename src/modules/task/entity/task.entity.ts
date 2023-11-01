@@ -46,6 +46,6 @@ export class Task {
   @JoinColumn({ name: 'list_id' })
   list: List;
 
-  @OneToOne(() => WorkSession, (workSession) => workSession.activeTask)
+  @OneToOne(() => WorkSession, (workSession) => workSession.activeTask,{nullable: true})
   workSession: WorkSession;
 }
