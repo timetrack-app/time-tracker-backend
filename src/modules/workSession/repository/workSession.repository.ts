@@ -95,44 +95,40 @@ export class WorkSessionRepository implements IWorkSessionRepository {
         // save tab instance
         await queryRunner.manager.save(tab).then(async (savedTab) => {
           savedWorkSession.tabs.push(savedTab);
-          await Promise.all(
-            unsavedTab.lists.map(async (unsavedList) => {
-              // create list instance
-              const list = listRepo.create({
-                tab: savedTab,
-                name: unsavedList.name,
-                displayOrder: unsavedList.displayOrder,
-                tasks: [],
-              });
-              // save list instance
-              await queryRunner.manager.save(list).then(async (savedList) => {
-                savedTab.lists.push(savedList);
-                await Promise.all(
-                  unsavedList.tasks.map(async (unsavedTask) => {
-                    // create task instance
-                    const task = taskRepo.create({
-                      list: savedList,
-                      name: unsavedTask.name,
-                      displayOrder: unsavedTask.displayOrder,
-                      totalTime: unsavedTask.totalTime,
-                    });
-                    if (unsavedTask.isActive) {
-                      task.workSession = savedWorkSession;
-                    }
-                    await queryRunner.manager.save(task).then((savedTask) => {
-                      savedList.tasks.push(savedTask);
-                      // When task is active, set it as active task in the workSession instance
-                      if (savedTask.isActive) {
-                        savedWorkSession.activeTask = savedTask;
-                      }
-                    });
-                  }),
-                );
-                // save list instance again, to update the tasks
-                await queryRunner.manager.save(savedList);
-              });
-            }),
-          );
+          for (const unsavedList of unsavedTab.lists) {
+            // create list instance
+            const list = listRepo.create({
+              tab: savedTab,
+              name: unsavedList.name,
+              displayOrder: unsavedList.displayOrder,
+              tasks: [],
+            });
+            // save list instance
+            await queryRunner.manager.save(list).then(async (savedList) => {
+              savedTab.lists.push(savedList);
+              for (const unsavedTask of unsavedList.tasks) {
+                // create task instance
+                const task = taskRepo.create({
+                  list: savedList,
+                  name: unsavedTask.name,
+                  displayOrder: unsavedTask.displayOrder,
+                  totalTime: unsavedTask.totalTime,
+                });
+                if (unsavedTask.isActive) {
+                  task.workSession = savedWorkSession;
+                }
+                await queryRunner.manager.save(task).then((savedTask) => {
+                  savedList.tasks.push(savedTask);
+                  // When task is active, set it as active task in the workSession instance
+                  if (savedTask.isActive) {
+                    savedWorkSession.activeTask = savedTask;
+                  }
+                });
+              }
+              // save list instance again, to update the tasks
+              await queryRunner.manager.save(savedList);
+            });
+          }
           // save tab instance again, to update the lists
           await queryRunner.manager.save(savedTab);
         });
