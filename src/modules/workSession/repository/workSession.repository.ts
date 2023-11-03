@@ -113,10 +113,11 @@ export class WorkSessionRepository implements IWorkSessionRepository {
                   name: unsavedTask.name,
                   displayOrder: unsavedTask.displayOrder,
                   totalTime: unsavedTask.totalTime,
+                  isActive: unsavedTask.isActive,
                 });
-                if (unsavedTask.isActive) {
-                  task.workSession = savedWorkSession;
-                }
+                // if (unsavedTask.isActive) {
+                //   task.workSession = savedWorkSession;
+                // }
                 await queryRunner.manager.save(task).then((savedTask) => {
                   savedList.tasks.push(savedTask);
                   // When task is active, set it as active task in the workSession instance
