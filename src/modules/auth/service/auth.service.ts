@@ -19,6 +19,7 @@ import { ISendEmailService } from '../../../modules/sendMail/interface/ISendEmai
 import { User } from '../../../modules/user/entity/user.entity';
 import { encryptPassword } from '../../../common/utils/password/password.utils';
 import { generateJWT } from '../../../common/utils/jwt/jwt.utils';
+import { AuthenticatedUserDto } from '../dto/authenticated-user.dto';
 
 @injectable()
 export class AuthService implements IAuthService {
@@ -75,7 +76,7 @@ export class AuthService implements IAuthService {
     return verifiedUser;
   }
 
-  async login(authLoginDto: AuthLoginDto): Promise<string> {
+  async login(authLoginDto: AuthLoginDto): Promise<AuthenticatedUserDto> {
     const { email, password } = authLoginDto;
 
     const user = await this.userService.findOneByEmail(email);
@@ -96,6 +97,12 @@ export class AuthService implements IAuthService {
 
     // Generate new JWT
     const newToken = generateJWT(user);
-    return newToken;
+
+    return {
+      id: user.id,
+      email: user.email,
+      isVerified: user.isVerified,
+      authToken: newToken,
+    };
   }
 }

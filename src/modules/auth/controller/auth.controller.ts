@@ -59,9 +59,14 @@ export class AuthController {
     req: Request,
     res: Response,
   ) {
-    const authToken = await this.authService.login(body);
+    const authenticatedUser = await this.authService.login(body);
 
-    return res.status(200).json({ token: authToken });
+    return res.status(200).json({
+      id: authenticatedUser.id,
+      email: authenticatedUser.email,
+      isVerified: authenticatedUser.isVerified,
+      authToken: authenticatedUser.authToken,
+    });
   }
 
   @httpPost('/logout', AuthGuardMiddleware)
