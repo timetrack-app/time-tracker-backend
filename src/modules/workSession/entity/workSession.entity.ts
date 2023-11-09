@@ -12,14 +12,12 @@ import {
 import { User } from '../../user/entity/user.entity';
 import { Tab } from '../../tab/entity/tab.entity';
 import { Task } from '../../task/entity/task.entity';
+import { List } from '../../../modules/list/entity/list.entity';
 
 @Entity('work_sessions')
 export class WorkSession {
   @PrimaryGeneratedColumn()
   id: number;
-
-  @Column({ name: 'user_id', nullable: false })
-  userId: number;
 
   @Column({ name: 'start_at', nullable: false, type: 'timestamp' })
   startAt: Date;
@@ -44,5 +42,13 @@ export class WorkSession {
 
   @OneToOne(() => Task, (task) => task.workSession, { nullable: true })
   @JoinColumn({ name: 'active_task_id' })
-  activeTask;
+  activeTask: Task;
+
+  @OneToOne(() => List, (tab) => tab.workSession, { nullable: true })
+  @JoinColumn({ name: 'active_list_id' })
+  activeList: List;
+
+  @OneToOne(() => Tab, (tab) => tab.activeWorkSession, { nullable: true })
+  @JoinColumn({ name: 'active_tab_id' })
+  activeTab: Tab;
 }

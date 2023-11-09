@@ -47,6 +47,7 @@ export class WorkSessionRepository implements IWorkSessionRepository {
       .createQueryBuilder('workSession')
       .innerJoinAndSelect('workSession.user', 'user')
       .innerJoinAndSelect('workSession.activeTask', 'activeTask')
+      .innerJoinAndSelect('workSession.activeList', 'activeList')
       .leftJoinAndSelect('workSession.tabs', 'tab')
       .leftJoinAndSelect('tab.lists', 'list')
       .leftJoinAndSelect('list.tasks', 'task')
@@ -116,14 +117,14 @@ export class WorkSessionRepository implements IWorkSessionRepository {
                   totalTime: unsavedTask.totalTime,
                   isActive: unsavedTask.isActive,
                 });
-                // if (unsavedTask.isActive) {
-                //   task.workSession = savedWorkSession;
-                // }
+
                 await queryRunner.manager.save(task).then((savedTask) => {
                   savedList.tasks.push(savedTask);
                   // When task is active, set it as active task in the workSession instance
                   if (savedTask.isActive) {
                     savedWorkSession.activeTask = savedTask;
+                    savedWorkSession.activeList = savedList;
+                    savedWorkSession.activeTab = savedTab;
                   }
                 });
               }

@@ -7,6 +7,7 @@ import {
   OneToMany,
   ManyToOne,
   JoinColumn,
+  OneToOne,
 } from 'typeorm';
 import { WorkSession } from '../../workSession/entity/workSession.entity';
 import { List } from '../../list/entity/list.entity';
@@ -38,4 +39,10 @@ export class Tab {
 
   @OneToMany(() => List, (list) => list.tab)
   lists: List[];
+
+  @OneToOne(() => WorkSession, (workSession) => workSession.activeTab, {
+    nullable: true,
+  })
+  @JoinColumn({ name: 'active_work_session_id' })
+  activeWorkSession: WorkSession;
 }

@@ -7,9 +7,11 @@ import {
   OneToMany,
   ManyToOne,
   JoinColumn,
+  OneToOne,
 } from 'typeorm';
 import { Tab } from '../../tab/entity/tab.entity';
 import { Task } from '../../task/entity/task.entity';
+import { WorkSession } from '../../../modules/workSession/entity/workSession.entity';
 
 @Entity('lists')
 export class List {
@@ -39,4 +41,10 @@ export class List {
 
   @OneToMany(() => Task, (task) => task.list)
   tasks: Task[];
+
+  @OneToOne(() => WorkSession, (workSession) => workSession.activeList, {
+    nullable: true,
+  })
+  @JoinColumn({ name: 'workSession_id' })
+  workSession: WorkSession;
 }
