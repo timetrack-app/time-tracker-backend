@@ -48,6 +48,7 @@ export class WorkSessionRepository implements IWorkSessionRepository {
       .innerJoinAndSelect('workSession.user', 'user')
       .innerJoinAndSelect('workSession.activeTask', 'activeTask')
       .innerJoinAndSelect('workSession.activeList', 'activeList')
+      .innerJoinAndSelect('workSession.activeTab', 'activeTab')
       .leftJoinAndSelect('workSession.tabs', 'tab')
       .leftJoinAndSelect('tab.lists', 'list')
       .leftJoinAndSelect('list.tasks', 'task')
