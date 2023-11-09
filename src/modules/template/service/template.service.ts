@@ -17,6 +17,12 @@ export class TemplateService implements ITemplateService {
     private readonly logger: Logger,
   ) {}
 
+  async getUsersTemplates(userId: number): Promise<Template[]> {
+    const templates = await this.templateRepository.findAllByUserId(userId);
+
+    return templates;
+  }
+
   async createTemplate(createTemplateDto: CreateTemplateDto): Promise<Template> {
     try {
       const template = await this.templateRepository.create(createTemplateDto);

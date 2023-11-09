@@ -20,68 +20,63 @@ export class TemplateRepository implements ITemplateRepository {
     return await repo.findOneBy({ id: templateId });
   }
 
-  /**
-   * Create Template from dto
-   *
-   * @private
-   * @param {CreateTemplateDto} createTemplateDto
-   * @return {*}  {Promise<Template>}
-   * @memberof TemplateRepository
-   */
-  private async createNewTemplateInstance(
-    createTemplateDto: CreateTemplateDto,
-  ): Promise<Template> {
-    const templateRepo = await this.database.getRepository(Template);
-    const templateTabRepo = await this.database.getRepository(TemplateTab);
-    const templateListRepo = await this.database.getRepository(TemplateList);
-
-    const template = templateRepo.create({
-      userId: createTemplateDto.userId,
-      name: createTemplateDto.name,
+  async findAllByUserId(userId: number): Promise<Template[]> {
+    const repo = await this.database.getRepository(Template);
+    const templates = await repo.find({
+      where: {
+        user: { id: userId },
+      },
+      relations: ['tabs', 'tabs.lists'],
     });
 
-    if (!createTemplateDto.tabs || !createTemplateDto.tabs.length) {
-      return template;
-    }
-
-    template.tabs = createTemplateDto.tabs.map((tabData) => {
-      const tab = templateTabRepo.create({
-        template,
-        name: tabData.name,
-        displayOrder: tabData.displayOrder,
-      });
-
-      if (tabData.lists && tabData.lists.length) {
-        tab.lists = tabData.lists.map((listData) =>
-          templateListRepo.create({
-            templateTab: tab,
-            name: listData.name,
-          }),
-        );
-      }
-
-      return tab;
-    });
-
-    return template;
+    return templates;
   }
 
   async create(createTemplateDto: CreateTemplateDto): Promise<Template> {
-    const template = await this.createNewTemplateInstance(createTemplateDto);
+    const entityManager = await this.database.getManager();
+    const queryRunner = entityManager.connection.createQueryRunner();
 
-    const queryRunner = (
-      await this.database.getManager()
-    ).connection.createQueryRunner();
+    await queryRunner.connect();
     await queryRunner.startTransaction();
+
     try {
-      await queryRunner.manager.save(template);
+      // create and save the template
+      const template = queryRunner.manager.create(Template, {
+          userId: createTemplateDto.userId,
+          name: createTemplateDto.name,
+      });
+      await queryRunner.manager.save(Template, template);
+
+      // create and save all TemplateTab
+      const tabs = createTemplateDto.tabs.map(tabData =>
+        queryRunner.manager.create(TemplateTab, {
+            template: template,
+            name: tabData.name,
+            displayOrder: tabData.displayOrder,
+        }),
+      );
+      await queryRunner.manager.save(TemplateTab, tabs);
+
+      // Create and save all TemplateList
+      const lists = createTemplateDto.tabs.flatMap((tabData, index) => {
+        return tabData.lists.map(listData =>
+          queryRunner.manager.create(TemplateList, {
+            templateTab: tabs[index],
+            name: listData.name,
+            displayOrder: listData.displayOrder,
+          }),
+        );
+      });
+      await queryRunner.manager.save(TemplateList, lists);
+
       await queryRunner.commitTransaction();
 
       return template;
     } catch (error) {
-      throw new Error(error);
+        await queryRunner.rollbackTransaction();
+        throw error;
     } finally {
-      await queryRunner.release();
+        await queryRunner.release();
     }
   }
 

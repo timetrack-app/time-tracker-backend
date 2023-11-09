@@ -35,5 +35,5 @@ export class Template {
   user: User;
 
   @OneToMany(() => TemplateTab, (templateTab) => templateTab.template)
-  tabs: TemplateTab[];
+  tabs: Partial<TemplateTab>[];
 }

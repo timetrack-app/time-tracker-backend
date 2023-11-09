@@ -14,11 +14,11 @@ export const AuthGuardMiddleware = (req: Request, res: Response, next: NextFunct
     if (error) {
       // unexpected error
       return res.status(500).json({
-          errors: [
-            {
-              message: 'An unexpected error occurred.',
-            },
-          ]
+        errors: [
+          {
+            message: 'An unexpected error occurred.',
+          },
+        ]
       });
     }
 

@@ -1,5 +1,5 @@
 import { inject } from 'inversify';
-import { controller, httpDelete, httpPost, requestBody, requestParam } from 'inversify-express-utils';
+import { controller, httpDelete, httpGet, httpPost, requestBody, requestParam } from 'inversify-express-utils';
 import { TYPES } from '../../../core/type.core';
 import { ITemplateService } from '../interfaces/ITemplate.service';
 import { Request, Response } from 'express';
@@ -15,6 +15,17 @@ export class TemplateController {
     @inject(TYPES.ITemplateService)
     private readonly templateService: ITemplateService,
   ) {}
+
+  @httpGet('/')
+  public async getTemplates(
+    @requestParam('userId') userId: number,
+    _: Request,
+    res: Response,
+  ) {
+    const templates = await this.templateService.getUsersTemplates(userId);
+
+    return res.status(200).json({ templates });
+  }
 
   @httpPost('/', DtoValidationMiddleware(CreateTemplateRequestDto))
   public async createTemplate(
