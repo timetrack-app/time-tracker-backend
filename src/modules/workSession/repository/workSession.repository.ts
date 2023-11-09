@@ -45,6 +45,8 @@ export class WorkSessionRepository implements IWorkSessionRepository {
 
     const latestWorkSession = await repo
       .createQueryBuilder('workSession')
+      .innerJoinAndSelect('workSession.user', 'user')
+      .innerJoinAndSelect('workSession.activeTask', 'activeTask')
       .leftJoinAndSelect('workSession.tabs', 'tab')
       .leftJoinAndSelect('tab.lists', 'list')
       .leftJoinAndSelect('list.tasks', 'task')
@@ -53,7 +55,6 @@ export class WorkSessionRepository implements IWorkSessionRepository {
       })
       .andWhere('workSession.end_at IS NULL')
       .getOne();
-
     return latestWorkSession;
   }
 
