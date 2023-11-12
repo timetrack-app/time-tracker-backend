@@ -1,12 +1,13 @@
 import { inject, injectable } from 'inversify';
+import { TYPES } from '../../../core/type.core';
 import { CreateTemplateDto } from '../dto/create-template-dto';
+import { DeleteTemplateDto } from '../dto/delete-template-dto';
 import { Template } from '../entity/template.entity';
 import { ITemplateService } from '../interfaces/ITemplate.service';
-import { TYPES } from '../../../core/type.core';
 import { ITemplateRepository } from '../interfaces/ITemplate.repository';
-import { Logger } from 'winston';
+import { Logger } from '../../../common/services/logger.service';
 import { InternalServerErrorException } from '../../../common/errors/all.exception';
-import { DeleteTemplateDto } from '../dto/delete-template-dto';
+import { GetTemplatesDto } from '../dto/get-templates-dto';
 
 @injectable()
 export class TemplateService implements ITemplateService {
@@ -17,10 +18,9 @@ export class TemplateService implements ITemplateService {
     private readonly logger: Logger,
   ) {}
 
-  async getUsersTemplates(userId: number): Promise<Template[]> {
-    const templates = await this.templateRepository.findAllByUserId(userId);
-
-    return templates;
+  async getUsersTemplates(getTemplatesDto: GetTemplatesDto): Promise<{templates: Template[]; total: number; hasMore: boolean}>  {
+    const templatesAndTotalCount = await this.templateRepository.findAllByUserId(getTemplatesDto);
+    return templatesAndTotalCount;
   }
 
   async createTemplate(createTemplateDto: CreateTemplateDto): Promise<Template> {

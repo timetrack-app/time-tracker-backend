@@ -1,5 +1,5 @@
 import { inject } from 'inversify';
-import { controller, httpDelete, httpGet, httpPost, requestBody, requestParam } from 'inversify-express-utils';
+import { controller, httpDelete, httpGet, httpPost, queryParam, requestBody, requestParam } from 'inversify-express-utils';
 import { TYPES } from '../../../core/type.core';
 import { ITemplateService } from '../interfaces/ITemplate.service';
 import { Request, Response } from 'express';
@@ -8,6 +8,7 @@ import { CreateTemplateDto } from '../dto/create-template-dto';
 import { DeleteTemplateDto } from '../dto/delete-template-dto';
 import { DtoValidationMiddleware } from '../../../middlewares/dto-validation.middleware';
 import { AuthGuardMiddleware } from '../../../middlewares/auth-guard.middleware';
+import { GetTemplatesDto } from '../dto/get-templates-dto';
 
 @controller('/users/:userId/templates', AuthGuardMiddleware)
 export class TemplateController {
@@ -18,13 +19,19 @@ export class TemplateController {
 
   @httpGet('/')
   public async getTemplates(
+    @queryParam('page') page: number|undefined,
+    @queryParam('limit') limit: number|undefined,
     @requestParam('userId') userId: number,
     _: Request,
     res: Response,
   ) {
-    const templates = await this.templateService.getUsersTemplates(userId);
+    const dto = new GetTemplatesDto();
+    dto.userId = userId;
+    dto.page = Number(page) || undefined;
+    dto.limit = Number(limit) || undefined;
 
-    return res.status(200).json({ templates });
+    const { templates, total, hasMore } = await this.templateService.getUsersTemplates(dto);
+    return res.status(200).json({ templates, total, hasMore });
   }
 
   @httpPost('/', DtoValidationMiddleware(CreateTemplateRequestDto))

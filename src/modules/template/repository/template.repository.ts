@@ -7,6 +7,7 @@ import { CreateTemplateDto } from '../dto/create-template-dto';
 import { TemplateTab } from '../entity/templateTab.entity';
 import { TemplateList } from '../entity/templateList.entity';
 import { DeleteTemplateDto } from '../dto/delete-template-dto';
+import { GetTemplatesDto } from '../dto/get-templates-dto';
 
 @injectable()
 export class TemplateRepository implements ITemplateRepository {
@@ -20,16 +21,43 @@ export class TemplateRepository implements ITemplateRepository {
     return await repo.findOneBy({ id: templateId });
   }
 
-  async findAllByUserId(userId: number): Promise<Template[]> {
+  async findAllByUserId(getTemplatesDto: GetTemplatesDto): Promise<{templates: Template[]; total: number; hasMore: boolean}> {
     const repo = await this.database.getRepository(Template);
+
+    const { userId, page, limit } = getTemplatesDto;
+
+    if (page !== undefined && limit !== undefined) {
+      const skip = (page - 1) * limit;
+
+      const [templates, total] = await repo.findAndCount({
+        where: {
+          user: { id: userId },
+        },
+        order: {
+          id: 'DESC',
+        },
+        relations: ['tabs', 'tabs.lists'],
+        take: limit, // number of records per page
+        skip: skip, // offset to start the query from
+      });
+
+      const hasMore = total > skip + templates.length;
+
+      return { templates, total, hasMore };
+    }
+
+    // if page and limit are undefined, return all data and the length of it
     const templates = await repo.find({
       where: {
         user: { id: userId },
       },
+      order: {
+        id: 'DESC',
+      },
       relations: ['tabs', 'tabs.lists'],
     });
 
-    return templates;
+    return { templates, total: templates.length, hasMore: false };
   }
 
   async create(createTemplateDto: CreateTemplateDto): Promise<Template> {
