@@ -8,6 +8,8 @@ import { TemplateTab } from '../entity/templateTab.entity';
 import { TemplateList } from '../entity/templateList.entity';
 import { DeleteTemplateDto } from '../dto/delete-template-dto';
 import { GetTemplatesDto } from '../dto/get-templates-dto';
+import { User } from 'src/modules/user/entity/user.entity';
+import { GetTemplateDto } from '../dto/get-template-dto';
 
 @injectable()
 export class TemplateRepository implements ITemplateRepository {
@@ -15,6 +17,24 @@ export class TemplateRepository implements ITemplateRepository {
     @inject(TYPES.IDatabaseService)
     private readonly database: IDatabaseService,
   ) {}
+
+  async findOneByUserId(getTemplateDto: GetTemplateDto): Promise<Template> {
+    const repo = await this.database.getRepository(Template);
+
+    const templates = await repo.find({
+      where: {
+        id: getTemplateDto.templateId,
+        userId: getTemplateDto.userId
+      },
+      relations: ['tabs', 'tabs.lists']
+    });
+
+    if (templates.length === 0) {
+      throw new Error('Template not found');
+    }
+
+    return templates[0];
+  }
 
   async findOneById(templateId: number): Promise<Template> {
     const repo = await this.database.getRepository(Template);
@@ -99,7 +119,14 @@ export class TemplateRepository implements ITemplateRepository {
 
       await queryRunner.commitTransaction();
 
-      return template;
+      // Make additional query to return template with related models
+      // It's possible to create object manually but is unreliable
+      const storedTemplate = await queryRunner.manager.findOne(Template, {
+        where: { id: template.id },
+        relations: ['tabs', 'tabs.lists'],
+      });
+
+      return storedTemplate;
     } catch (error) {
         await queryRunner.rollbackTransaction();
         throw error;
@@ -108,15 +135,57 @@ export class TemplateRepository implements ITemplateRepository {
     }
   }
 
-  async delete(deleteTemplateDto: DeleteTemplateDto): Promise<void> {
-    const repo = await this.database.getRepository(Template);
+  /**
+   * NOTE: cascade option in entity didn't work at all so delete every related model manually
+   * (I have no idea why { onDelete: 'CASCADE' } doesn't reflect on migration file so please fix this issue if you know any solutions...)
+   *
+   * @param {number} templateId
+   * @param {User} user
+   * @return {Promise<void>}
+   * @memberof TemplateRepository
+   */
+  async delete(templateId: number, user: User): Promise<void> {
+    const templateRepo = await this.database.getRepository(Template);
+    const tabRepo = await this.database.getRepository(TemplateTab);
+    const listRepo = await this.database.getRepository(TemplateList);
 
-    await repo
-      .createQueryBuilder()
-      .delete()
-      .from(Template)
-      .where('id = :id', { id: deleteTemplateDto.templateId })
-      .andWhere('user_id = :userId', { userId: deleteTemplateDto.userId })
-      .execute();
+    const entityManager = await this.database.getManager();
+    const queryRunner = entityManager.connection.createQueryRunner();
+
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      // get ids of TemplateTab
+      const tabs = await tabRepo.find({
+        select: ['id'],
+        where: { template: { id: templateId } }
+      });
+      const tabIds = tabs.map(tab => tab.id);
+
+      if (tabIds.length > 0) {
+        // delete multiple TemplateList
+        await listRepo.createQueryBuilder()
+          .delete()
+          .where("templateTabId IN (:...tabIds)", { tabIds })
+          .execute();
+      }
+
+      // delete TemplateTab
+      await tabRepo.delete({ template: { id: templateId } });
+
+      // delete Template
+      await templateRepo.delete({ id: templateId, user });
+
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
   }
-}
+
+
+    // await repo.delete({ id: templateId, user })
+  }

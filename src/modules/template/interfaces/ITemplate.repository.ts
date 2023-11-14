@@ -1,11 +1,13 @@
+import { User } from 'src/modules/user/entity/user.entity';
 import { CreateTemplateDto } from '../dto/create-template-dto';
-import { DeleteTemplateDto } from '../dto/delete-template-dto';
 import { GetTemplatesDto } from '../dto/get-templates-dto';
 import { Template } from '../entity/template.entity';
+import { GetTemplateDto } from '../dto/get-template-dto';
 
 export interface ITemplateRepository {
+  findOneByUserId(getTemplateDto: GetTemplateDto): Promise<Template>;
   findOneById(templateId: number): Promise<Template>;
   findAllByUserId(getTemplatesDto: GetTemplatesDto): Promise<{templates: Template[]; total: number; hasMore: boolean}>;
   create(createTemplateDto: CreateTemplateDto): Promise<Template>;
-  delete(deleteTemplateDto: DeleteTemplateDto): Promise<void>;
+  delete(templateId: number, user: User): Promise<void>;
 };

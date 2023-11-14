@@ -6,19 +6,33 @@ import { Template } from '../entity/template.entity';
 import { ITemplateService } from '../interfaces/ITemplate.service';
 import { ITemplateRepository } from '../interfaces/ITemplate.repository';
 import { Logger } from '../../../common/services/logger.service';
-import { InternalServerErrorException } from '../../../common/errors/all.exception';
+import { InternalServerErrorException, NotFoundException } from '../../../common/errors/all.exception';
 import { GetTemplatesDto } from '../dto/get-templates-dto';
+import { IUserService } from '../../../modules/user/interfaces/IUser.service';
+import { GetTemplateDto } from '../dto/get-template-dto';
 
 @injectable()
 export class TemplateService implements ITemplateService {
   constructor(
+    @inject(TYPES.IUserService)
+    private readonly userService: IUserService,
     @inject(TYPES.ITemplateRepository)
     private readonly templateRepository: ITemplateRepository,
     @inject(TYPES.Logger)
     private readonly logger: Logger,
   ) {}
 
-  async getUsersTemplates(getTemplatesDto: GetTemplatesDto): Promise<{templates: Template[]; total: number; hasMore: boolean}>  {
+  async getUserTemplate(getTemplateDto: GetTemplateDto): Promise<Template> {
+    try {
+      const res = await this.templateRepository.findOneByUserId(getTemplateDto);
+      return res;
+    } catch (error) {
+      this.logger.error(`Failed to find the user's template. Error: ${error}`);
+      throw new NotFoundException("Failed to find the user's template");
+    }
+  }
+
+  async getUserTemplates(getTemplatesDto: GetTemplatesDto): Promise<{templates: Template[]; total: number; hasMore: boolean}>  {
     const templatesAndTotalCount = await this.templateRepository.findAllByUserId(getTemplatesDto);
     return templatesAndTotalCount;
   }
@@ -35,7 +49,8 @@ export class TemplateService implements ITemplateService {
 
   async deleteTemplate(deleteTemplateDto: DeleteTemplateDto): Promise<void> {
     try {
-      await this.deleteTemplate(deleteTemplateDto);
+      const user = await this.userService.findOneById(deleteTemplateDto.userId);
+      await this.templateRepository.delete(deleteTemplateDto.templateId, user);
     } catch (error) {
       this.logger.error(`Failed to delete a Template. Error: ${error}`);
       throw new InternalServerErrorException('Failed to delete a Template.');
