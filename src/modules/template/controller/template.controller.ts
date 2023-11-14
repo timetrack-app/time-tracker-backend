@@ -68,14 +68,14 @@ export class TemplateController {
   }
 
   @httpDelete('/:templateId')
-  public async DeleteTemplateDto(
+  public async deleteTemplate(
     @requestParam('userId') userId: number,
     @requestParam('templateId') templateId: number,
-    _: Request,
+    req: Request,
     res: Response,
   ) {
     const dto = new DeleteTemplateDto()
-    dto.userId = userId;
+    dto.userId = req.user.id;
     dto.templateId = templateId;
 
     await this.templateService.deleteTemplate(dto);
