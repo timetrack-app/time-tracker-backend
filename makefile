@@ -25,7 +25,7 @@ dc migration create:
 migration generate:
 	docker-compose -f docker-compose.yml   --env-file env/.env.dev run dev npm run typeorm:generate src/migrations/table-init
 dc migration generate:
-	docker compose -f docker-compose-arm.yml   --env-file env/.env.dev run dev npm run typeorm:generate src/migrations/table-init
+	docker compose -f docker-compose-arm.yml   --env-file env/.env.dev run dev npm run -- typeorm:generate src/migrations/table-init
 migration run:
 	docker-compose -f docker-compose.yml  --env-file env/.env.dev run dev npm run typeorm:run
 dc migration run:
