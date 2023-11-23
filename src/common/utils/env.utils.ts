@@ -52,3 +52,7 @@ export const getAppEmailAddress = (): string => {
 
   return appEmailAddress;
 };
+
+export const getFrontendPort = (): number => Number(process.env.FRONTEND_PORT) || 3000;
+
+export const getFrontendBaseUrl = (): string => process.env.FRONTEND_DOMAIN || `http://localhost:${getFrontendPort()}`;

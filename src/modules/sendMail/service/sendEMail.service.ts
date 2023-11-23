@@ -4,7 +4,7 @@ import nodemailer from 'nodemailer';
 import { ISendEmailService } from '../interface/ISendEmail.service';
 import { MailOptions, SendEmailFunc } from '../types/types';
 import { InternalServerErrorException } from '../../../common/errors/all.exception';
-import { isInProduction, getAppBaseUrl, getAppEmailAddress } from '../../../common/utils/env.utils';
+import { isInProduction, getAppBaseUrl, getAppEmailAddress, getFrontendBaseUrl } from '../../../common/utils/env.utils';
 
 @injectable()
 export class SendEmailService implements ISendEmailService {
@@ -84,7 +84,7 @@ export class SendEmailService implements ISendEmailService {
    * @memberof SendEmailService
    */
   sendVerificationEmail(email: string, emailVerificationToken: string): void {
-    const url = `${getAppBaseUrl()}/auth/email-verification?token=${emailVerificationToken}`;
+    const url = `${getFrontendBaseUrl()}/email-verification?token=${emailVerificationToken}`;
 
     const mailOpt: MailOptions = {
       from: getAppEmailAddress(),
