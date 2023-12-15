@@ -55,7 +55,7 @@ export class WorkSessionController {
       dto,
     );
 
-    const statusCode = latestWorkSession.isUnfinished ? 204 : 200;
+    const statusCode = latestWorkSession.isUnfinished ? 200 : 201;
 
     return res.status(statusCode).json({
       isUnfinished: latestWorkSession.isUnfinished,
