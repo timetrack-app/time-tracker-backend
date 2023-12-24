@@ -48,7 +48,7 @@ describe('Auth Controller Test', () => {
         .send(userPayload)
         .then((response) => {
           expect(response.status).toBe(200);
-          expect(response.body.token).toBeDefined();
+          expect(response.body.authToken).toBeDefined();
           done();
         })
         .catch((error) => {
