@@ -43,6 +43,25 @@ describe('WorkSession Repository Test', () => {
     set: jest.fn(() => mockQueryBuilder),
     returning: jest.fn(() => mockQueryBuilder),
     updateEntity: jest.fn(() => mockQueryBuilder),
+    findOneBy: jest.fn().mockResolvedValue(fakeWorkSession),
+    createQueryBuilder: jest.fn(() => mockQueryBuilder),
+    innerJoinAndSelect: jest.fn(() => mockQueryBuilder),
+    leftJoinAndSelect: jest.fn(() => mockQueryBuilder),
+  };
+
+  const mockEntityManager = {
+    save: jest.fn().mockResolvedValue(fakeWorkSession),
+    connection: {
+      createQueryRunner: jest.fn(() => mockQueryRunner),
+    },
+  };
+
+  const mockQueryRunner = {
+    startTransaction: jest.fn(),
+    commitTransaction: jest.fn(),
+    rollbackTransaction: jest.fn(),
+    release: jest.fn(),
+    manager: mockEntityManager,
   };
 
   // Test starts from here
@@ -57,7 +76,10 @@ describe('WorkSession Repository Test', () => {
     // Mock the create method on the repository
     mockDatabaseService.getRepository = jest.fn().mockResolvedValue({
       create: jest.fn(() => fakeWorkSession),
+      createQueryBuilder: () => mockQueryBuilder,
     });
+
+    mockDatabaseService.getManager = jest.fn().mockResolvedValue(mockEntityManager);
   });
 
   describe('findOneById', () => {
@@ -79,28 +101,33 @@ describe('WorkSession Repository Test', () => {
   describe('create', () => {
     it('Should create a new WorkSession', async () => {
       // Mock transaction methods
-      const startTransaction = jest.fn();
-      const commitTransaction = jest.fn();
-      const rollbackTransaction = jest.fn();
-      const release = jest.fn();
+      // const startTransaction = jest.fn();
+      // const commitTransaction = jest.fn();
+      // const rollbackTransaction = jest.fn();
+      // const release = jest.fn();
 
-      // Mock the query runner
-      const queryRunner = {
-        startTransaction,
-        commitTransaction,
-        rollbackTransaction,
-        release,
-        manager: {
-          save: jest.fn(),
-        },
-      };
+      // // Mock the query runner
+      // const queryRunner = {
+      //   startTransaction,
+      //   commitTransaction,
+      //   rollbackTransaction,
+      //   release,
+      //   manager: {
+      //     save: jest.fn(),
+      //   },
+      // };
 
-      // Mock the getManager method
-      mockDatabaseService.getManager = jest.fn().mockResolvedValue(queryRunner);
+      // // Mock the getManager method
+      // mockDatabaseService.getManager = jest.fn().mockResolvedValue(queryRunner);
+
+      // const response = await workSessionRepository.create(createWorkSessionDto);
+
+      // expect(response).toEqual(fakeWorkSession);
 
       const response = await workSessionRepository.create(createWorkSessionDto);
 
       expect(response).toEqual(fakeWorkSession);
+      expect(mockEntityManager.save).toHaveBeenCalledWith(expect.any(WorkSession));
     });
   });
 

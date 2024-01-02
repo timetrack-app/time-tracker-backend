@@ -39,7 +39,7 @@ export class WorkSessionService implements IWorkSessionService {
    * Get latest unfinished WorkSession
    *
    * @param {FindLatestUnfinishedWorkSessionDto} findLatestUnfinishedWorkSessionDto
-   * @return {*}  {Promise<WorkSession>}
+   * @return {Promise<WorkSession>}
    * @memberof WorkSessionService
    */
   async getLatestUnfinishedWorkSession(

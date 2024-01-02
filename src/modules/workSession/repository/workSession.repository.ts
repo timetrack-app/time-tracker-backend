@@ -64,7 +64,7 @@ export class WorkSessionRepository implements IWorkSessionRepository {
    * Create new WorkSession(no template)
    *
    * @param {CreateWorkSessionDto} createWorkSessionDto
-   * @return {*}  {Promise<WorkSession>}
+   * @return {Promise<WorkSession>}
    * @memberof WorkSessionRepository
    */
   async create(
