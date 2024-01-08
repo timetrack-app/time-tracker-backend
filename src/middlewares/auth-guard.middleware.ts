@@ -13,6 +13,7 @@ export const AuthGuardMiddleware = (req: Request, res: Response, next: NextFunct
   passport.authenticate('jwt', { session: false }, (error, user: User, info) => {
     if (error) {
       // unexpected error
+      console.error(error);
       return res.status(500).json({
         errors: [
           {
