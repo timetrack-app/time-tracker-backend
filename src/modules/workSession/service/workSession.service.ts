@@ -6,7 +6,6 @@ import { IWorkSessionRepository } from '../interfaces/IWorkSession.repository';
 import { CreateWorkSessionDto } from '../dto/create-work-session.dto';
 import { WorkSession } from '../entity/workSession.entity';
 import { CreateWorkSessionServiceDto } from '../dto/create-work-session-service-dto';
-import { ITemplateRepository } from '../../../modules/template/interfaces/ITemplate.repository';
 import {
   InternalServerErrorException,
   NotFoundException,
@@ -15,6 +14,10 @@ import { Logger } from '../../../common/services/logger.service';
 import { EndWorkSessionDto } from '../dto/end-work-session-dto';
 import { FindLatestUnfinishedWorkSessionDto } from '../dto/find-latest-unfinished-work-session-dto';
 import { CreateWorkSessionServiceReturnDto } from '../dto/create-work-session-service-return-dto';
+import { UpdateActiveTaskServiceDto } from '../dto/update-active-task-service.dto';
+import { IListRepository } from '../../../modules/list/interface/IList.repository';
+import { ITabRepository } from '../../../modules/tab/interface/ITab.repository';
+import { ITaskRepository } from '../../../modules/task/interface/ITask.repository';
 
 /**
  *
@@ -29,8 +32,12 @@ export class WorkSessionService implements IWorkSessionService {
     private readonly userRepository: IUserRepository,
     @inject(TYPES.IWorkSessionRepository)
     private readonly workSessionRepository: IWorkSessionRepository,
-    @inject(TYPES.ITemplateRepository)
-    private readonly templateRepository: ITemplateRepository,
+    @inject(TYPES.ITabRepository)
+    private readonly tabRepository: ITabRepository,
+    @inject(TYPES.IListRepository)
+    private readonly listRepository: IListRepository,
+    @inject(TYPES.ITaskRepository)
+    private readonly taskRepository: ITaskRepository,
     @inject(TYPES.Logger)
     private readonly logger: Logger,
   ) {}
@@ -96,6 +103,10 @@ export class WorkSessionService implements IWorkSessionService {
     // create new WorkSession
     try {
       const user = await this.userRepository.findOneById(userId);
+      if (!user) {
+        this.logger.error(`User with ID ${userId} not found`);
+        throw new NotFoundException(`User with ID ${userId} not found`);
+      }
       const createWorkSessionDto = new CreateWorkSessionDto();
       createWorkSessionDto.user = user;
       // create without template
@@ -113,11 +124,91 @@ export class WorkSessionService implements IWorkSessionService {
     }
   }
 
+  /**
+   * Update active Task
+   *
+   * @param {UpdateActiveTaskServiceDto} updateActiveTaskServiceDto
+   * @return {*}  {Promise<WorkSession>}
+   * @memberof WorkSessionService
+   */
+  async updateActiveTask(
+    updateActiveTaskServiceDto: UpdateActiveTaskServiceDto,
+  ): Promise<WorkSession> {
+    // TODO : accessing DB 5 times, need to optimize
+    const { userId, workSessionId, activeTabId, activeListId, activeTaskId } =
+      updateActiveTaskServiceDto;
+    try {
+      const user = await this.userRepository.findOneById(userId);
+      if (!user) {
+        this.logger.error(`User with ID ${userId} not found`);
+        throw new NotFoundException(`User with ID ${userId} not found`);
+      }
+      const workSession = await this.workSessionRepository.findOneById(
+        workSessionId,
+      );
+      if (!workSession) {
+        this.logger.error(`WorkSession with ID ${workSessionId} not found`);
+        throw new NotFoundException(
+          `WorkSession with ID ${workSessionId} not found`,
+        );
+      }
+      const activeTab = await this.tabRepository.findOneById(activeTabId);
+      if (!activeTab) {
+        this.logger.error(`Tab with ID ${activeTabId} not found`);
+        throw new NotFoundException(`Task with ID ${activeTabId} not found`);
+      }
+      const activeList = await this.listRepository.findOneById(activeListId);
+      if (!activeList) {
+        this.logger.error(`List with ID ${activeListId} not found`);
+        throw new NotFoundException(`Task with ID ${activeListId} not found`);
+      }
+      const activeTask = await this.taskRepository.findOneById(activeTaskId);
+      if (!activeTask) {
+        this.logger.error(`Task with ID ${activeTaskId} not found`);
+        throw new NotFoundException(`Task with ID ${activeTaskId} not found`);
+      }
+      const updatedWorkSession = Object.assign(workSession, {
+        activeTab,
+        activeList,
+        activeTask,
+      });
+      return await this.workSessionRepository.update(updatedWorkSession);
+    } catch (error) {
+      this.logger.error(`Failed to update the active task. Error: ${error}`);
+      throw new InternalServerErrorException(
+        'Failed to update the active task.',
+      );
+    }
+  }
+
+  /**
+   * End a WorkSession
+   *
+   * @param {EndWorkSessionDto} endWorkSessionDto
+   * @return {*}  {Promise<WorkSession>}
+   * @memberof WorkSessionService
+   */
+
   async endWorkSession(
     endWorkSessionDto: EndWorkSessionDto,
   ): Promise<WorkSession> {
     try {
-      return this.workSessionRepository.update(endWorkSessionDto.workSessionId);
+      const { workSessionId } = endWorkSessionDto;
+      const workSession = await this.workSessionRepository.findOneById(
+        workSessionId,
+      );
+      if (!workSession) {
+        this.logger.error(`WorkSession with ID ${workSessionId} not found`);
+        throw new NotFoundException(
+          `WorkSession with ID ${workSessionId} not found`,
+        );
+      }
+      const endAt = new Date();
+      const updatedWorkSession: WorkSession = {
+        ...workSession,
+        endAt,
+      };
+      return this.workSessionRepository.update(updatedWorkSession);
     } catch (error) {
       this.logger.error(`Failed to create new work session. Error: ${error}`);
       throw new InternalServerErrorException(

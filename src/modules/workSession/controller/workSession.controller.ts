@@ -17,6 +17,8 @@ import { CreateWorkSessionReturnType } from '../types';
 import { FindLatestUnfinishedWorkSessionDto } from '../dto/find-latest-unfinished-work-session-dto';
 import { EndWorkSessionDto } from '../dto/end-work-session-dto';
 import { AuthGuardMiddleware } from '../../../middlewares/auth-guard.middleware';
+import { UpdateActiveTaskRequestDto } from '../dto/update-active-task-request-dto';
+import { UpdateActiveTaskServiceDto } from '../dto/update-active-task-service.dto';
 
 @controller('/users/:userId/work-sessions', AuthGuardMiddleware)
 export class WorkSessionController {
@@ -61,6 +63,26 @@ export class WorkSessionController {
       isUnfinished: latestWorkSession.isUnfinished,
       workSession: latestWorkSession.workSession,
     });
+  }
+
+  @httpPut('/:workSessionId/update-active-task')
+  public async updateActiveTask(
+    @requestParam('userId') userId: number,
+    @requestParam('workSessionId') workSessionId: number,
+    @requestBody() reqBody: UpdateActiveTaskRequestDto,
+    _req: Request,
+    res: Response,
+  ) {
+    const dto = new UpdateActiveTaskServiceDto();
+    dto.userId = userId;
+    dto.workSessionId = workSessionId;
+    dto.activeTabId = reqBody.activeTabId;
+    dto.activeListId = reqBody.activeListId;
+    dto.activeTaskId = reqBody.activeTaskId;
+
+    const workSession = await this.workSessionService.updateActiveTask(dto);
+
+    return res.status(200).json({ ...workSession });
   }
 
   @httpPut('/:workSessionId/end')

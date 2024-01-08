@@ -6,7 +6,7 @@ import { IDatabaseService } from '../../../core/interface/IDatabase.service';
 import { CreateWorkSessionDto } from '../dto/create-work-session.dto';
 import { Tab } from '../../tab/entity/tab.entity';
 import { List } from '../../list/entity/list.entity';
-import { Repository, UpdateResult } from 'typeorm';
+import { Repository } from 'typeorm';
 import { FindLatestUnfinishedWorkSessionDto } from '../dto/find-latest-unfinished-work-session-dto';
 import { Task } from '../../../modules/task/entity/task.entity';
 
@@ -149,30 +149,15 @@ export class WorkSessionRepository implements IWorkSessionRepository {
     }
   }
 
-  // TODO: should move transaction to service layer
-  async update(workSessionId: number): Promise<WorkSession> {
+  /**
+   * Update WorkSession
+   *
+   * @param {WorkSession} updatedWorkSession
+   * @return {*}  {Promise<WorkSession>}
+   * @memberof WorkSessionRepository
+   */
+  async update(updatedWorkSession: WorkSession): Promise<WorkSession> {
     const repo = await this.getWorkSessionRepo();
-
-    try {
-      // https://github.com/typeorm/typeorm/issues/4920#issuecomment-813765677
-      const updatedResult: UpdateResult = await repo
-        .createQueryBuilder()
-        .update(WorkSession)
-        .set({ endAt: new Date() })
-        .where('id = :id', { id: workSessionId })
-        .returning('*')
-        .updateEntity(true)
-        .execute();
-
-      if (updatedResult.affected && updatedResult.affected > 0) {
-        return updatedResult.raw[0] as WorkSession;
-      }
-
-      throw new Error(
-        `Failed to update the WorkSession with id:${workSessionId}.`,
-      );
-    } catch (error) {
-      throw new Error(error);
-    }
+    return await repo.save(updatedWorkSession);
   }
 }

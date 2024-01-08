@@ -16,7 +16,7 @@ import { AuthGuardMiddleware } from '../../../middlewares/auth-guard.middleware'
 
 @controller(
   '/work-sessions/:workSessionId/tabs/:tabId/lists/:listId/tasks',
-  AuthGuardMiddleware
+  AuthGuardMiddleware,
 )
 export class TaskController {
   constructor(

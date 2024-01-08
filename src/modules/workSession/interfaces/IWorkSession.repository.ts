@@ -7,5 +7,5 @@ export interface IWorkSessionRepository {
     findLatestUnfinishedWorkSessionDto: FindLatestUnfinishedWorkSessionDto,
   ): Promise<WorkSession | null>;
   create(createWorkSessionDto: CreateWorkSessionDto): Promise<WorkSession>;
-  update(workSessionId: number): Promise<WorkSession>;
+  update(updatedWorkSession: WorkSession): Promise<WorkSession>;
 }
