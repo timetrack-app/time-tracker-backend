@@ -28,5 +28,6 @@
     // }
   },
   // "exclude": ["./**/*.spec.ts"],
-  "include": ["src/types.d.ts", "src", "test"]
+  "include": ["src/types.d.ts", "src"],
+  "exclude": ["test", "./**/*.spec.ts"]
 }
