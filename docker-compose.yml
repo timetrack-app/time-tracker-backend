@@ -1,26 +1,45 @@
-version: "3.8"
+version: '3'
 services:
-  api:
-    container_name: api
+  db:
+    container_name: timetrack-app-db
+    image: postgres
     restart: always
-    build: .
+    env_file: ./env/.env.dev
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+    networks:
+      - timetracker_app_api
     ports:
-      - ${PORT}:${PORT}
+      - 5432:5432
+  mailhog:
+    container_name: mailhog
+    image: mailhog/mailhog:latest
+    restart: always
+    ports:
+      - 1025:1025
+      - 8025:8025
+    networks:
+      - timetracker_app_api
+  dev:
+    container_name: timetrack-app-dev
+    image: timetrack-app-api
+    env_file: ./env/.env.dev
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    volumes:
+      - .:/app
+      - /app/node_modules
+    ports:
+      - '4000:4000'
     depends_on:
       - db
-    volumes:
-      - .:/usr/src/app
+    restart: unless-stopped
+    networks:
+      - timetracker_app_api
 
-  db:
-    container_name: postgres
-    image: postgres
-    ports:
-      - "5433:${DB_PORT}"
-    volumes:
-      - data:/data/db
-    environment:
-      - POSTGRES_PASSWORD=${DB_PASSWORD}
-      - POSTGRES_DB=${DB_NAME}
-
+networks:
+  timetracker_app_api:
 volumes:
-  data: {}
+  pgdata:
+  pgadmin-data:
