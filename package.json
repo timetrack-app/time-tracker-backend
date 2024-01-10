@@ -58,6 +58,7 @@
     "start:watch": "nodemon --trace-warnings",
     "build-dev": "tsc && node ./dist/main.js",
     "build": "tsc",
+    "build-pro": "npm install && npm run typeorm migration:run && tsc",
     "typeorm": "ts-node --require tsconfig-paths/register ./node_modules/typeorm/cli.js -d src/datasource.config.ts",
     "typeorm:create": "npm run typeorm migration:create",
     "typeorm:generate": "npm run typeorm migration:generate",
