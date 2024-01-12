@@ -1,7 +1,7 @@
 ---
-name: "[Feature or Fix]"
-about: Additional feature or fix for current feature
-title: ''
+name: Feature
+about: Development tasks
+title: "[Feature]"
 labels: ''
 assignees: ''
 
