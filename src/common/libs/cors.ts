@@ -1,12 +1,12 @@
 import cors from 'cors';
 
 export const allowedOrigins = [
+  // Production
+  'https://time-tracker-eight-ruddy.vercel.app',
   // Vercel preview
   'https://timetrackerapp.vercel.app',
   // Local
   'http://localhost:3000',
-  // Production
-  'https://time-tracker-eight-ruddy.vercel.app',
 ];
 
 const allowedMethods = [
