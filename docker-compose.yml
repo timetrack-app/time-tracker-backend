@@ -10,7 +10,7 @@ services:
     networks:
       - timetracker_app_api
     ports:
-      - 5432:5432
+      - ${POSTGRES_PORT_OUTSIDE}:5432
   mailhog:
     container_name: mailhog
     image: mailhog/mailhog:latest
@@ -31,7 +31,7 @@ services:
       - .:/app
       - /app/node_modules
     ports:
-      - '4000:4000'
+      - '${APP_PORT}:${APP_PORT}'
     depends_on:
       - db
     restart: unless-stopped

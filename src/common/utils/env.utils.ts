@@ -5,7 +5,7 @@ import { InternalServerErrorException } from '../errors/all.exception';
  *
  * @return {string}  current environment of the app
  */
-export const getCurrentEnvironment = (): string => process.env.APP_ENV || 'development';
+export const getCurrentEnvironment = (): string => process.env.APP_ENV || 'develop';
 
 /**
  * Check if it's production environment or not
