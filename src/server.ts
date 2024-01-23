@@ -21,6 +21,7 @@ import {
 import { TYPES } from './core/type.core';
 import { ISendEmailService } from './modules/sendMail/interface/ISendEmail.service';
 import { IPassportService } from './modules/passport/interface/IPassport.service';
+import { corsOptions } from './common/libs/cors';
 
 export const server = new InversifyExpressServer(container);
 const passportService = container.get<IPassportService>(TYPES.IPassportService);
@@ -35,13 +36,7 @@ server.setConfig((app) => {
   app.use(express.urlencoded({ extended: true }));
   app.use(express.json());
   app.use(passport.initialize());
-
-  // TODO: This is temporary. Fix later
-  const allowedOrigins = ['http://localhost:3000'];
-  const options: cors.CorsOptions = {
-    origin: allowedOrigins
-  };
-  app.use(cors(options));
+  app.use(cors(corsOptions));
 });
 
 const errorResponse = (
