@@ -21,7 +21,7 @@ export class SendEmailService implements ISendEmailService {
    * @param {MailOptions} mailOpt
    * @memberof SendEmailService
    */
-  private async sendMailWithSendGrid(mailOpt: MailOptions) {
+  private async sendMailInProd(mailOpt: MailOptions) {
     try {
       await sgMail.send(mailOpt);
     } catch (error) {
@@ -73,7 +73,7 @@ export class SendEmailService implements ISendEmailService {
    * @memberof SendEmailService
    */
   private async sendEmail(mailOpt: MailOptions) {
-    this.sendEmailByEnvironment(mailOpt, this.sendMailWithSendGrid, this.sendMailWithMailHog);
+    this.sendEmailByEnvironment(mailOpt, this.sendMailInProd, this.sendMailWithMailHog);
   }
 
   /**
