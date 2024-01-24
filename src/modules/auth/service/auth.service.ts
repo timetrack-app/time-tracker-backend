@@ -1,8 +1,8 @@
-import jwt from 'jsonwebtoken';
 import { inject, injectable } from 'inversify';
 import bcrypt from 'bcryptjs';
 
 import { TYPES } from '../../../core/type.core';
+import { IDatabaseService } from '../../../core/interface/IDatabase.service';
 import { IAuthService } from '../interfaces/IAuth.service';
 import { AuthLoginDto } from '../dto/auth-login.dto';
 import { AuthRegisterDto } from '../dto/auth-register.dto';
@@ -19,6 +19,7 @@ import { ISendEmailService } from '../../../modules/sendMail/interface/ISendEmai
 import { User } from '../../../modules/user/entity/user.entity';
 import { encryptPassword } from '../../../common/utils/password/password.utils';
 import { generateJWT } from '../../../common/utils/jwt/jwt.utils';
+import { Logger } from '../../../common/services/logger.service';
 import { AuthenticatedUserDto } from '../dto/authenticated-user.dto';
 
 @injectable()
@@ -29,13 +30,17 @@ export class AuthService implements IAuthService {
     private userEmailVerificationService: IUserEmailVerificationService,
     @inject(TYPES.ISendEMailService)
     private sendEmailService: ISendEmailService,
+    @inject(TYPES.IDatabaseService)
+    private readonly database: IDatabaseService,
+    @inject(TYPES.Logger)
+    private readonly logger: Logger
   ) {}
 
   /**
    * Create user and send a registration email
    *
    * @param {AuthRegisterDto} registerDto
-   * @return {*}  {Promise<void>}
+   * @return {Promise<void>}
    * @memberof AuthService
    */
   async registerUser(registerDto: AuthRegisterDto): Promise<void> {
@@ -50,17 +55,29 @@ export class AuthService implements IAuthService {
     const hashedPassword = await encryptPassword(password);
     const newUser = { email, password: hashedPassword };
 
-    await this.userService.createUser(newUser);
+    const queryRunner = (await this.database.getManager()).connection.createQueryRunner();
+    await queryRunner.startTransaction();
+    try {
+      await this.userService.createUser(newUser);
 
-    // create a token
-    const verificationToken =
-      await this.userEmailVerificationService.createVerificationToken(email);
+      // create a token
+      const verificationToken =
+        await this.userEmailVerificationService.createVerificationToken(email);
 
-    // create verification record
-    await this.userEmailVerificationService.createVerification(email, verificationToken);
+      // create verification record
+      await this.userEmailVerificationService.createVerification(email, verificationToken);
 
-    // send verification email
-    await this.sendEmailService.sendVerificationEmail(email, verificationToken);
+      // send verification email
+      await this.sendEmailService.sendVerificationEmail(email, verificationToken);
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      this.logger.error(
+        `Failed to update the user's password. Error: ${error}`,
+      );
+      throw new InternalServerErrorException('Failed to register new user');
+    } finally {
+      await queryRunner.release();
+    }
   }
 
   async verifyUser(token: string): Promise<User> {
