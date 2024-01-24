@@ -10,7 +10,7 @@ export const getCurrentEnvironment = (): string => process.env.APP_ENV || 'devel
 /**
  * Check if it's production environment or not
  *
- * @return {*}  {boolean}
+ * @return {boolean}
  */
 export const isInProduction = (): boolean => getCurrentEnvironment() === 'production';
 
@@ -21,6 +21,11 @@ export const isInProduction = (): boolean => getCurrentEnvironment() === 'produc
  */
 export const getAppPort = (): number => Number(process.env.APP_PORT) || 3000;
 
+/**
+ *
+ *
+ * @return {string}
+ */
 export const getAppBaseUrl = (): string => process.env.WEB_DOMAIN || `http://localhost:${getAppPort()}`;
 
 /**
@@ -52,6 +57,25 @@ export const getAppEmailAddress = (): string => {
 
   return appEmailAddress;
 };
+
+/**
+ *
+ *
+ * @return {string}
+ */
+export const getSendGridApiKey = (): string => {
+  const sgApiKey = process.env.SENDGRID_API_KEY;
+
+  if (!sgApiKey || sgApiKey.trim() === '') {
+    throw new InternalServerErrorException('SENDGRID_API_KEY is not defined or is an empty string.');
+  }
+
+  return sgApiKey;
+};
+
+export const getSmtpPort = (): number => process.env.SMTP_PORT ? Number(process.env.SMTP_PORT) : 1025;
+
+export const getLocalSmtpServerName = (): string => process.env.LOCAL_SMTP_SERVER || 'mailhog';
 
 export const getFrontendPort = (): number => Number(process.env.FRONTEND_PORT) || 3000;
 

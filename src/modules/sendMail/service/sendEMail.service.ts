@@ -4,14 +4,22 @@ import nodemailer from 'nodemailer';
 import { ISendEmailService } from '../interface/ISendEmail.service';
 import { MailOptions, SendEmailFunc } from '../types/types';
 import { InternalServerErrorException } from '../../../common/errors/all.exception';
-import { isInProduction, getAppBaseUrl, getAppEmailAddress, getFrontendBaseUrl } from '../../../common/utils/env.utils';
+import {
+  isInProduction,
+  getAppBaseUrl,
+  getAppEmailAddress,
+  getFrontendBaseUrl,
+  getSendGridApiKey,
+  getSmtpPort,
+  getLocalSmtpServerName,
+} from '../../../common/utils/env.utils';
 
 @injectable()
 export class SendEmailService implements ISendEmailService {
   constructor() {}
 
   init() {
-    sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+    sgMail.setApiKey(getSendGridApiKey());
   }
 
   /**
@@ -21,10 +29,11 @@ export class SendEmailService implements ISendEmailService {
    * @param {MailOptions} mailOpt
    * @memberof SendEmailService
    */
-  private async sendMailInProd(mailOpt: MailOptions) {
+  private async sendMailWithSendGrid(mailOpt: MailOptions) {
     try {
       await sgMail.send(mailOpt);
     } catch (error) {
+      console.error(error);
       throw new InternalServerErrorException(error.message);
     }
   }
@@ -38,8 +47,8 @@ export class SendEmailService implements ISendEmailService {
    */
   private async sendMailWithMailHog(mailOpt: MailOptions) {
     const transporter = nodemailer.createTransport({
-      host: 'mailhog',
-      port: 1025,
+      host: getLocalSmtpServerName(),
+      port: getSmtpPort(),
       ignoreTLS: true ,
     });
 
@@ -57,12 +66,16 @@ export class SendEmailService implements ISendEmailService {
    *
    * @private
    * @param {MailOptions} mailOpt
-   * @param {SendEmailFunc} sendEmailProd
-   * @param {SendEmailFunc} sendEmailDev
+   * @param {SendEmailFunc} sendEmailProdCallback
+   * @param {SendEmailFunc} sendEmailDevCallback
    * @memberof SendEmailService
    */
-  private async sendEmailByEnvironment(mailOpt: MailOptions, sendEmailProd: SendEmailFunc, sendEmailDev: SendEmailFunc) {
-    await isInProduction() ? sendEmailProd(mailOpt) : sendEmailDev(mailOpt);
+  private async sendEmailByEnvironment(
+    mailOpt: MailOptions,
+    sendEmailProdCallback: SendEmailFunc,
+    sendEmailDevCallback: SendEmailFunc,
+  ) {
+    await isInProduction() ? sendEmailProdCallback(mailOpt) : sendEmailDevCallback(mailOpt);
   }
 
   /**
@@ -73,7 +86,7 @@ export class SendEmailService implements ISendEmailService {
    * @memberof SendEmailService
    */
   private async sendEmail(mailOpt: MailOptions) {
-    this.sendEmailByEnvironment(mailOpt, this.sendMailInProd, this.sendMailWithMailHog);
+    this.sendEmailByEnvironment(mailOpt, this.sendMailWithSendGrid, this.sendMailWithMailHog);
   }
 
   /**
