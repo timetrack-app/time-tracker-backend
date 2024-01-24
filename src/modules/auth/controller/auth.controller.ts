@@ -28,8 +28,12 @@ export class AuthController {
     req: Request,
     res: Response,
   ) {
-    await this.authService.registerUser(body);
-    return res.status(200).json();
+    try {
+      await this.authService.registerUser(body);
+      return res.status(200).json();
+    } catch (error) {
+      throw new InternalServerErrorException('Failed to register user');
+    }
   }
 
   /**
