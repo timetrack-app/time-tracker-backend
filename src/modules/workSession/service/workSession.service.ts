@@ -18,6 +18,7 @@ import { UpdateActiveTaskServiceDto } from '../dto/update-active-task-service.dt
 import { IListRepository } from '../../../modules/list/interface/IList.repository';
 import { ITabRepository } from '../../../modules/tab/interface/ITab.repository';
 import { ITaskRepository } from '../../../modules/task/interface/ITask.repository';
+import { getWorkSessionsByUserIdDto } from '../dto/getWorkSessionByUserId.dto';
 
 /**
  *
@@ -42,6 +43,29 @@ export class WorkSessionService implements IWorkSessionService {
     private readonly logger: Logger,
   ) {}
 
+  /**
+   * Get WorkSessions by UserId
+   *
+   * @param {GetWorkSessionByUserIdDto} getWorkSessionsByUserIdDto
+   * @return {*}  {Promise<WorkSession[]>}
+   * @memberof WorkSessionService
+   */
+  async getWorkSessionsByUserId(
+    getWorkSessionsByUserIdDto: getWorkSessionsByUserIdDto,
+  ): Promise<WorkSession[]> {
+    const { userId } = getWorkSessionsByUserIdDto;
+    try {
+      const workSessions = await this.workSessionRepository.findByUserId(
+        userId,
+      );
+      return workSessions;
+    } catch (error) {
+      this.logger.error(`Failed to get the work sessions. Error: ${error}`);
+      throw new InternalServerErrorException(
+        'Failed to get the work sessions.',
+      );
+    }
+  }
   /**
    * Get latest unfinished WorkSession
    *
