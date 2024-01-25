@@ -15,6 +15,10 @@ import { IUserRepository } from '../../../modules/user/interfaces/IUser.reposito
 import { ITemplateRepository } from '../../../modules/template/interfaces/ITemplate.repository';
 import { fakeWorkSession } from '../../../../test/factory/workSession.factory';
 import { fakeTask } from '../../../../test/factory/task.factory';
+import { ITabRepository } from 'src/modules/tab/interface/ITab.repository';
+import { ITaskRepository } from 'src/modules/task/interface/ITask.repository';
+import { IListRepository } from 'src/modules/list/interface/IList.repository';
+import { GetWorkSessionByUserIdDto } from '../dto/getWorkSessionByUserId.dto';
 
 describe('WorkSession Service Test', () => {
   let workSessionService: WorkSessionService;
@@ -35,9 +39,17 @@ describe('WorkSession Service Test', () => {
     findOneById: jest.fn(() => Promise.resolve({ id: 1 })),
   } as unknown as IUserRepository;
 
-  const mockTemplateRepository: ITemplateRepository = {
-    // Mock any methods from the template repository if needed.
-  } as unknown as ITemplateRepository;
+  const mockTabRepository: ITabRepository = {
+    findOneById: jest.fn(() => Promise.resolve({ id: 1 })),
+  } as unknown as ITabRepository;
+
+  const mockListRepository: IListRepository = {
+    findOneById: jest.fn(() => Promise.resolve({ id: 1 })),
+  } as unknown as IListRepository;
+
+  const mockTaskRepository: ITaskRepository = {
+    findOneById: jest.fn(() => Promise.resolve({ id: 1 })),
+  } as unknown as ITaskRepository;
 
   const mockLogger: Logger = {
     error: jest.fn(),
@@ -48,9 +60,23 @@ describe('WorkSession Service Test', () => {
     workSessionService = new WorkSessionService(
       mockUserRepository,
       mockWorkSessionRepository,
-      mockTemplateRepository,
+      mockTabRepository,
+      mockListRepository,
+      mockTaskRepository,
       mockLogger,
     );
+  });
+
+  describe('Get Work Sessions By User ID', () => {
+    it('Should get all work sessions for a user', async () => {
+      const getWorkSessionByUserIdDto: GetWorkSessionByUserIdDto = {
+        userId: 1,
+      };
+      const response = await workSessionService.getWorkSessionByUserId(
+        getWorkSessionByUserIdDto,
+      );
+      expect(response).toEqual([fakeWorkSessionA]);
+    });
   });
 
   describe('Create WorkSession', () => {
@@ -79,6 +105,8 @@ describe('WorkSession Service Test', () => {
       expect(response.workSession).toEqual(fakeWorkSessionA);
     });
   });
+
+  describe('Update Active Task', () => {});
 
   describe('Get Latest Unfinished WorkSession', () => {
     it('Should get the latest unfinished work session', async () => {
