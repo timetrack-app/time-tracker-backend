@@ -26,9 +26,34 @@ export class WorkSessionRepository implements IWorkSessionRepository {
     return await this.database.getRepository(WorkSession);
   }
 
+  /**
+   * Find WorkSession by Id
+   *
+   * @param {number} workSessionId
+   * @return {*}  {Promise<WorkSession>}
+   * @memberof WorkSessionRepository
+   */
   async findOneById(workSessionId: number): Promise<WorkSession> {
     const repo = await this.getWorkSessionRepo();
     return repo.findOneBy({ id: workSessionId });
+  }
+
+  /**
+   * Find WorkSessions by UserId
+   *
+   * @param {number} userId
+   * @return {*}  {Promise<WorkSession[]>}
+   * @memberof WorkSessionRepository
+   */
+  async findByUserId(userId: number): Promise<WorkSession[]> {
+    const repo = await this.getWorkSessionRepo();
+    return repo.find({
+      where: {
+        user: {
+          id: userId,
+        },
+      },
+    });
   }
 
   /**
