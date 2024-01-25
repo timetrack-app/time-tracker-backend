@@ -19,8 +19,7 @@ import { EndWorkSessionDto } from '../dto/end-work-session-dto';
 import { AuthGuardMiddleware } from '../../../middlewares/auth-guard.middleware';
 import { UpdateActiveTaskRequestDto } from '../dto/update-active-task-request-dto';
 import { UpdateActiveTaskServiceDto } from '../dto/update-active-task-service.dto';
-import { http } from 'winston';
-import { GetWorkSessionByUserIdDto } from '../dto/getWorkSessionByUserId.dto';
+import { getWorkSessionsByUserIdDto } from '../dto/getWorkSessionByUserId.dto';
 
 @controller('/users/:userId/work-sessions', AuthGuardMiddleware)
 export class WorkSessionController {
@@ -35,7 +34,7 @@ export class WorkSessionController {
     _: Request,
     res: Response,
   ) {
-    const dto = new GetWorkSessionByUserIdDto();
+    const dto = new getWorkSessionsByUserIdDto();
     dto.userId = userId;
     const workSessions = await this.workSessionService.getWorkSessionByUserId(
       dto,

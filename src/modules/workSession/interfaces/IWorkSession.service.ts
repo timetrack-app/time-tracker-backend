@@ -4,7 +4,7 @@ import { EndWorkSessionDto } from '../dto/end-work-session-dto';
 import { FindLatestUnfinishedWorkSessionDto } from '../dto/find-latest-unfinished-work-session-dto';
 import { CreateWorkSessionServiceReturnDto } from '../dto/create-work-session-service-return-dto';
 import { UpdateActiveTaskServiceDto } from '../dto/update-active-task-service.dto';
-import { GetWorkSessionByUserIdDto } from '../dto/getWorkSessionByUserId.dto';
+import { getWorkSessionsByUserIdDto } from '../dto/getWorkSessionByUserId.dto';
 
 export interface IWorkSessionService {
   createWorkSession(
@@ -17,7 +17,7 @@ export interface IWorkSessionService {
   updateActiveTask(
     updateActiveTaskServiceDto: UpdateActiveTaskServiceDto,
   ): Promise<WorkSession>;
-  getWorkSessionByUserId(
-    getWorkSessionByUserIdDto: GetWorkSessionByUserIdDto,
+  getWorkSessionsByUserId(
+    getWorkSessionsByUserIdDto: getWorkSessionsByUserIdDto,
   ): Promise<WorkSession[]>;
 }

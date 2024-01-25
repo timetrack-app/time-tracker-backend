@@ -18,7 +18,7 @@ import { UpdateActiveTaskServiceDto } from '../dto/update-active-task-service.dt
 import { IListRepository } from '../../../modules/list/interface/IList.repository';
 import { ITabRepository } from '../../../modules/tab/interface/ITab.repository';
 import { ITaskRepository } from '../../../modules/task/interface/ITask.repository';
-import { GetWorkSessionByUserIdDto } from '../dto/getWorkSessionByUserId.dto';
+import { getWorkSessionsByUserIdDto } from '../dto/getWorkSessionByUserId.dto';
 
 /**
  *
@@ -46,14 +46,14 @@ export class WorkSessionService implements IWorkSessionService {
   /**
    * Get WorkSessions by UserId
    *
-   * @param {GetWorkSessionByUserIdDto} getWorkSessionByUserIdDto
+   * @param {GetWorkSessionByUserIdDto} getWorkSessionsByUserIdDto
    * @return {*}  {Promise<WorkSession[]>}
    * @memberof WorkSessionService
    */
-  async getWorkSessionByUserId(
-    getWorkSessionByUserIdDto: GetWorkSessionByUserIdDto,
+  async getWorkSessionsByUserId(
+    getWorkSessionsByUserIdDto: getWorkSessionsByUserIdDto,
   ): Promise<WorkSession[]> {
-    const { userId } = getWorkSessionByUserIdDto;
+    const { userId } = getWorkSessionsByUserIdDto;
     try {
       const workSessions = await this.workSessionRepository.findByUserId(
         userId,
