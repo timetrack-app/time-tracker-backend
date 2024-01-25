@@ -17,5 +17,7 @@ export interface IWorkSessionService {
   updateActiveTask(
     updateActiveTaskServiceDto: UpdateActiveTaskServiceDto,
   ): Promise<WorkSession>;
-  getWorkSessionByUserId(getWorkSessionNyUserIdDto: GetWorkSessionByUserIdDto);
+  getWorkSessionByUserId(
+    getWorkSessionByUserIdDto: GetWorkSessionByUserIdDto,
+  ): Promise<WorkSession[]>;
 }

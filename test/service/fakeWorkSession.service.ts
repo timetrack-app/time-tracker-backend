@@ -6,9 +6,16 @@ import { FindLatestUnfinishedWorkSessionDto } from '../../src/modules/workSessio
 import { CreateWorkSessionServiceReturnDto } from '../../src/modules/workSession/dto/create-work-session-service-return-dto';
 import { WorkSession } from '../../src/modules/workSession/entity/workSession.entity';
 import { fakeWorkSession } from '../factory/workSession.factory';
+import { GetWorkSessionByUserIdDto } from 'src/modules/workSession/dto/getWorkSessionByUserId.dto';
+import { UpdateActiveTaskServiceDto } from 'src/modules/workSession/dto/update-active-task-service.dto';
 
 @injectable()
 export class FakeWorkSessionService implements IWorkSessionService {
+  updateActiveTask(
+    updateActiveTaskServiceDto: UpdateActiveTaskServiceDto,
+  ): Promise<WorkSession> {
+    throw new Error('Method not implemented.');
+  }
   createWorkSession(
     createWorkSessionServiceDto: CreateWorkSessionServiceDto,
   ): Promise<CreateWorkSessionServiceReturnDto> {
@@ -17,6 +24,12 @@ export class FakeWorkSessionService implements IWorkSessionService {
       isUnfinished: true,
       workSession: fakeWorkSession(), // Using the factory to generate a WorkSession
     });
+  }
+
+  getWorkSessionByUserId(
+    getWorkSessionNyUserIdDto: GetWorkSessionByUserIdDto,
+  ): Promise<WorkSession[]> {
+    return Promise.resolve([fakeWorkSession()]);
   }
 
   getLatestUnfinishedWorkSession(

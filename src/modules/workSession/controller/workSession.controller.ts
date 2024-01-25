@@ -19,6 +19,8 @@ import { EndWorkSessionDto } from '../dto/end-work-session-dto';
 import { AuthGuardMiddleware } from '../../../middlewares/auth-guard.middleware';
 import { UpdateActiveTaskRequestDto } from '../dto/update-active-task-request-dto';
 import { UpdateActiveTaskServiceDto } from '../dto/update-active-task-service.dto';
+import { http } from 'winston';
+import { GetWorkSessionByUserIdDto } from '../dto/getWorkSessionByUserId.dto';
 
 @controller('/users/:userId/work-sessions', AuthGuardMiddleware)
 export class WorkSessionController {
@@ -26,6 +28,21 @@ export class WorkSessionController {
     @inject(TYPES.IWorkSessionService)
     private readonly workSessionService: IWorkSessionService,
   ) {}
+
+  @httpGet('/')
+  public async getWorkSessionsByUserId(
+    @requestParam('userId') userId: number,
+    _: Request,
+    res: Response,
+  ) {
+    const dto = new GetWorkSessionByUserIdDto();
+    dto.userId = userId;
+    const workSessions = await this.workSessionService.getWorkSessionByUserId(
+      dto,
+    );
+
+    return res.status(200).json({ workSessions });
+  }
 
   @httpGet('/latest')
   public async findLatestUnfinishedWorkSession(

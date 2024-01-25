@@ -13,6 +13,13 @@ describe('WorkSession Controller Test', () => {
       .to(FakeWorkSessionService);
   });
 
+  describe('Get Work Sessions By User ID', () => {
+    it('should get all work sessions for a user', (done: jest.DoneCallback) => {
+      const userId = 1; // Replace with the user ID for testing
+      agent.get(`/users/${userId}/work-sessions`).expect(200, done);
+    });
+  });
+
   describe('Find Latest Unfinished Work Session', () => {
     it('should get the latest unfinished work session', (done: jest.DoneCallback) => {
       const userId = 1; // Replace with the user ID for testing
