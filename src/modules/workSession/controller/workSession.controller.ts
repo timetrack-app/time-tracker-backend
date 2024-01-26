@@ -10,7 +10,6 @@ import {
 } from 'inversify-express-utils';
 import { TYPES } from '../../../core/type.core';
 import { IWorkSessionService } from '../interfaces/IWorkSession.service';
-import { CreateWorkSessionRequestDto } from '../dto/create-work-session-request-dto';
 import { CreateWorkSessionServiceDto } from '../dto/create-work-session-service-dto';
 import { DtoValidationMiddleware } from '../../../middlewares/dto-validation.middleware';
 import { CreateWorkSessionReturnType } from '../types';
@@ -57,27 +56,20 @@ export class WorkSessionController {
     return res.status(200).json({ workSession });
   }
 
-  @httpPost('/', DtoValidationMiddleware(CreateWorkSessionRequestDto))
+  @httpPost('/')
   public async createWorkSession(
     @requestParam('userId') userId: number,
-    @requestBody() reqBody: CreateWorkSessionRequestDto,
     _: Request,
     res: Response<CreateWorkSessionReturnType>,
   ) {
     const dto = new CreateWorkSessionServiceDto();
 
     dto.userId = userId;
-    dto.tabs = reqBody.tabs;
 
-    const latestWorkSession = await this.workSessionService.createWorkSession(
-      dto,
-    );
+    const workSession = await this.workSessionService.createWorkSession(dto);
 
-    const statusCode = latestWorkSession.isUnfinished ? 200 : 201;
-
-    return res.status(statusCode).json({
-      isUnfinished: latestWorkSession.isUnfinished,
-      workSession: latestWorkSession.workSession,
+    return res.status(201).json({
+      workSession,
     });
   }
 
