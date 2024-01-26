@@ -25,6 +25,9 @@ export class WorkSession {
   @Column({ name: 'end_at', nullable: true, type: 'timestamp' })
   endAt: Date;
 
+  @Column({ name: 'isPaused', nullable: false, default: false })
+  isPaused: boolean;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 

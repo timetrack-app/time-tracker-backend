@@ -36,7 +36,7 @@ export class WorkSessionController {
   ) {
     const dto = new getWorkSessionsByUserIdDto();
     dto.userId = userId;
-    const workSessions = await this.workSessionService.getWorkSessionByUserId(
+    const workSessions = await this.workSessionService.getWorkSessionsByUserId(
       dto,
     );
 
