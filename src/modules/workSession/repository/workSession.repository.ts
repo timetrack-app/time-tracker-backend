@@ -100,8 +100,9 @@ export class WorkSessionRepository implements IWorkSessionRepository {
       user: createWorkSessionDto.user,
       startAt: new Date(),
       tabs: [],
+      isPaused: false,
     });
-    return workSession;
+    return await workSessionRepo.save(workSession);
   }
 
   /**

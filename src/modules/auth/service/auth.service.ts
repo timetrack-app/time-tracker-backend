@@ -21,7 +21,7 @@ import { encryptPassword } from '../../../common/utils/password/password.utils';
 import { generateJWT } from '../../../common/utils/jwt/jwt.utils';
 import { Logger } from '../../../common/services/logger.service';
 import { AuthenticatedUserDto } from '../dto/authenticated-user.dto';
-import { IWorkSessionService } from 'src/modules/workSession/interfaces/IWorkSession.service';
+import { IWorkSessionService } from '../../../modules/workSession/interfaces/IWorkSession.service';
 
 @injectable()
 export class AuthService implements IAuthService {
@@ -87,9 +87,7 @@ export class AuthService implements IAuthService {
       );
     } catch (error) {
       await queryRunner.rollbackTransaction();
-      this.logger.error(
-        `Failed to update the user's password. Error: ${error}`,
-      );
+      this.logger.error(`Failed to register new user. Error: ${error}`);
       throw new InternalServerErrorException('Failed to register new user');
     } finally {
       await queryRunner.release();

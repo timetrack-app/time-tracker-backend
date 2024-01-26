@@ -119,6 +119,8 @@ export class WorkSessionService implements IWorkSessionService {
       const workSession = await this.workSessionRepository.create(
         createWorkSessionDto,
       );
+      console.log('workSession', workSession);
+
       return workSession;
     } catch (error) {
       this.logger.error(`Failed to create new work session. Error: ${error}`);
