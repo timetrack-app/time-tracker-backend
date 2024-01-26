@@ -21,6 +21,7 @@ import { encryptPassword } from '../../../common/utils/password/password.utils';
 import { generateJWT } from '../../../common/utils/jwt/jwt.utils';
 import { Logger } from '../../../common/services/logger.service';
 import { AuthenticatedUserDto } from '../dto/authenticated-user.dto';
+import { IWorkSessionService } from 'src/modules/workSession/interfaces/IWorkSession.service';
 
 @injectable()
 export class AuthService implements IAuthService {
@@ -30,10 +31,12 @@ export class AuthService implements IAuthService {
     private userEmailVerificationService: IUserEmailVerificationService,
     @inject(TYPES.ISendEMailService)
     private sendEmailService: ISendEmailService,
+    @inject(TYPES.IWorkSessionService)
+    private readonly workSessionService: IWorkSessionService,
     @inject(TYPES.IDatabaseService)
     private readonly database: IDatabaseService,
     @inject(TYPES.Logger)
-    private readonly logger: Logger
+    private readonly logger: Logger,
   ) {}
 
   /**
@@ -55,20 +58,33 @@ export class AuthService implements IAuthService {
     const hashedPassword = await encryptPassword(password);
     const newUser = { email, password: hashedPassword };
 
-    const queryRunner = (await this.database.getManager()).connection.createQueryRunner();
+    const queryRunner = (
+      await this.database.getManager()
+    ).connection.createQueryRunner();
     await queryRunner.startTransaction();
     try {
-      await this.userService.createUser(newUser);
+      const user = await this.userService.createUser(newUser);
+
+      // on creating a user, create new workSession automatically for now
+      await this.workSessionService.createWorkSession({
+        userId: user.id,
+      });
 
       // create a token
       const verificationToken =
         await this.userEmailVerificationService.createVerificationToken(email);
 
       // create verification record
-      await this.userEmailVerificationService.createVerification(email, verificationToken);
+      await this.userEmailVerificationService.createVerification(
+        email,
+        verificationToken,
+      );
 
       // send verification email
-      await this.sendEmailService.sendVerificationEmail(email, verificationToken);
+      await this.sendEmailService.sendVerificationEmail(
+        email,
+        verificationToken,
+      );
     } catch (error) {
       await queryRunner.rollbackTransaction();
       this.logger.error(
