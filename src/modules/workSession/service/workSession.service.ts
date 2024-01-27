@@ -13,7 +13,6 @@ import {
 import { Logger } from '../../../common/services/logger.service';
 import { EndWorkSessionDto } from '../dto/end-work-session-dto';
 import { FindLatestUnfinishedWorkSessionDto } from '../dto/find-latest-unfinished-work-session-dto';
-import { CreateWorkSessionServiceReturnDto } from '../dto/create-work-session-service-return-dto';
 import { UpdateActiveTaskServiceDto } from '../dto/update-active-task-service.dto';
 import { IListRepository } from '../../../modules/list/interface/IList.repository';
 import { ITabRepository } from '../../../modules/tab/interface/ITab.repository';
@@ -105,25 +104,9 @@ export class WorkSessionService implements IWorkSessionService {
    */
   async createWorkSession(
     createWorkSessionServiceDto: CreateWorkSessionServiceDto,
-  ): Promise<CreateWorkSessionServiceReturnDto> {
-    const { userId, tabs } = createWorkSessionServiceDto;
+  ): Promise<WorkSession> {
+    const { userId } = createWorkSessionServiceDto;
 
-    const res = new CreateWorkSessionServiceReturnDto();
-    res.isUnfinished = false;
-
-    const latestUnfinishedWorkSessionDto =
-      new FindLatestUnfinishedWorkSessionDto();
-    latestUnfinishedWorkSessionDto.userId = userId;
-
-    const latestWorkSession =
-      await this.workSessionRepository.findLatestUnfinished(
-        latestUnfinishedWorkSessionDto,
-      );
-    if (latestWorkSession) {
-      res.isUnfinished = true;
-      res.workSession = latestWorkSession;
-      return res;
-    }
     // create new WorkSession
     try {
       const user = await this.userRepository.findOneById(userId);
@@ -133,13 +116,12 @@ export class WorkSessionService implements IWorkSessionService {
       }
       const createWorkSessionDto = new CreateWorkSessionDto();
       createWorkSessionDto.user = user;
-      // create without template
-      createWorkSessionDto.tabs = tabs;
       const workSession = await this.workSessionRepository.create(
         createWorkSessionDto,
       );
-      res.workSession = workSession;
-      return res;
+      console.log('workSession', workSession);
+
+      return workSession;
     } catch (error) {
       this.logger.error(`Failed to create new work session. Error: ${error}`);
       throw new InternalServerErrorException(

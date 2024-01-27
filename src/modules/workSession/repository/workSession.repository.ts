@@ -95,83 +95,14 @@ export class WorkSessionRepository implements IWorkSessionRepository {
   async create(
     createWorkSessionDto: CreateWorkSessionDto,
   ): Promise<WorkSession> {
-    const entityManager = await this.database.getManager();
-    const queryRunner = entityManager.connection.createQueryRunner();
     const workSessionRepo = await this.database.getRepository(WorkSession);
-    const tabRepo = await this.database.getRepository(Tab);
-    const listRepo = await this.database.getRepository(List);
-    const taskRepo = await this.database.getRepository(Task);
-
-    await queryRunner.startTransaction();
     const workSession = workSessionRepo.create({
       user: createWorkSessionDto.user,
       startAt: new Date(),
       tabs: [],
+      isPaused: false,
     });
-    try {
-      // save workSession
-      const savedWorkSession = await queryRunner.manager.save(workSession);
-
-      for (const unsavedTab of createWorkSessionDto.tabs) {
-        // Create tab instance
-        const tab = tabRepo.create({
-          workSession: savedWorkSession,
-          lists: [],
-          name: unsavedTab.name,
-          displayOrder: unsavedTab.displayOrder,
-        });
-        // save tab instance
-        await queryRunner.manager.save(tab).then(async (savedTab) => {
-          savedWorkSession.tabs.push(savedTab);
-          for (const unsavedList of unsavedTab.lists) {
-            // create list instance
-            const list = listRepo.create({
-              tab: savedTab,
-              name: unsavedList.name,
-              displayOrder: unsavedList.displayOrder,
-              tasks: [],
-            });
-            // save list instance
-            await queryRunner.manager.save(list).then(async (savedList) => {
-              savedTab.lists.push(savedList);
-              for (const unsavedTask of unsavedList.tasks) {
-                // create task instance
-                const task = taskRepo.create({
-                  list: savedList,
-                  name: unsavedTask.name,
-                  displayOrder: unsavedTask.displayOrder,
-                  totalTime: unsavedTask.totalTime,
-                  isActive: unsavedTask.isActive,
-                });
-
-                await queryRunner.manager.save(task).then((savedTask) => {
-                  savedList.tasks.push(savedTask);
-                  // When task is active, set it as active task in the workSession instance
-                  if (savedTask.isActive) {
-                    savedWorkSession.activeTask = savedTask;
-                    savedWorkSession.activeList = savedList;
-                    savedWorkSession.activeTab = savedTab;
-                  }
-                });
-              }
-              // save list instance again, to update the tasks
-              await queryRunner.manager.save(savedList);
-            });
-          }
-          // save tab instance again, to update the lists
-          await queryRunner.manager.save(savedTab);
-        });
-      }
-
-      await queryRunner.manager.save(savedWorkSession);
-      await queryRunner.commitTransaction();
-      return savedWorkSession;
-    } catch (error) {
-      await queryRunner.rollbackTransaction();
-      throw new Error(error);
-    } finally {
-      await queryRunner.release();
-    }
+    return await workSessionRepo.save(workSession);
   }
 
   /**
