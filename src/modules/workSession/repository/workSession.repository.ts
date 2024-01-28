@@ -9,7 +9,6 @@ import { List } from '../../list/entity/list.entity';
 import { Repository } from 'typeorm';
 import { FindLatestUnfinishedWorkSessionDto } from '../dto/find-latest-unfinished-work-session-dto';
 import { Task } from '../../../modules/task/entity/task.entity';
-
 /**
  *
  *
@@ -24,6 +23,18 @@ export class WorkSessionRepository implements IWorkSessionRepository {
 
   private async getWorkSessionRepo(): Promise<Repository<WorkSession>> {
     return await this.database.getRepository(WorkSession);
+  }
+
+  private async getTabRepo(): Promise<Repository<Tab>> {
+    return await this.database.getRepository(Tab);
+  }
+
+  private async getListRepo(): Promise<Repository<List>> {
+    return await this.database.getRepository(List);
+  }
+
+  private async getTaskRepo(): Promise<Repository<Task>> {
+    return await this.database.getRepository(Task);
   }
 
   /**
@@ -95,14 +106,109 @@ export class WorkSessionRepository implements IWorkSessionRepository {
   async create(
     createWorkSessionDto: CreateWorkSessionDto,
   ): Promise<WorkSession> {
-    const workSessionRepo = await this.database.getRepository(WorkSession);
-    const workSession = workSessionRepo.create({
-      user: createWorkSessionDto.user,
-      startAt: new Date(),
-      tabs: [],
-      isPaused: false,
-    });
-    return await workSessionRepo.save(workSession);
+    // get entityManager and queryRunner
+    const entityManager = await this.database.getManager();
+    const queryRunner = entityManager.connection.createQueryRunner();
+
+    // get repositories
+    const workSessionRepo = await this.getWorkSessionRepo();
+    const tabRepo = await this.getTabRepo();
+    const listRepo = await this.getListRepo();
+    const taskRepo = await this.getTaskRepo();
+
+    try {
+      // create workSession instance
+      const workSession = workSessionRepo.create({
+        user: createWorkSessionDto.user,
+        startAt: new Date(),
+        isPaused: false,
+        tabs: [],
+      });
+      // save workSession
+      const savedWorkSession = await queryRunner.manager.save(workSession);
+
+      // create tab
+      const tab = tabRepo.create({
+        name: 'Untitled Project',
+        workSession: savedWorkSession,
+        lists: [],
+        displayOrder: 1,
+      });
+
+      // save tab
+      const savedTab = await queryRunner.manager.save(tab);
+
+      // create list
+      const primaryFocusList = listRepo.create({
+        name: 'Primary Focus',
+        tab: savedTab,
+        tasks: [],
+        displayOrder: 1,
+      });
+
+      const secondaryFocusList = listRepo.create({
+        name: 'Secondary Focus',
+        tab: savedTab,
+        tasks: [],
+        displayOrder: 2,
+      });
+
+      const otherList = listRepo.create({
+        name: 'Other',
+        tab: savedTab,
+        tasks: [],
+        displayOrder: 3,
+      });
+
+      // save lists
+      const savedPrimaryFocusList = await queryRunner.manager.save(
+        primaryFocusList,
+      );
+
+      const savedSecondaryFocusList = await queryRunner.manager.save(
+        secondaryFocusList,
+      );
+
+      const savedOtherList = await queryRunner.manager.save(otherList);
+
+      // create task
+      const task = taskRepo.create({
+        name: 'Untitled Task',
+        list: savedPrimaryFocusList,
+        totalTime: 0,
+        description: '',
+        displayOrder: 1,
+      });
+
+      // save task
+      const savedTask = await queryRunner.manager.save(task);
+
+      // update list
+      savedPrimaryFocusList.tasks.push(savedTask);
+      const updatedPrimaryFocusList = await queryRunner.manager.save(
+        savedPrimaryFocusList,
+      );
+
+      // update tab
+      savedTab.lists.push(updatedPrimaryFocusList);
+      savedTab.lists.push(savedSecondaryFocusList);
+      savedTab.lists.push(savedOtherList);
+      const updatedTab = await queryRunner.manager.save(savedTab);
+
+      // update workSession
+      savedWorkSession.tabs.push(updatedTab);
+      const updatedWorkSession = await queryRunner.manager.save(
+        savedWorkSession,
+      );
+
+      await queryRunner.commitTransaction();
+      return updatedWorkSession;
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw new Error(error);
+    } finally {
+      await queryRunner.release();
+    }
   }
 
   /**
