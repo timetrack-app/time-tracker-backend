@@ -1,5 +1,4 @@
-import { IsNumber, IsOptional } from 'class-validator';
-import { Tab } from '../../../modules/tab/entity/tab.entity';
+import { IsNumber } from 'class-validator';
 
 export class CreateWorkSessionServiceDto {
   @IsNumber()
