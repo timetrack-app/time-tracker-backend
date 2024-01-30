@@ -71,7 +71,6 @@ export class WorkSessionRepository implements IWorkSessionRepository {
         userId,
       })
       .getMany();
-    console.log(workSessions);
 
     return workSessions;
   }
@@ -209,7 +208,6 @@ export class WorkSessionRepository implements IWorkSessionRepository {
       const updatedWorkSession = await queryRunner.manager.save(
         savedWorkSession,
       );
-      console.log(updatedWorkSession);
 
       await queryRunner.commitTransaction();
       return updatedWorkSession;
