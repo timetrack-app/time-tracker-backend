@@ -58,13 +58,22 @@ export class WorkSessionRepository implements IWorkSessionRepository {
    */
   async findByUserId(userId: number): Promise<WorkSession[]> {
     const repo = await this.getWorkSessionRepo();
-    return repo.find({
-      where: {
-        user: {
-          id: userId,
-        },
-      },
-    });
+    const workSessions = await repo
+      .createQueryBuilder('workSession')
+      .innerJoinAndSelect('workSession.user', 'user')
+      .leftJoinAndSelect('workSession.tabs', 'tab')
+      .leftJoinAndSelect('tab.lists', 'list')
+      .leftJoinAndSelect('list.tasks', 'task')
+      .leftJoinAndSelect('workSession.activeTab', 'activeTab')
+      .leftJoinAndSelect('workSession.activeList', 'activeList')
+      .leftJoinAndSelect('workSession.activeTask', 'activeTask')
+      .where('workSession.user_id = :userId', {
+        userId,
+      })
+      .getMany();
+    console.log(workSessions);
+
+    return workSessions;
   }
 
   /**
@@ -200,6 +209,7 @@ export class WorkSessionRepository implements IWorkSessionRepository {
       const updatedWorkSession = await queryRunner.manager.save(
         savedWorkSession,
       );
+      console.log(updatedWorkSession);
 
       await queryRunner.commitTransaction();
       return updatedWorkSession;
