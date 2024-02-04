@@ -42,12 +42,18 @@ export class Task {
 
   // Define the relations
 
-  @ManyToOne(() => List, (list) => list.tasks, { nullable: false })
+  @ManyToOne(() => List, (list) => list.tasks, {
+    nullable: false,
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
   @JoinColumn({ name: 'list_id' })
   list: List;
 
   @OneToOne(() => WorkSession, (workSession) => workSession.activeTask, {
     nullable: true,
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
   })
   @JoinColumn({ name: 'workSession_id' })
   workSession: WorkSession;

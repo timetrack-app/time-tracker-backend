@@ -35,11 +35,15 @@ export class List {
 
   // Define the relations
 
-  @ManyToOne(() => Tab, (tab) => tab.lists, { nullable: false })
+  @ManyToOne(() => Tab, (tab) => tab.lists, {
+    nullable: false,
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
   @JoinColumn({ name: 'tab_id' })
   tab: Tab;
 
-  @OneToMany(() => Task, (task) => task.list)
+  @OneToMany(() => Task, (task) => task.list, { onDelete: 'CASCADE' })
   tasks: Task[];
 
   @OneToOne(() => WorkSession, (workSession) => workSession.activeList, {
