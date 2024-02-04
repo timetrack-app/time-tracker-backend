@@ -33,15 +33,19 @@ export class Tab {
 
   @ManyToOne(() => WorkSession, (workSession) => workSession.tabs, {
     nullable: false,
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
   })
   @JoinColumn({ name: 'work_session_id' })
   workSession: WorkSession;
 
-  @OneToMany(() => List, (list) => list.tab)
+  @OneToMany(() => List, (list) => list.tab, { onDelete: 'CASCADE' })
   lists: List[];
 
   @OneToOne(() => WorkSession, (workSession) => workSession.activeTab, {
     nullable: true,
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
   })
   @JoinColumn({ name: 'active_work_session_id' })
   activeWorkSession: WorkSession;
